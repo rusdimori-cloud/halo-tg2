@@ -353,3 +353,15 @@ a.pva-chip:hover{border-color:var(--pva-primary);color:var(--pva-primary)}
   .pva-curriculum .tutor-course-content-list-item{padding-left:58px!important}
   .pva-curriculum .tutor-course-content-list-item-status{left:18px!important}
 }
+
+/* ===== TEMA 1.3.14 — CTA biru + glow (salin gaya ClassAI) =====
+   Tombol utama halaman course: biru primer dengan bayangan glow
+   biru lembut di bawah pil (sebelumnya hitam polos). Tombol di
+   kartu beli dibuat lebih besar (54px) seperti tombol Buy ClassAI;
+   tombol Lanjutkan (sudah terdaftar) disamakan. */
+.pva-page .tutor-btn-primary{background:var(--pva-primary)!important;border-color:var(--pva-primary)!important;box-shadow:0 8px 22px rgba(20,99,255,.32)}
+.pva-page .tutor-btn-primary:hover{background:var(--pva-primary-dark)!important;border-color:var(--pva-primary-dark)!important;box-shadow:0 10px 26px rgba(20,99,255,.40)}
+.pva-page .pva-buy-card .tutor-btn-primary{height:54px;min-height:54px;font-size:16px!important;box-shadow:0 14px 34px rgba(20,99,255,.42),0 3px 10px rgba(20,99,255,.28)}
+.pva-page .pva-buy-card .tutor-btn-primary:hover{box-shadow:0 18px 40px rgba(20,99,255,.50),0 4px 12px rgba(20,99,255,.30)}
+.pva-continue-btn{background:var(--pva-primary);height:54px;font-size:16px;box-shadow:0 14px 34px rgba(20,99,255,.42),0 3px 10px rgba(20,99,255,.28)}
+.pva-continue-btn:hover{background:var(--pva-primary-dark)}
