@@ -154,14 +154,15 @@ html[data-halo-tg2-theme="dark"] .ht-panel__switch::after{left:19px}
 /* Dock bawah */
 .ht-panel__dock{
   position:fixed;left:264px;right:0;bottom:0;z-index:55;
-  display:flex;justify-content:center;gap:4px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+  display:flex;gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));
   background:rgba(244,246,251,.85);backdrop-filter:blur(14px);border-top:1px solid var(--ht-line);
 }
 html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
 .ht-panel__dock a,.ht-panel__dock button{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:7px 16px;border-radius:14px;font-size:11.6px;font-weight:500;color:var(--ht-text-2);
-  background:none;border:0;cursor:pointer;font-family:inherit;
+  flex:1 1 0;min-width:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:7px 4px;border-radius:14px;font-size:11.6px;line-height:1.2;font-weight:500;color:var(--ht-text-2);
+  background:none;border:0;cursor:pointer;font-family:inherit;text-decoration:none;
 }
 .ht-panel__dock svg{width:19px;height:19px}
 .ht-panel__nav a svg,.ht-panel__nav button svg{width:17px;height:17px;flex:none}
