@@ -23,7 +23,7 @@ if (!is_user_logged_in()) {
 $ht_user    = wp_get_current_user();
 $ht_uid     = get_current_user_id();
 $ht_view    = isset($_GET['tampilan']) ? sanitize_key(wp_unslash($_GET['tampilan'])) : 'beranda'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-if (!in_array($ht_view, array('beranda', 'kelas', 'pesanan', 'akun', 'statistik', 'pengaturan'), true)) {
+if (!in_array($ht_view, array('beranda', 'kelas', 'pesanan', 'akun', 'statistik', 'notifikasi', 'pengaturan'), true)) {
 	$ht_view = 'beranda';
 }
 $ht_base    = get_permalink();
@@ -39,6 +39,7 @@ $ht_titles  = array(
 	'pesanan'   => 'Pesanan Saya',
 	'akun'      => 'Akun & Pembayaran',
 	'statistik' => 'Statistik',
+	'notifikasi' => 'Notifikasi',
 	'pengaturan' => 'Pengaturan',
 );
 $ht_initial = strtoupper(substr($ht_user->display_name, 0, 1));
@@ -58,6 +59,8 @@ $ht_exam_days      = null;
 if ('' !== $ht_exam_date) {
 	$ht_exam_days = (int) floor((strtotime($ht_exam_date) - strtotime(current_time('Y-m-d'))) / DAY_IN_SECONDS);
 }
+$ht_notif_unread = function_exists('halo_tg2_core_notif_unread') ? halo_tg2_core_notif_unread($ht_uid) : 0;
+$ht_notif_latest = function_exists('halo_tg2_core_notif_list') ? halo_tg2_core_notif_list($ht_uid, 5) : array();
 $ht_public_profile = function_exists('tutor_utils') ? (string) tutor_utils()->profile_url($ht_user) : '';
 if ('' === $ht_public_profile || '#' === $ht_public_profile) {
 	$ht_public_profile = home_url('/profile/' . $ht_user->user_nicename . '/');
@@ -124,6 +127,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<a class="<?php echo 'beranda' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('beranda')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg><span>Dashboard</span></a>
 			<a class="<?php echo 'kelas' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('kelas')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg><span>Kelas Saya</span></a>
 			<a class="<?php echo 'statistik' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('statistik')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 20V10M10 20V4M16 20v-8M21 20H3"/></svg>Statistik</a>
+			<a class="<?php echo 'notifikasi' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('notifikasi')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg><span>Notifikasi</span><?php if ($ht_notif_unread > 0) : ?><span class="ht-panel__badge"><?php echo esc_html($ht_notif_unread > 99 ? '99+' : $ht_notif_unread); ?></span><?php endif; ?></a>
 			<p class="ht-panel__group">Belanja</p>
 			<a class="<?php echo 'pesanan' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('pesanan')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 7h12l-1.2 11a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>Pesanan Saya</a>
 			<a class="<?php echo 'akun' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('akun')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5.5" width="18" height="13" rx="2.4"/><path d="M3 10h18"/></svg>Akun &amp; Pembayaran</a>
@@ -152,15 +156,31 @@ $ht_logout = wp_logout_url(home_url('/'));
 				<div class="ht-panel__ddwrap">
 					<button type="button" class="ht-panel__iconbtn" data-dd-btn aria-label="Notifikasi" aria-haspopup="true">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg>
+						<?php if ($ht_notif_unread > 0) : ?>
+							<span class="ht-panel__belldot" aria-hidden="true"></span>
+						<?php endif; ?>
 					</button>
 					<div class="ht-panel__dropdown ht-panel__notif" data-dd-panel hidden>
-						<div class="halo-tg2__empty">
-							<div class="halo-tg2__empty-icon" aria-hidden="true">
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg>
+						<?php if (empty($ht_notif_latest)) : ?>
+							<div class="halo-tg2__empty">
+								<div class="halo-tg2__empty-icon" aria-hidden="true">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg>
+								</div>
+								<h3>Belum ada notifikasi</h3>
+								<p>Email dari toko (pesanan, pembayaran, akun) akan muncul di sini begitu terkirim ke email kamu.</p>
 							</div>
-							<h3>Belum ada notifikasi</h3>
-							<p>Pengumuman dan pengingat belajarmu akan muncul di sini.</p>
-						</div>
+						<?php else : ?>
+							<div class="ht-panel__ddnotif-list">
+								<?php foreach ($ht_notif_latest as $ht_n) : ?>
+									<a class="ht-panel__ddnotif<?php echo 0 === (int) $ht_n->is_read ? ' is-unread' : ''; ?>" href="<?php echo esc_url(add_query_arg(array('tampilan' => 'notifikasi', 'baca' => (int) $ht_n->id), $ht_base)); ?>">
+										<strong><?php echo esc_html($ht_n->title); ?></strong>
+										<p><?php echo esc_html(halo_tg2_core_notif_excerpt($ht_n->body, 220)); ?></p>
+										<time><?php echo esc_html(halo_tg2_core_notif_time_label($ht_n->created_at)); ?></time>
+									</a>
+								<?php endforeach; ?>
+							</div>
+							<a class="ht-panel__notif-all" href="<?php echo esc_url($ht_url('notifikasi')); ?>">Lihat semua notifikasi</a>
+						<?php endif; ?>
 					</div>
 				</div>
 				<div class="ht-panel__ddwrap">
@@ -338,6 +358,14 @@ $ht_logout = wp_logout_url(home_url('/'));
 						<p>Kosakata dari pembahasan soal akan muncul di sini untuk dihafal ulang.</p>
 					</div>
 				</div>
+			<?php elseif ('notifikasi' === $ht_view) : ?>
+				<?php
+				if (function_exists('halo_tg2_core_render_notifications')) {
+					halo_tg2_core_render_notifications();
+				} else {
+					echo '<p>Aktifkan plugin halo-tg2-core untuk melihat notifikasi di sini.</p>';
+				}
+				?>
 			<?php elseif ('pengaturan' === $ht_view) : ?>
 				<?php
 				$ht_bagian = isset($_GET['bagian']) ? sanitize_key(wp_unslash($_GET['bagian'])) : 'akun'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
