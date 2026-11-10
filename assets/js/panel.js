@@ -117,4 +117,53 @@
       try { localStorage.setItem("halo-tg2-theme", next); } catch (e) {}
     });
   });
+
+  /* Tab geser di layar kecil + tips "Geser" otomatis (tour sekali tampil).
+     Tab yang muat tidak disentuh; yang meluber dibungkus .ht-panel__tabsbox,
+     tab aktif digeser masuk pandangan, tepi kanan memudar selama masih
+     bisa digeser, dan pil tips muncul sekali per perangkat. */
+  function initSwipeTabs() {
+    if (!window.matchMedia("(max-width: 768px)").matches) return;
+    $$(".ht-panel__tabs").forEach(function (tabs) {
+      if (tabs.closest(".ht-panel__toolbar")) return;
+      if (tabs.scrollWidth <= tabs.clientWidth + 2) return;
+      var box = document.createElement("div");
+      box.className = "ht-panel__tabsbox is-scrollable";
+      tabs.parentNode.insertBefore(box, tabs);
+      box.appendChild(tabs);
+      var hint = null, hintTimer = null;
+      function hideHint() {
+        if (hint) hint.classList.remove("is-show");
+        if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; }
+        try { localStorage.setItem("ht_swipe_hint_seen", "1"); } catch (e) {}
+      }
+      var active = tabs.querySelector(".is-active");
+      if (active) {
+        tabs.scrollLeft = Math.max(0, active.offsetLeft - (tabs.clientWidth - active.offsetWidth) / 2);
+      }
+      function syncEnd() {
+        box.classList.toggle("is-end", tabs.scrollLeft >= tabs.scrollWidth - tabs.clientWidth - 2);
+      }
+      syncEnd();
+      tabs.addEventListener("scroll", function () { syncEnd(); hideHint(); }, { passive: true });
+      var seen = false;
+      try { seen = "1" === localStorage.getItem("ht_swipe_hint_seen"); } catch (e) {}
+      if (!seen) {
+        hint = document.createElement("span");
+        hint.className = "ht-panel__swipehint";
+        hint.innerHTML = 'Geser <span class="ht-panel__swipe-arrows" aria-hidden="true">\u00bb</span>';
+        box.appendChild(hint);
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { if (hint) hint.classList.add("is-show"); });
+        });
+        hintTimer = setTimeout(hideHint, 4200);
+        tabs.addEventListener("touchstart", hideHint, { passive: true, once: true });
+      }
+    });
+  }
+  if ("loading" === document.readyState) {
+    document.addEventListener("DOMContentLoaded", function () { requestAnimationFrame(initSwipeTabs); });
+  } else {
+    requestAnimationFrame(initSwipeTabs);
+  }
 })();
