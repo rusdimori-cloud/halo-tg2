@@ -23,7 +23,7 @@ if (!is_user_logged_in()) {
 $ht_user    = wp_get_current_user();
 $ht_uid     = get_current_user_id();
 $ht_view    = isset($_GET['tampilan']) ? sanitize_key(wp_unslash($_GET['tampilan'])) : 'beranda'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-if (!in_array($ht_view, array('beranda', 'kelas', 'pesanan', 'akun', 'statistik', 'notifikasi', 'pengaturan'), true)) {
+if (!in_array($ht_view, array('beranda', 'kelas', 'wishlist', 'pesanan', 'akun', 'statistik', 'notifikasi', 'pengaturan'), true)) {
 	$ht_view = 'beranda';
 }
 $ht_base    = get_permalink();
@@ -88,12 +88,18 @@ $ht_titles  = array(
 	'akun'      => 'Akun & Pembayaran',
 	'statistik' => 'Statistik',
 	'notifikasi' => 'Notifikasi',
+	'wishlist' => 'Wishlist',
 	'pengaturan' => 'Pengaturan',
 );
 $ht_initial = strtoupper(substr($ht_user->display_name, 0, 1));
 $ht_photo_id  = (int) get_user_meta($ht_uid, '_tutor_profile_photo', true);
 $ht_photo_url = $ht_photo_id ? (string) wp_get_attachment_image_url($ht_photo_id, 'thumbnail') : '';
 $ht_contact_status = isset($_GET['hubungi']) ? sanitize_key(wp_unslash($_GET['hubungi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$ht_wish_status = isset($_GET['status']) ? sanitize_key(wp_unslash($_GET['status'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$ht_wishlist    = array();
+if ('wishlist' === $ht_view && function_exists('tutor_utils') && method_exists(tutor_utils(), 'get_wishlist')) {
+	$ht_wishlist = (array) tutor_utils()->get_wishlist($ht_uid);
+}
 $ht_profil_status  = isset($_GET['profil']) ? sanitize_key(wp_unslash($_GET['profil'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_sandi_status   = isset($_GET['sandi']) ? sanitize_key(wp_unslash($_GET['sandi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_foto_status    = isset($_GET['foto']) ? sanitize_key(wp_unslash($_GET['foto'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -168,6 +174,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<p class="ht-panel__group">Menu</p>
 			<a class="<?php echo 'beranda' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('beranda')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg><span>Dashboard</span></a>
 			<a class="<?php echo 'kelas' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('kelas')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg><span>Kelas Saya</span></a>
+			<a class="<?php echo 'wishlist' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('wishlist')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6A4.6 4.6 0 0 1 8 5c1.7 0 3.2.9 4 2.2C12.8 5.9 14.3 5 16 5a4.6 4.6 0 0 1 4.5 4.6c0 3.7-3.5 6.9-8.5 10.9Z"/></svg><span>Wishlist</span></a>
 			<a class="<?php echo 'statistik' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('statistik')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 20V10M10 20V4M16 20v-8M21 20H3"/></svg>Statistik</a>
 			<a class="<?php echo 'notifikasi' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('notifikasi')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg><span>Notifikasi</span><?php if ($ht_notif_unread > 0) : ?><span class="ht-panel__badge"><?php echo esc_html($ht_notif_unread > 99 ? '99+' : $ht_notif_unread); ?></span><?php endif; ?></a>
 			<p class="ht-panel__group">Belanja</p>
@@ -382,6 +389,85 @@ $ht_logout = wp_logout_url(home_url('/'));
 					</div>
 				<?php endif; ?>
 
+			<?php elseif ('wishlist' === $ht_view) : ?>
+				<?php if ('terhapus' === $ht_wish_status) : ?>
+					<p class="ht-panel__notice is-ok">Kelas dihapus dari wishlist.</p>
+				<?php endif; ?>
+				<?php if (empty($ht_wishlist)) : ?>
+					<div class="halo-tg2__empty">
+						<div class="halo-tg2__empty-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6A4.6 4.6 0 0 1 8 5c1.7 0 3.2.9 4 2.2C12.8 5.9 14.3 5 16 5a4.6 4.6 0 0 1 4.5 4.6c0 3.7-3.5 6.9-8.5 10.9Z"/></svg>
+						</div>
+						<h3>Wishlist masih kosong</h3>
+						<p>Tekan ikon hati di halaman kelas untuk menyimpan kelas yang kamu incar di sini.</p>
+						<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url(home_url('/courses/')); ?>">Lihat Katalog Kelas</a>
+					</div>
+				<?php else : ?>
+					<div class="ht-panel__wish-grid">
+						<?php
+						foreach ($ht_wishlist as $ht_wpost) :
+							setup_postdata($ht_wpost);
+							$ht_wid    = (int) $ht_wpost->ID;
+							$ht_wurl   = get_permalink($ht_wid);
+							$ht_wthumb = get_the_post_thumbnail_url($ht_wid, 'medium_large');
+							if (!$ht_wthumb && function_exists('get_tutor_course_thumbnail_src')) {
+								$ht_wthumb = get_tutor_course_thumbnail_src();
+							}
+							$ht_wfree  = true;
+							$ht_wprice = '';
+							$ht_wdisc  = 0;
+							if (function_exists('tutor_utils') && tutor_utils()->is_course_purchasable($ht_wid)) {
+								$ht_wpid = (int) tutor_utils()->get_course_product_id($ht_wid);
+								$ht_wpro = ($ht_wpid && function_exists('wc_get_product')) ? wc_get_product($ht_wpid) : null;
+								if ($ht_wpro) {
+									$ht_wfree  = false;
+									$ht_wprice = (string) $ht_wpro->get_price_html();
+									if ($ht_wpro->is_on_sale()) {
+										$ht_wreg  = (float) $ht_wpro->get_regular_price();
+										$ht_wsale = (float) $ht_wpro->get_sale_price();
+										if ($ht_wreg > 0 && $ht_wsale > 0 && $ht_wsale < $ht_wreg) {
+											$ht_wdisc = (int) round((1 - $ht_wsale / $ht_wreg) * 100);
+										}
+									}
+								} else {
+									$ht_wraw = tutor_utils()->get_course_price($ht_wid);
+									if (null !== $ht_wraw && '' !== $ht_wraw) {
+										$ht_wfree  = false;
+										$ht_wprice = is_numeric($ht_wraw) ? (function_exists('wc_price') ? wc_price((float) $ht_wraw) : number_format((float) $ht_wraw)) : (string) $ht_wraw;
+									}
+								}
+							}
+							?>
+							<article class="ht-panel__wish">
+								<a class="ht-panel__wish-cover" href="<?php echo esc_url($ht_wurl); ?>">
+									<?php if ($ht_wthumb) : ?>
+										<img src="<?php echo esc_url($ht_wthumb); ?>" alt="">
+									<?php endif; ?>
+									<?php if ($ht_wfree) : ?>
+										<span class="ht-panel__wish-badge">Gratis</span>
+									<?php elseif ($ht_wdisc > 0) : ?>
+										<span class="ht-panel__wish-badge">-<?php echo esc_html($ht_wdisc); ?>%</span>
+									<?php endif; ?>
+								</a>
+								<div class="ht-panel__wish-body">
+									<h3><a href="<?php echo esc_url($ht_wurl); ?>"><?php echo esc_html(get_the_title($ht_wid)); ?></a></h3>
+									<p class="ht-panel__wish-price"><?php echo $ht_wfree ? 'Gratis' : wp_kses_post($ht_wprice); ?></p>
+									<div class="ht-panel__wish-actions">
+										<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_wurl); ?>">Lihat Kelas</a>
+										<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+											<input type="hidden" name="action" value="halo_tg2_wishlist_remove">
+											<?php wp_nonce_field('halo_tg2_wishlist_remove', '_htwnonce'); ?>
+											<input type="hidden" name="course_id" value="<?php echo esc_attr($ht_wid); ?>">
+											<input type="hidden" name="return_url" value="<?php echo esc_url($ht_url('wishlist')); ?>">
+											<button type="submit" class="ht-panel__wish-remove" aria-label="Hapus dari wishlist" title="Hapus dari wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16M9.5 7V5.2A1.2 1.2 0 0 1 10.7 4h2.6A1.2 1.2 0 0 1 14.5 5.2V7M6.5 7l.9 12.2A1.8 1.8 0 0 0 9.2 21h5.6a1.8 1.8 0 0 0 1.8-1.8L17.5 7M10 11v6M14 11v6"/></svg></button>
+										</form>
+									</div>
+								</div>
+							</article>
+						<?php endforeach; wp_reset_postdata(); ?>
+					</div>
+				<?php endif; ?>
+
 			<?php elseif ('pesanan' === $ht_view) : ?>
 				<?php
 				if (function_exists('halo_tg2_core_render_orders')) {
@@ -535,7 +621,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 
 				<?php if ('akun' === $ht_bagian) : ?>
 				<section class="ht-panel__setting-card">
-					<h2>Foto Profil &amp; Sampul</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5" width="18" height="14" rx="2.4"/><circle cx="9" cy="10" r="1.6"/><path d="m4.5 17.5 5-5 3.5 3.5 4-4.5 2.5 3"/></svg>Foto Profil &amp; Sampul</h2>
 					<p class="ht-panel__modal-sub">Foto profil tampil di panel, header situs, dan profil publikmu; sampul tampil di widget Dashboard dan bagian atas profil publik.</p>
 					<div class="ht-panel__profile-head">
 						<div class="ht-panel__cover-preview">
@@ -588,7 +674,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 				</section>
 
 				<section class="ht-panel__setting-card">
-					<h2>Profil</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>Profil</h2>
 					<p class="ht-panel__modal-sub">Nama dan keterangan yang tampil di kelasmu.</p>
 					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_save_profile">
@@ -641,7 +727,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 				</section>
 
 				<section class="ht-panel__setting-card" id="pengingat-ujian">
-					<h2>Pengingat Ujian</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg>Pengingat Ujian</h2>
 					<p class="ht-panel__modal-sub">Atur tanggal ujianmu — banner hitung mundurnya tampil di Dashboard.</p>
 					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_save_exam">
@@ -663,14 +749,14 @@ $ht_logout = wp_logout_url(home_url('/'));
 				</section>
 
 				<section class="ht-panel__setting-card is-danger">
-					<h2>Hapus Akun</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16M9.5 7V5.2A1.2 1.2 0 0 1 10.7 4h2.6A1.2 1.2 0 0 1 14.5 5.2V7M6.5 7l.9 12.2A1.8 1.8 0 0 0 9.2 21h5.6a1.8 1.8 0 0 0 1.8-1.8L17.5 7M10 11v6M14 11v6"/></svg>Hapus Akun</h2>
 					<p class="ht-panel__modal-sub">Menghapus akun bersifat permanen — akses kelas dan riwayat belajarmu ikut hilang. Demi keamanan, penghapusan diproses manual lewat email agar tidak ada yang terhapus karena tidak sengaja.</p>
 					<button type="button" class="halo-tg2__btn ht-panel__danger-btn" data-contact-open>Minta Hapus Akun</button>
 				</section>
 
 				<?php elseif ('keamanan' === $ht_bagian) : ?>
 				<section class="ht-panel__setting-card">
-					<h2>Info Masuk</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5.5" width="18" height="13" rx="2.4"/><path d="m4 7 8 6 8-6"/></svg>Info Masuk</h2>
 					<p class="ht-panel__modal-sub">Email ini dipakai untuk masuk dan menerima pemberitahuan akun.</p>
 					<label class="ht-panel__field">Email Akun
 						<input type="email" value="<?php echo esc_attr($ht_user->user_email); ?>" readonly>
@@ -679,7 +765,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 				</section>
 
 				<section class="ht-panel__setting-card">
-					<h2>Kata Sandi</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="5" y="10.5" width="14" height="9.5" rx="2.2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Kata Sandi</h2>
 					<p class="ht-panel__modal-sub">Ganti kata sandi masukmu. Kamu tetap masuk setelah sandi berganti.</p>
 					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_change_password">
@@ -704,7 +790,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 
 				<?php elseif ('sosial' === $ht_bagian) : ?>
 				<section class="ht-panel__setting-card">
-					<h2>Akun Sosial</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="5.5" r="2.6"/><circle cx="17.5" cy="18.5" r="2.6"/><path d="m8.3 10.8 6.9-4M8.3 13.2l6.9 4"/></svg>Akun Sosial</h2>
 					<p class="ht-panel__modal-sub">Tautan media sosial yang tertaut ke profil publikmu. Kosongkan untuk melepas tautan.</p>
 					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_save_social">
@@ -723,7 +809,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 
 				<?php elseif ('preferensi' === $ht_bagian) : ?>
 				<section class="ht-panel__setting-card">
-					<h2>Preferensi Belajar</h2>
+					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 8h9M19 8h1M4 16h3M13 16h7"/><circle cx="16" cy="8" r="2.4"/><circle cx="10" cy="16" r="2.4"/></svg>Preferensi Belajar</h2>
 					<p class="ht-panel__modal-sub">Atur pengalaman belajarmu di halaman lesson — sama seperti preferensi di dasbor Tutor.</p>
 					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_save_preferences">
