@@ -23,7 +23,7 @@ if (!is_user_logged_in()) {
 $ht_user    = wp_get_current_user();
 $ht_uid     = get_current_user_id();
 $ht_view    = isset($_GET['tampilan']) ? sanitize_key(wp_unslash($_GET['tampilan'])) : 'beranda'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-if (!in_array($ht_view, array('beranda', 'kelas', 'pesanan', 'akun', 'statistik'), true)) {
+if (!in_array($ht_view, array('beranda', 'kelas', 'pesanan', 'akun', 'statistik', 'pengaturan'), true)) {
 	$ht_view = 'beranda';
 }
 $ht_base    = get_permalink();
@@ -39,9 +39,12 @@ $ht_titles  = array(
 	'pesanan'   => 'Pesanan Saya',
 	'akun'      => 'Akun & Pembayaran',
 	'statistik' => 'Statistik',
+	'pengaturan' => 'Pengaturan',
 );
 $ht_initial = strtoupper(substr($ht_user->display_name, 0, 1));
 $ht_contact_status = isset($_GET['hubungi']) ? sanitize_key(wp_unslash($_GET['hubungi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$ht_profil_status  = isset($_GET['profil']) ? sanitize_key(wp_unslash($_GET['profil'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$ht_sandi_status   = isset($_GET['sandi']) ? sanitize_key(wp_unslash($_GET['sandi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 /**
  * Cetak satu kartu kelas (gaya mockup v16: sampul penuh, teks putih).
@@ -76,7 +79,7 @@ function halo_tg2_panel_user_menu($logout_url) {
 	?>
 	<a href="<?php echo esc_url(halo_tg2_panel_page_url()); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg>Dashboard</a>
 	<a href="<?php echo esc_url(add_query_arg('tampilan', 'kelas', halo_tg2_panel_page_url())); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg>Kelas Saya</a>
-	<a href="<?php echo esc_url(trailingslashit(halo_tg2_dashboard_url()) . 'settings'); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg>Pengaturan Profil</a>
+	<a href="<?php echo esc_url(add_query_arg('tampilan', 'pengaturan', halo_tg2_panel_page_url())); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg>Pengaturan Profil</a>
 	<button type="button" class="ht-panel__menu-row" data-theme-switch>
 		<span class="ht-panel__menu-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z"/></svg>Mode Gelap</span><span class="ht-panel__switch" aria-hidden="true"></span>
 	</button>
@@ -108,7 +111,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<a class="<?php echo 'pesanan' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('pesanan')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 7h12l-1.2 11a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>Pesanan Saya</a>
 			<a class="<?php echo 'akun' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('akun')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5.5" width="18" height="13" rx="2.4"/><path d="M3 10h18"/></svg>Akun &amp; Pembayaran</a>
 			<p class="ht-panel__group">Lainnya</p>
-			<a href="<?php echo esc_url(trailingslashit($ht_dash) . 'settings'); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg>Pengaturan</a>
+			<a class="<?php echo 'pengaturan' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('pengaturan')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg>Pengaturan</a>
 			<button type="button" data-contact-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5.5" width="18" height="13" rx="2.4"/><path d="m4 7 8 6 8-6"/></svg>Hubungi Kami</button>
 		</nav>
 		<div class="ht-panel__userbox">
@@ -265,6 +268,118 @@ $ht_logout = wp_logout_url(home_url('/'));
 						<p>Kosakata dari pembahasan soal akan muncul di sini untuk dihafal ulang.</p>
 					</div>
 				</div>
+			<?php elseif ('pengaturan' === $ht_view) : ?>
+				<?php
+				$ht_sandi_errors = array(
+					'lama_salah'        => 'Kata sandi lama salah.',
+					'baru_kosong'       => 'Kata sandi baru wajib diisi.',
+					'konfirmasi_kosong' => 'Konfirmasi kata sandi wajib diisi.',
+					'tidak_cocok'       => 'Konfirmasi tidak sama dengan kata sandi baru.',
+					'gagal'             => 'Kata sandi belum diubah. Coba lagi sebentar lagi.',
+				);
+				$ht_phone = (string) get_user_meta($ht_uid, 'phone_number', true);
+				$ht_job   = (string) get_user_meta($ht_uid, '_tutor_profile_job_title', true);
+				$ht_bio   = (string) get_user_meta($ht_uid, '_tutor_profile_bio', true);
+				$ht_tz    = (string) get_user_meta($ht_uid, '_tutor_timezone', true);
+				if ('' === $ht_tz) { $ht_tz = (string) get_option('timezone_string'); }
+				if ('' === $ht_tz) { $ht_tz = 'Asia/Tokyo'; }
+				$ht_tz_list = function_exists('tutor_global_timezone_lists') ? tutor_global_timezone_lists() : array();
+				if (empty($ht_tz_list)) { foreach (timezone_identifiers_list() as $z) { $ht_tz_list[$z] = $z; } }
+				$ht_return = $ht_url('pengaturan');
+				?>
+				<?php if ('tersimpan' === $ht_profil_status) : ?>
+					<p class="ht-panel__notice is-ok">Profil tersimpan.</p>
+				<?php elseif ('gagal' === $ht_profil_status) : ?>
+					<p class="ht-panel__notice is-error">Profil belum tersimpan. Coba lagi sebentar lagi.</p>
+				<?php endif; ?>
+				<?php if ('berubah' === $ht_sandi_status) : ?>
+					<p class="ht-panel__notice is-ok">Kata sandi berhasil diubah.</p>
+				<?php elseif (isset($ht_sandi_errors[$ht_sandi_status])) : ?>
+					<p class="ht-panel__notice is-error"><?php echo esc_html($ht_sandi_errors[$ht_sandi_status]); ?></p>
+				<?php endif; ?>
+
+				<section class="ht-panel__setting-card">
+					<h2>Profil</h2>
+					<p class="ht-panel__modal-sub">Nama dan keterangan yang tampil di kelasmu.</p>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+						<input type="hidden" name="action" value="halo_tg2_save_profile">
+						<?php wp_nonce_field('halo_tg2_save_profile', '_htpnonce'); ?>
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+						<div class="ht-panel__form-grid">
+							<label class="ht-panel__field">Nama Depan
+								<input type="text" name="first_name" value="<?php echo esc_attr($ht_user->first_name); ?>" autocomplete="given-name">
+							</label>
+							<label class="ht-panel__field">Nama Belakang
+								<input type="text" name="last_name" value="<?php echo esc_attr($ht_user->last_name); ?>" autocomplete="family-name">
+							</label>
+						</div>
+						<label class="ht-panel__field">Nama Tampilan
+							<input type="text" name="display_name" value="<?php echo esc_attr($ht_user->display_name); ?>">
+						</label>
+						<div class="ht-panel__form-grid">
+							<label class="ht-panel__field">Nama Pengguna
+								<input type="text" value="<?php echo esc_attr($ht_user->user_login); ?>" readonly>
+							</label>
+							<label class="ht-panel__field">Email Akun
+								<input type="email" value="<?php echo esc_attr($ht_user->user_email); ?>" readonly>
+							</label>
+						</div>
+						<div class="ht-panel__form-grid">
+							<label class="ht-panel__field">Nomor Telepon
+								<input type="tel" name="phone_number" value="<?php echo esc_attr($ht_phone); ?>" autocomplete="tel">
+							</label>
+							<label class="ht-panel__field">Pekerjaan / Keahlian
+								<input type="text" name="tutor_profile_job_title" value="<?php echo esc_attr($ht_job); ?>">
+							</label>
+						</div>
+						<label class="ht-panel__field">Zona Waktu
+							<select name="timezone">
+								<?php if (!isset($ht_tz_list[$ht_tz])) : ?>
+									<option value="<?php echo esc_attr($ht_tz); ?>" selected><?php echo esc_html($ht_tz); ?></option>
+								<?php endif; ?>
+								<?php foreach ($ht_tz_list as $zkey => $zlabel) : ?>
+									<option value="<?php echo esc_attr($zkey); ?>" <?php selected($ht_tz, $zkey); ?>><?php echo esc_html($zlabel); ?></option>
+								<?php endforeach; ?>
+							</select>
+						</label>
+						<label class="ht-panel__field">Bio
+							<textarea name="tutor_profile_bio" rows="3" placeholder="Ceritakan sedikit tentang dirimu…"><?php echo esc_textarea($ht_bio); ?></textarea>
+						</label>
+						<div class="ht-panel__modal-actions">
+							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Profil</button>
+						</div>
+					</form>
+				</section>
+
+				<section class="ht-panel__setting-card">
+					<h2>Kata Sandi</h2>
+					<p class="ht-panel__modal-sub">Ganti kata sandi masukmu. Kamu tetap masuk setelah sandi berganti.</p>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+						<input type="hidden" name="action" value="halo_tg2_change_password">
+						<?php wp_nonce_field('halo_tg2_change_password', '_htsnonce'); ?>
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+						<label class="ht-panel__field">Kata Sandi Lama
+							<input type="password" name="previous_password" autocomplete="current-password" required>
+						</label>
+						<div class="ht-panel__form-grid">
+							<label class="ht-panel__field">Kata Sandi Baru
+								<input type="password" name="new_password" autocomplete="new-password" required>
+							</label>
+							<label class="ht-panel__field">Konfirmasi Kata Sandi Baru
+								<input type="password" name="confirm_new_password" autocomplete="new-password" required>
+							</label>
+						</div>
+						<div class="ht-panel__modal-actions">
+							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Ubah Kata Sandi</button>
+						</div>
+					</form>
+				</section>
+
+				<section class="ht-panel__setting-card is-danger">
+					<h2>Hapus Akun</h2>
+					<p class="ht-panel__modal-sub">Menghapus akun bersifat permanen — akses kelas dan riwayat belajarmu ikut hilang. Demi keamanan, penghapusan diproses manual lewat email agar tidak ada yang terhapus karena tidak sengaja.</p>
+					<button type="button" class="halo-tg2__btn ht-panel__danger-btn" data-contact-open>Minta Hapus Akun</button>
+				</section>
 			<?php endif; ?>
 		</main>
 

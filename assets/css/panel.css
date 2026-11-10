@@ -220,3 +220,22 @@ html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
   .ht-panel__dropdown,.ht-panel__modal-card{animation:none}
   .ht-panel__side{transition:none}
 }
+
+/* ---------- Pengaturan (Fase 9) ---------- */
+.ht-panel__setting-card{
+  background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:20px;
+  box-shadow:var(--ht-shadow);padding:20px;margin-bottom:16px;
+}
+.ht-panel__setting-card h2{font-size:16.6px;font-weight:600}
+.ht-panel__setting-card.is-danger{border-color:rgba(217,45,32,.35)}
+.ht-panel__setting-card.is-danger h2{color:var(--ht-error)}
+.ht-panel__form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media (max-width:640px){ .ht-panel__form-grid{grid-template-columns:1fr} }
+.ht-panel__field select{
+  border:1px solid var(--ht-line-strong);border-radius:14px;background:var(--ht-surface);color:var(--ht-fg);
+  padding:11px 36px 11px 14px;font:inherit;font-weight:400;width:100%;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%235B6472' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+}
+.ht-panel__field input[readonly]{background:var(--ht-fill);color:var(--ht-text-2)}
+.ht-panel__danger-btn{background:transparent;border:1px solid rgba(217,45,32,.45);color:var(--ht-error)}

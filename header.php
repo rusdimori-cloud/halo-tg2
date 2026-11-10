@@ -69,7 +69,7 @@ $ht_checkout  = $ht_cart_on && function_exists('wc_get_checkout_url') ? wc_get_c
 
 		<div class="halo-tg2__header-cta">
 			<?php if (is_user_logged_in()) : ?>
-				<a class="halo-tg2__btn-link" href="<?php echo esc_url(home_url('/dashboard/')); ?>">Dashboard</a>
+				<a class="halo-tg2__btn-link" href="<?php echo esc_url(halo_tg2_home_url()); ?>">Dashboard</a>
 			<?php else : ?>
 				<a class="halo-tg2__btn-link" href="<?php echo esc_url(halo_tg2_login_url()); ?>">Masuk</a>
 			<?php endif; ?>
@@ -132,7 +132,7 @@ $ht_checkout  = $ht_cart_on && function_exists('wc_get_checkout_url') ? wc_get_c
 				<a class="halo-tg2__btn halo-tg2__btn--primary halo-tg2__btn--block" href="<?php echo esc_url(halo_tg2_cta_url()); ?>"><?php echo esc_html((string) halo_tg2_get('cta_text')); ?></a>
 			<?php endif; ?>
 			<?php if (is_user_logged_in()) : ?>
-				<a class="halo-tg2__btn-link" href="<?php echo esc_url(home_url('/dashboard/')); ?>">Dashboard</a>
+				<a class="halo-tg2__btn-link" href="<?php echo esc_url(halo_tg2_home_url()); ?>">Dashboard</a>
 			<?php else : ?>
 				<a class="halo-tg2__btn-link" href="<?php echo esc_url(halo_tg2_login_url()); ?>">Masuk</a>
 			<?php endif; ?>
