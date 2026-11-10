@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('HALO_TG2_VERSION', '1.2.2');
+define('HALO_TG2_VERSION', '1.2.3');
 
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/woocommerce.php';
@@ -89,6 +89,12 @@ function halo_tg2_assets() {
 		wp_enqueue_style('halo-tg2-fa', 'https://cdn.jsdelivr.net/gh/aquawolf04/font-awesome-pro@5cd1511/css/all.css', array(), null);
 		wp_enqueue_style('halo-tg2-course', get_template_directory_uri() . '/assets/css/course.css', array('halo-tg2'), HALO_TG2_VERSION);
 		wp_enqueue_script('halo-tg2-course', get_template_directory_uri() . '/assets/js/course.js', array(), HALO_TG2_VERSION, true);
+	}
+
+	// Arsip katalog course Tutor (/course/): kartu menyamai landing.
+	if (is_post_type_archive('courses')) {
+		wp_enqueue_style('halo-tg2-fa', 'https://cdn.jsdelivr.net/gh/aquawolf04/font-awesome-pro@5cd1511/css/all.css', array(), null);
+		wp_enqueue_style('halo-tg2-archive-course', get_template_directory_uri() . '/assets/css/archive-course.css', array('halo-tg2'), HALO_TG2_VERSION);
 	}
 
 	// Fase 2: aset khusus halaman depan (landing).
