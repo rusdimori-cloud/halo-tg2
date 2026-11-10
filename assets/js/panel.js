@@ -18,8 +18,38 @@
   if (scrim) scrim.addEventListener("click", function () { setDrawer(false); });
 
   /* Dropdown: satu terbuka pada satu waktu, klik luar menutup */
+  var openPair = null;
   function closeDropdowns(except) {
     $$("[data-dd-panel]").forEach(function (p) { if (p !== except) p.hidden = true; });
+    if (!except) openPair = null;
+  }
+  /* Jaga dropdown tetap di dalam layar: balik sisi mendatar /
+     tegak dan geser seperlunya sesuai sisa ruang viewport. */
+  function fitDropdown(panel, btn) {
+    panel.classList.remove("is-left", "is-upx");
+    panel.style.marginLeft = "";
+    if ("fixed" === getComputedStyle(panel).position) return; // panel notif seluler: sudah dibatasi CSS
+    var M = 8, vw = window.innerWidth, vh = window.innerHeight;
+    var r = panel.getBoundingClientRect();
+    if (r.left < M) {
+      panel.classList.add("is-left");
+      r = panel.getBoundingClientRect();
+    }
+    if (r.right > vw - M) {
+      panel.style.marginLeft = (vw - M - r.right) + "px";
+      r = panel.getBoundingClientRect();
+    }
+    if (r.left < M) {
+      var cur = parseFloat(panel.style.marginLeft || "0") || 0;
+      panel.style.marginLeft = (cur + (M - r.left)) + "px";
+      r = panel.getBoundingClientRect();
+    }
+    if (r.bottom > vh - M && !panel.classList.contains("is-up")) {
+      var btnR = btn.getBoundingClientRect();
+      if (btnR.top > r.height + 16) {
+        panel.classList.add("is-upx");
+      }
+    }
   }
   $$("[data-dd-btn]").forEach(function (btn) {
     btn.addEventListener("click", function (e) {
@@ -30,7 +60,16 @@
       var willOpen = panel.hidden;
       closeDropdowns(panel);
       panel.hidden = !willOpen;
+      if (willOpen) {
+        openPair = { panel: panel, btn: btn };
+        fitDropdown(panel, btn);
+      } else {
+        openPair = null;
+      }
     });
+  });
+  window.addEventListener("resize", function () {
+    if (openPair && !openPair.panel.hidden) fitDropdown(openPair.panel, openPair.btn);
   });
   document.addEventListener("click", function (e) {
     if (!e.target.closest("[data-dd-panel]")) closeDropdowns(null);

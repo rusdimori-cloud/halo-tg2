@@ -47,6 +47,9 @@
   animation:ht-dd-in .18s var(--ht-ease);
 }
 .ht-panel__dropdown.is-up{top:auto;bottom:calc(100% + 8px);left:0;right:auto;width:100%}
+.ht-panel__dropdown{max-width:calc(100vw - 16px)}
+.ht-panel__dropdown.is-left{left:0;right:auto}
+.ht-panel__dropdown.is-upx{top:auto;bottom:calc(100% + 8px)}
 .ht-panel__dropdown a,.ht-panel__dropdown>button{
   display:flex;align-items:center;gap:10px;width:100%;
   padding:9px 12px;border-radius:10px;font-size:14px;color:#0A0B0D;text-align:left;
@@ -183,8 +186,9 @@ html[data-halo-tg2-theme="dark"] .ht-panel__switch::after{left:19px}
   background:linear-gradient(160deg,#4D84FF,#1463FF 48%,#0A36A8);
   box-shadow:var(--ht-shadow);color:#fff;
 }
-.ht-panel__course-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.ht-panel__course-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,11,13,0) 34%,rgba(10,11,13,.62))}
+.ht-panel__course-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.22,.8,.32,1)}
+.ht-panel__course:hover .ht-panel__course-img,.ht-panel__course:focus-visible .ht-panel__course-img{transform:scale(1.07)}
+.ht-panel__course-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,11,13,0) 26%,rgba(10,11,13,.34) 52%,rgba(10,11,13,.84))}
 .ht-panel__course-body{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;display:grid;gap:7px}
 .ht-panel__course-title{font-weight:600;font-size:15.6px;line-height:1.3}
 .ht-panel__course-bar{height:6px;border-radius:9999px;background:rgba(255,255,255,.35);overflow:hidden}
@@ -451,3 +455,7 @@ html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
 .ht-panel__switchwrap input:checked + .ht-panel__switch{background:var(--ht-primary)}
 .ht-panel__switchwrap input:checked + .ht-panel__switch::after{left:19px}
 .ht-panel__reset-form{margin-top:14px;display:flex;justify-content:flex-end}
+@media (prefers-reduced-motion: reduce){
+  .ht-panel__course-img{transition:none}
+  .ht-panel__course:hover .ht-panel__course-img,.ht-panel__course:focus-visible .ht-panel__course-img{transform:none}
+}
