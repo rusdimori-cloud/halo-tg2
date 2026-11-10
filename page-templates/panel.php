@@ -55,17 +55,14 @@ if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'user_profile
 			'_tutor_profile_photo'        => 'Pasang Foto Profil',
 			'_tutor_social_links'         => 'Tambahkan Tautan Sosial',
 			'_tutor_profile_bio'          => 'Isi Bio Profil',
-			'_tutor_withdraw_method_data' => 'Atur Metode Penarikan',
 		);
-		// Metode penarikan HANYA untuk instruktur yang benar-benar
-		// approved (status + flag instruktur Tutor). user_profile_
-		// completion() sendiri hanya memeriksa string status, jadi
-		// panel menyaring ulang di sini; persen dihitung dari item
-		// yang tampil saja agar siswa bisa mencapai 100%.
-		$ht_is_instructor = method_exists(tutor_utils(), 'is_instructor') ? (bool) tutor_utils()->is_instructor($ht_uid, true) : false;
+		// Metode penarikan TIDAK ditampilkan di panel untuk siapa
+		// pun (keputusan pemilik situs 2026-11-11: satu-satunya
+		// instruktur adalah pemilik sendiri, item ini hanya jadi
+		// gangguan). Persen dihitung dari item yang tampil saja.
 		$ht_done_count = 0;
 		foreach ($ht_raw_completion as $ht_key => $ht_item) {
-			if ('_tutor_withdraw_method_data' === $ht_key && !$ht_is_instructor) {
+			if ('_tutor_withdraw_method_data' === $ht_key) {
 				continue;
 			}
 			$ht_is_set = !empty($ht_item['is_set']);
