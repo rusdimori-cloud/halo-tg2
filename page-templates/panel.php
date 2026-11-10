@@ -57,8 +57,17 @@ if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'user_profile
 			'_tutor_profile_bio'          => 'Isi Bio Profil',
 			'_tutor_withdraw_method_data' => 'Atur Metode Penarikan',
 		);
+		// Metode penarikan HANYA untuk instruktur yang benar-benar
+		// approved (status + flag instruktur Tutor). user_profile_
+		// completion() sendiri hanya memeriksa string status, jadi
+		// panel menyaring ulang di sini; persen dihitung dari item
+		// yang tampil saja agar siswa bisa mencapai 100%.
+		$ht_is_instructor = method_exists(tutor_utils(), 'is_instructor') ? (bool) tutor_utils()->is_instructor($ht_uid, true) : false;
 		$ht_done_count = 0;
 		foreach ($ht_raw_completion as $ht_key => $ht_item) {
+			if ('_tutor_withdraw_method_data' === $ht_key && !$ht_is_instructor) {
+				continue;
+			}
 			$ht_is_set = !empty($ht_item['is_set']);
 			if ($ht_is_set) {
 				$ht_done_count++;
@@ -69,7 +78,9 @@ if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'user_profile
 				'url'    => add_query_arg(array('tampilan' => 'pengaturan', 'bagian' => '_tutor_social_links' === $ht_key ? 'sosial' : 'akun'), $ht_base),
 			);
 		}
-		$ht_complete_pct = (int) round($ht_done_count / count($ht_raw_completion) * 100);
+		if (!empty($ht_complete_items)) {
+			$ht_complete_pct = (int) round($ht_done_count / count($ht_complete_items) * 100);
+		}
 	}
 }
 $ht_dash    = halo_tg2_dashboard_url();
