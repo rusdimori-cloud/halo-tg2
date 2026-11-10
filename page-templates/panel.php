@@ -48,6 +48,20 @@ $ht_contact_status = isset($_GET['hubungi']) ? sanitize_key(wp_unslash($_GET['hu
 $ht_profil_status  = isset($_GET['profil']) ? sanitize_key(wp_unslash($_GET['profil'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_sandi_status   = isset($_GET['sandi']) ? sanitize_key(wp_unslash($_GET['sandi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_foto_status    = isset($_GET['foto']) ? sanitize_key(wp_unslash($_GET['foto'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$ht_ujian_status   = isset($_GET['ujian']) ? sanitize_key(wp_unslash($_GET['ujian'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$ht_cover_id_top   = (int) get_user_meta($ht_uid, '_tutor_cover_photo', true);
+$ht_cover_url_top  = $ht_cover_id_top ? (string) wp_get_attachment_image_url($ht_cover_id_top, 'large') : '';
+$ht_job_top        = (string) get_user_meta($ht_uid, '_tutor_profile_job_title', true);
+$ht_exam_date      = (string) get_user_meta($ht_uid, 'halo_tg2_exam_date', true);
+$ht_exam_name      = (string) get_user_meta($ht_uid, 'halo_tg2_exam_name', true);
+$ht_exam_days      = null;
+if ('' !== $ht_exam_date) {
+	$ht_exam_days = (int) floor((strtotime($ht_exam_date) - strtotime(current_time('Y-m-d'))) / DAY_IN_SECONDS);
+}
+$ht_public_profile = function_exists('tutor_utils') ? (string) tutor_utils()->profile_url($ht_user) : '';
+if ('' === $ht_public_profile || '#' === $ht_public_profile) {
+	$ht_public_profile = home_url('/profile/' . $ht_user->user_nicename . '/');
+}
 
 /**
  * Cetak satu kartu kelas (gaya mockup v16: sampul penuh, teks putih).
@@ -172,7 +186,60 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<?php endif; ?>
 
 			<?php if ('beranda' === $ht_view) : ?>
-				<p class="ht-panel__greeting">Halo, <strong><?php echo esc_html($ht_user->first_name ? $ht_user->first_name : $ht_user->display_name); ?></strong> — siap lanjut belajar?</p>
+				<section class="ht-panel__pwidget">
+					<div class="ht-panel__pcover">
+						<?php if ('' !== $ht_cover_url_top) : ?>
+							<img src="<?php echo esc_url($ht_cover_url_top); ?>" alt="">
+						<?php endif; ?>
+					</div>
+					<div class="ht-panel__pbody">
+						<span class="ht-panel__pavatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
+						<div class="ht-panel__pinfo">
+							<h2><?php echo esc_html($ht_user->display_name); ?></h2>
+							<p><?php echo esc_html('' !== $ht_job_top ? $ht_job_top : $ht_user->user_email); ?></p>
+						</div>
+						<div class="ht-panel__pactions">
+							<a class="halo-tg2__btn halo-tg2__btn--ghost" href="<?php echo esc_url($ht_public_profile); ?>">Profil Publik</a>
+							<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_url('pengaturan')); ?>">Ubah Profil</a>
+						</div>
+					</div>
+				</section>
+				<?php if (null !== $ht_exam_days && $ht_exam_days >= 0) : ?>
+					<div class="ht-panel__exam">
+						<div class="ht-panel__exam-text">
+							<strong>Ujian Anda pada <?php echo esc_html(date_i18n('l, j F Y', strtotime($ht_exam_date))); ?></strong>
+							<span><?php echo esc_html('' !== $ht_exam_name ? $ht_exam_name . ' · ' : ''); ?>Hitung mundur menuju hari ujianmu — tetap konsisten belajarnya.</span>
+						</div>
+						<div class="ht-panel__exam-ring" aria-hidden="true">
+							<?php $ht_ring_c = 2 * M_PI * 26; $ht_ring_f = min(max($ht_exam_days, 0), 30) / 30; ?>
+							<svg viewBox="0 0 64 64">
+								<circle class="ht-ring-bg" cx="32" cy="32" r="26"/>
+								<circle class="ht-ring-fg" cx="32" cy="32" r="26" stroke-dasharray="<?php echo esc_attr(round($ht_ring_c, 1)); ?>" stroke-dashoffset="<?php echo esc_attr(round($ht_ring_c * (1 - $ht_ring_f), 1)); ?>"/>
+							</svg>
+							<?php if (0 === $ht_exam_days) : ?>
+								<span class="ht-panel__exam-num is-today">HARI<br>INI</span>
+							<?php else : ?>
+								<span class="ht-panel__exam-num"><?php echo esc_html($ht_exam_days); ?><small>HARI LAGI</small></span>
+							<?php endif; ?>
+						</div>
+					</div>
+				<?php elseif (null !== $ht_exam_days) : ?>
+					<div class="ht-panel__exam is-past">
+						<div class="ht-panel__exam-text">
+							<strong>Tanggal ujianmu sudah lewat (<?php echo esc_html(date_i18n('j F Y', strtotime($ht_exam_date))); ?>)</strong>
+							<span>Sudah ujian? Atur tanggal berikutnya agar hitung mundur tampil lagi di sini.</span>
+						</div>
+						<a class="halo-tg2__btn halo-tg2__btn--ghost" href="<?php echo esc_url($ht_url('pengaturan')); ?>#pengingat-ujian">Atur Ulang</a>
+					</div>
+				<?php else : ?>
+					<div class="ht-panel__exam is-empty">
+						<div class="ht-panel__exam-text">
+							<strong>Belum ada pengingat ujian</strong>
+							<span>Atur tanggal ujianmu — hitung mundurnya akan tampil di sini setiap kamu membuka Dashboard.</span>
+						</div>
+						<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_url('pengaturan')); ?>#pengingat-ujian">Atur Tanggal Ujian</a>
+					</div>
+				<?php endif; ?>
 				<?php foreach ($ht_unpaid as $order) : ?>
 					<div class="ht-panel__strip" data-strip="<?php echo esc_attr($order->get_id()); ?>">
 						<p>Ada pesanan <strong>#<?php echo esc_html($order->get_order_number()); ?></strong> yang belum dibayar (<?php echo wp_kses_post($order->get_formatted_order_total()); ?>). Selesaikan agar kelasmu terbuka.</p>
@@ -340,6 +407,13 @@ $ht_logout = wp_logout_url(home_url('/'));
 				<?php elseif ('gagal' === $ht_profil_status) : ?>
 					<p class="ht-panel__notice is-error">Profil belum tersimpan. Coba lagi sebentar lagi.</p>
 				<?php endif; ?>
+				<?php if ('tersimpan' === $ht_ujian_status) : ?>
+					<p class="ht-panel__notice is-ok">Pengingat ujian tersimpan — hitung mundurnya tampil di Dashboard.</p>
+				<?php elseif ('dihapus' === $ht_ujian_status) : ?>
+					<p class="ht-panel__notice is-ok">Pengingat ujian dihapus.</p>
+				<?php elseif ('gagal' === $ht_ujian_status) : ?>
+					<p class="ht-panel__notice is-error">Pengingat ujian belum tersimpan — periksa tanggalnya lalu coba lagi.</p>
+				<?php endif; ?>
 				<?php if ('berubah' === $ht_sandi_status) : ?>
 					<p class="ht-panel__notice is-ok">Kata sandi berhasil diubah.</p>
 				<?php elseif (isset($ht_sandi_errors[$ht_sandi_status])) : ?>
@@ -368,7 +442,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 				<?php if ('akun' === $ht_bagian) : ?>
 				<section class="ht-panel__setting-card">
 					<h2>Foto Profil &amp; Sampul</h2>
-					<p class="ht-panel__modal-sub">Foto profil tampil di panel dan di profil publikmu; sampul tampil di bagian atas profil publik.</p>
+					<p class="ht-panel__modal-sub">Foto profil tampil di panel, header situs, dan profil publikmu; sampul tampil di widget Dashboard dan bagian atas profil publik.</p>
 					<div class="ht-panel__profile-head">
 						<div class="ht-panel__cover-preview">
 							<?php if ('' !== $ht_cover_url) : ?>
@@ -469,6 +543,28 @@ $ht_logout = wp_logout_url(home_url('/'));
 						<div class="ht-panel__modal-actions">
 							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Profil</button>
 						</div>
+					</form>
+				</section>
+
+				<section class="ht-panel__setting-card" id="pengingat-ujian">
+					<h2>Pengingat Ujian</h2>
+					<p class="ht-panel__modal-sub">Atur tanggal ujianmu — banner hitung mundurnya tampil di Dashboard.</p>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+						<input type="hidden" name="action" value="halo_tg2_save_exam">
+						<?php wp_nonce_field('halo_tg2_save_exam', '_htexnonce'); ?>
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
+						<div class="ht-panel__form-grid">
+							<label class="ht-panel__field">Nama Ujian
+								<input type="text" name="exam_name" value="<?php echo esc_attr($ht_exam_name); ?>" placeholder="cth. ビジネス・キャリア検定 3級">
+							</label>
+							<label class="ht-panel__field">Tanggal Ujian
+								<input type="date" name="exam_date" value="<?php echo esc_attr($ht_exam_date); ?>">
+							</label>
+						</div>
+						<div class="ht-panel__modal-actions">
+							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Pengingat</button>
+						</div>
+						<p class="ht-panel__modal-sub">Untuk menghapus pengingat, kosongkan tanggalnya lalu simpan.</p>
 					</form>
 				</section>
 

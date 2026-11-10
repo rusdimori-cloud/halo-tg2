@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('HALO_TG2_VERSION', '1.3.2');
+define('HALO_TG2_VERSION', '1.3.3');
 
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/woocommerce.php';
@@ -95,6 +95,14 @@ function halo_tg2_assets() {
 	if (is_post_type_archive('courses')) {
 		wp_enqueue_style('halo-tg2-fa', 'https://cdn.jsdelivr.net/gh/aquawolf04/font-awesome-pro@5cd1511/css/all.css', array(), null);
 		wp_enqueue_style('halo-tg2-archive-course', get_template_directory_uri() . '/assets/css/archive-course.css', array('halo-tg2'), HALO_TG2_VERSION);
+	}
+
+	// Profil publik Tutor (/profile/<username>/): kepala profil sendiri
+	// + kartu katalog yang sama dengan arsip.
+	if ('' !== (string) get_query_var('tutor_profile_username')) {
+		wp_enqueue_style('halo-tg2-fa', 'https://cdn.jsdelivr.net/gh/aquawolf04/font-awesome-pro@5cd1511/css/all.css', array(), null);
+		wp_enqueue_style('halo-tg2-archive-course', get_template_directory_uri() . '/assets/css/archive-course.css', array('halo-tg2'), HALO_TG2_VERSION);
+		wp_enqueue_style('halo-tg2-profile', get_template_directory_uri() . '/assets/css/profile.css', array('halo-tg2'), HALO_TG2_VERSION);
 	}
 
 	// Fase 2: aset khusus halaman depan (landing).

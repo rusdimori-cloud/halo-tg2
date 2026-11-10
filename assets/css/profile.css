@@ -1,0 +1,53 @@
+/* Profil publik — /profile/<username>/ (override Tutor public-profile).
+   Kepala profil memakai bahasa kartu Halo TG2 Template Desain;
+   daftar kelas memakai kartu katalog dari archive-course.css. */
+
+.ht-profile{padding:28px 0 56px}
+.ht-profile__head{
+  background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);
+  box-shadow:var(--ht-shadow);overflow:hidden;margin-bottom:30px;
+}
+.ht-profile__cover{
+  height:210px;background:linear-gradient(120deg,#0A2A6E,#1463FF 55%,#5B93FF);
+  background-size:cover;background-position:center;
+}
+.ht-profile__cover img{width:100%;height:100%;object-fit:cover;display:block}
+.ht-profile__cover:has(img){background:none}
+.ht-profile__body{display:flex;align-items:center;gap:16px;padding:0 28px;flex-wrap:wrap}
+.ht-profile__avatar{
+  width:92px;height:92px;border-radius:9999px;flex:0 0 auto;margin-top:-42px;
+  border:4px solid var(--ht-surface);box-shadow:var(--ht-shadow);overflow:hidden;background:#EEF4FF;
+  color:var(--ht-primary);display:grid;place-items:center;font-weight:700;font-size:34px;
+}
+.ht-profile__avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.ht-profile__id{min-width:0;flex:1 1 220px;padding:14px 0 4px}
+.ht-profile__id h1{font-size:26px;font-weight:700;line-height:1.2;margin:0}
+.ht-profile__meta{font-size:13.6px;color:var(--ht-text-2);margin:5px 0 0}
+.ht-profile__edit{margin:14px 0 4px}
+.ht-profile__bio{
+  padding:14px 28px 0;font-size:14.6px;line-height:1.65;color:var(--ht-fg);margin:0;max-width:720px;
+}
+.ht-profile__socials{display:flex;gap:8px;flex-wrap:wrap;padding:14px 28px 0}
+.ht-profile__socials a{
+  font-size:12.8px;font-weight:600;color:var(--ht-primary);text-decoration:none;
+  background:var(--ht-primary-soft);border-radius:var(--ht-r-full);padding:6px 13px;
+}
+.ht-profile__stats{
+  display:flex;gap:0;flex-wrap:wrap;margin-top:20px;border-top:1px solid var(--ht-line);
+}
+.ht-profile__stat{padding:16px 28px 18px;display:grid;gap:1px}
+.ht-profile__stat + .ht-profile__stat{border-left:1px solid var(--ht-line)}
+.ht-profile__stat strong{font-size:21px;font-weight:700;line-height:1.1}
+.ht-profile__stat span{font-size:12.4px;color:var(--ht-text-2)}
+.ht-profile__courses h2{font-size:21px;font-weight:700;margin:0 0 16px}
+
+@media (max-width:640px){
+  .ht-profile{padding:18px 0 44px}
+  .ht-profile__cover{height:140px}
+  .ht-profile__body{padding:0 18px}
+  .ht-profile__avatar{width:76px;height:76px;margin-top:-34px;font-size:28px}
+  .ht-profile__id h1{font-size:22px}
+  .ht-profile__bio{padding:12px 18px 0}
+  .ht-profile__socials{padding:12px 18px 0}
+  .ht-profile__stat{padding:14px 18px 16px}
+}
