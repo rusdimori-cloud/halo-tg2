@@ -32,6 +32,15 @@ $ht_url     = function ($view) use ($ht_base) {
 };
 $ht_courses = halo_tg2_panel_courses($ht_uid);
 $ht_unpaid  = halo_tg2_panel_unpaid_orders($ht_uid);
+// Statistik mini beranda — semua dari data Tutor yang nyata.
+$ht_stat_total = count($ht_courses);
+$ht_done_ids   = function_exists('tutor_utils') ? tutor_utils()->get_completed_courses_ids_by_user($ht_uid) : array();
+$ht_stat_done  = is_array($ht_done_ids) ? count($ht_done_ids) : 0;
+$ht_stat_sum   = 0;
+foreach ($ht_courses as $ht_sc) {
+	$ht_stat_sum += (int) (is_array($ht_sc) && isset($ht_sc['percent']) ? $ht_sc['percent'] : 0);
+}
+$ht_stat_avg = $ht_stat_total > 0 ? (int) round($ht_stat_sum / $ht_stat_total) : 0;
 $ht_dash    = halo_tg2_dashboard_url();
 $ht_titles  = array(
 	'beranda'   => 'Dashboard',
@@ -237,6 +246,17 @@ $ht_logout = wp_logout_url(home_url('/'));
 						<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_url('pengaturan')); ?>#pengingat-ujian">Atur Tanggal Ujian</a>
 					</div>
 				<?php endif; ?>
+				<section class="ht-panel__ministat" aria-label="Statistik belajar">
+					<div class="ht-panel__ministat-head">
+						<h2>Statistik Belajarmu</h2>
+						<a href="<?php echo esc_url($ht_url('statistik')); ?>">Lihat Statistik</a>
+					</div>
+					<div class="ht-panel__ministat-grid">
+						<div class="ht-panel__ministat-cell"><strong><?php echo esc_html($ht_stat_total); ?></strong><span>Kelas Diikuti</span></div>
+						<div class="ht-panel__ministat-cell"><strong><?php echo esc_html($ht_stat_done); ?></strong><span>Kelas Selesai</span></div>
+						<div class="ht-panel__ministat-cell"><strong><?php echo esc_html($ht_stat_avg); ?>%</strong><span>Rata-rata Progres</span></div>
+					</div>
+				</section>
 				<?php foreach ($ht_unpaid as $order) : ?>
 					<div class="ht-panel__strip" data-strip="<?php echo esc_attr($order->get_id()); ?>">
 						<p>Ada pesanan <strong>#<?php echo esc_html($order->get_order_number()); ?></strong> yang belum dibayar (<?php echo wp_kses_post($order->get_formatted_order_total()); ?>). Selesaikan agar kelasmu terbuka.</p>
