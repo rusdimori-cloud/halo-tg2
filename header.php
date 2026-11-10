@@ -169,10 +169,6 @@ if ('' === $ht_mnav_html) {
 				<?php endif; ?>
 			<?php endif; ?>
 
-			<button class="halo-tg2__icon-btn halo-tg2__theme-toggle" type="button" data-theme-toggle aria-label="Aktifkan tema gelap">
-				<svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 13.2A8.2 8.2 0 0 1 10.8 4 8.5 8.5 0 1 0 20 13.2Z"/></svg>
-				<svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
-			</button>
 			<button class="halo-tg2__icon-btn halo-tg2__burger" type="button" data-burger aria-label="Buka menu" aria-expanded="false" aria-controls="halo-tg2-menu">
 				<svg class="ic-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
 				<svg class="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>

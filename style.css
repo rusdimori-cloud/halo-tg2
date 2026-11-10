@@ -3,7 +3,7 @@ Theme Name: halo-tg2
 Theme URI: https://halo-tg2.com
 Author: halo TG2
 Description: Tema mandiri halo TG2 — dibangun dari Halo TG2 Template Desain. Mesin WooCommerce & Tutor LMS, kulit tema ini. Header pill, footer gradasi navy (satu-satunya gradasi resmi), cart drawer, satu pintu login.
-Version: 1.3.0
+Version: 1.3.1
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -72,7 +72,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ============ LAYOUT & KOMPONEN DASAR ============ */
 .halo-tg2__wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 var(--ht-sp-md)}
 .halo-tg2__section{padding:calc(var(--ht-sp-gutter)*2) 0}
-.halo-tg2__card{background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow)}
+.halo-tg2__card{background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:28px}
 .halo-tg2__btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--ht-sp-xs);height:40px;padding:11px 16px;border-radius:var(--ht-r-full);font-size:13.6px;font-weight:500;line-height:20px;letter-spacing:.02em;border:1px solid transparent;transition:background-color .2s,color .2s,border-color .2s,transform .15s var(--ht-ease);white-space:nowrap}
 .halo-tg2__btn:active{transform:scale(.98)}
 .halo-tg2__btn--primary{background:#0F0F0F;color:#fff;border-color:var(--ht-line-strong)}
