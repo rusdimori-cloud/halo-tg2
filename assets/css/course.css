@@ -16,6 +16,14 @@
   font-family:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   color:var(--pva-ink);
   max-width:1200px;
+  /* Ruang aman untuk header melayang tema ini (position:fixed).
+     Di tema sebelumnya header Twenty Twenty-Five statis sehingga
+     halaman tidak butuh bantalan atas sendiri; tanpa ini judul
+     hero tertutup pil header. */
+  padding-top:96px;
+}
+@media (max-width:760px){
+  .pva-page{padding-top:84px}
 }
 .pva-page a{transition:color .15s}
 .pva-page img{max-width:100%}
