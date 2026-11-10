@@ -247,7 +247,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 			</div>
 		</header>
 
-		<main class="ht-panel__content">
+		<main class="ht-panel__content" id="ht-panel-main">
 			<?php if ('terkirim' === $ht_contact_status) : ?>
 				<p class="ht-panel__notice is-ok">Pesanmu sudah terkirim. Kami balas lewat email ya.</p>
 			<?php elseif ('gagal' === $ht_contact_status) : ?>

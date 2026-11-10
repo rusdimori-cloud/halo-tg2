@@ -124,3 +124,31 @@ function halo_tg2_panel_assets() {
 		wp_enqueue_script('halo-tg2-panel', get_template_directory_uri() . '/assets/js/panel.js', array(), HALO_TG2_VERSION, true);
 	}
 }
+
+add_action('wp_enqueue_scripts', 'halo_tg2_softnav_assets');
+/**
+ * Navigasi lembut (soft navigation) panel & halaman lesson: hanya
+ * region konten yang bertukar, kerang halaman tetap hidup.
+ * Saklar: Settings → Halo TG2 Core (option halo_tg2_core_softnav,
+ * bawaan menyala). Halaman lesson/kuis Tutor memakai region konten
+ * #tutor-single-entry-content; konten video/kuis bawaan Tutor yang
+ * butuh inisialisasi skripnya sendiri otomatis jatuh ke muat penuh
+ * (ditangani softnav.js).
+ */
+function halo_tg2_softnav_assets() {
+	if ('1' !== (string) get_option('halo_tg2_core_softnav', '1')) {
+		return;
+	}
+	$is_panel  = is_page_template('page-templates/panel.php');
+	$is_lesson = is_singular(array('lesson', 'tutor_quiz', 'tutor_assignments'));
+	if (!$is_panel && !$is_lesson) {
+		return;
+	}
+	wp_enqueue_style('halo-tg2-softnav', get_template_directory_uri() . '/assets/css/softnav.css', array(), HALO_TG2_VERSION);
+	wp_enqueue_script('halo-tg2-softnav', get_template_directory_uri() . '/assets/js/softnav.js', array(), HALO_TG2_VERSION, true);
+	$panel_url = halo_tg2_panel_page_url();
+	wp_localize_script('halo-tg2-softnav', 'HT_SOFTNAV', array(
+		'enabled'   => true,
+		'panelPath' => $panel_url ? (string) wp_parse_url($panel_url, PHP_URL_PATH) : '',
+	));
+}

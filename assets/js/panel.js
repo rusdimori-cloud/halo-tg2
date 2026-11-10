@@ -51,28 +51,30 @@
       }
     }
   }
-  $$("[data-dd-btn]").forEach(function (btn) {
-    btn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      var wrap = btn.closest(".ht-panel__ddwrap") || btn.parentElement;
-      var panel = wrap ? $("[data-dd-panel]", wrap) : null;
-      if (!panel) return;
-      var willOpen = panel.hidden;
-      closeDropdowns(panel);
-      panel.hidden = !willOpen;
-      if (willOpen) {
-        openPair = { panel: panel, btn: btn };
-        fitDropdown(panel, btn);
-      } else {
-        openPair = null;
-      }
-    });
+  /* Delegasi klik: konten panel bertukar lewat navigasi lembut,
+     jadi pengendali widget tidak boleh diikat per node. */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("[data-dd-btn]") : null;
+    if (!btn) return;
+    var wrap = btn.closest(".ht-panel__ddwrap") || btn.parentElement;
+    var panel = wrap ? $("[data-dd-panel]", wrap) : null;
+    if (!panel) return;
+    var willOpen = panel.hidden;
+    closeDropdowns(panel);
+    panel.hidden = !willOpen;
+    if (willOpen) {
+      openPair = { panel: panel, btn: btn };
+      fitDropdown(panel, btn);
+    } else {
+      openPair = null;
+    }
   });
   window.addEventListener("resize", function () {
     if (openPair && !openPair.panel.hidden) fitDropdown(openPair.panel, openPair.btn);
   });
   document.addEventListener("click", function (e) {
-    if (!e.target.closest("[data-dd-panel]")) closeDropdowns(null);
+    if (e.target.closest("[data-dd-panel]") || e.target.closest("[data-dd-btn]")) return;
+    closeDropdowns(null);
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") { closeDropdowns(null); setDrawer(false); closeModal(); }
@@ -85,76 +87,89 @@
     if (btn) btn.click();
   });
 
-  /* Modal Hubungi Kami */
-  var modal = $("[data-contact-modal]");
-  function closeModal() { if (modal) modal.hidden = true; }
-  $$("[data-contact-open]").forEach(function (b) {
-    b.addEventListener("click", function () { if (modal) { modal.hidden = false; setDrawer(false); } });
-  });
-  $$("[data-contact-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
-  if (modal) modal.addEventListener("click", function (e) { if (e.target === modal) closeModal(); });
-
-  /* Saringan kelas */
-  var grid = $("[data-course-grid]");
-  $$("[data-filter]").forEach(function (tab) {
-    tab.addEventListener("click", function () {
-      $$("[data-filter]").forEach(function (t) { t.classList.toggle("is-active", t === tab); });
-      if (!grid) return;
-      var f = tab.getAttribute("data-filter"), visible = 0;
-      $$(".ht-panel__course", grid).forEach(function (card) {
-        var show = f === "semua" || card.getAttribute("data-status") === f;
-        card.style.display = show ? "" : "none";
-        if (show) visible++;
-      });
-      var empty = $("[data-filter-empty]");
-      if (empty) empty.hidden = visible > 0;
-    });
+  /* Modal Hubungi Kami (delegasi; modal dicari saat kejadian) */
+  function contactModal() { return $("[data-contact-modal]"); }
+  function closeModal() { var m = contactModal(); if (m) m.hidden = true; }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest) return;
+    if (e.target.closest("[data-contact-open]")) {
+      var m = contactModal();
+      if (m) { m.hidden = false; setDrawer(false); }
+      return;
+    }
+    if (e.target.closest("[data-contact-close]")) { closeModal(); return; }
+    var m2 = contactModal();
+    if (m2 && e.target === m2) closeModal();
   });
 
-  /* Urutan kelas */
-  var originalOrder = grid ? $$(".ht-panel__course", grid) : [];
-  $$("[data-sort]").forEach(function (opt) {
-    opt.addEventListener("click", function () {
-      if (!grid) return;
-      var mode = opt.getAttribute("data-sort");
-      var cards = $$(".ht-panel__course", grid);
-      if (mode === "progres") cards.sort(function (a, b) { return (+b.dataset.percent) - (+a.dataset.percent); });
-      else if (mode === "az") cards.sort(function (a, b) { return a.dataset.title < b.dataset.title ? -1 : 1; });
-      else cards = originalOrder.slice();
-      cards.forEach(function (c) { grid.appendChild(c); });
-      var label = $("[data-sort-label]");
-      if (label) label.textContent = opt.textContent.trim();
-      closeDropdowns(null);
+  /* Saringan kelas (delegasi) */
+  document.addEventListener("click", function (e) {
+    var tab = e.target.closest ? e.target.closest("[data-filter]") : null;
+    if (!tab) return;
+    $$("[data-filter]").forEach(function (t) { t.classList.toggle("is-active", t === tab); });
+    var grid = $("[data-course-grid]");
+    if (!grid) return;
+    var f = tab.getAttribute("data-filter"), visible = 0;
+    $$(".ht-panel__course", grid).forEach(function (card) {
+      var show = f === "semua" || card.getAttribute("data-status") === f;
+      card.style.display = show ? "" : "none";
+      if (show) visible++;
     });
+    var empty = $("[data-filter-empty]");
+    if (empty) empty.hidden = visible > 0;
   });
 
-  /* Tab statistik */
-  $$("[data-stab]").forEach(function (tab) {
-    tab.addEventListener("click", function () {
-      $$("[data-stab]").forEach(function (t) { t.classList.toggle("is-active", t === tab); });
-      $$("[data-spanel]").forEach(function (p) { p.hidden = p.getAttribute("data-spanel") !== tab.getAttribute("data-stab"); });
-    });
+  /* Urutan kelas (delegasi; urutan awal dicatat malas per grid) */
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest ? e.target.closest("[data-sort]") : null;
+    if (!opt) return;
+    var grid = $("[data-course-grid]");
+    if (!grid) return;
+    if (!grid.__htOrig) grid.__htOrig = $$(".ht-panel__course", grid);
+    var mode = opt.getAttribute("data-sort");
+    var cards = $$(".ht-panel__course", grid);
+    if (mode === "progres") cards.sort(function (a, b) { return (+b.dataset.percent) - (+a.dataset.percent); });
+    else if (mode === "az") cards.sort(function (a, b) { return a.dataset.title < b.dataset.title ? -1 : 1; });
+    else cards = grid.__htOrig.slice();
+    cards.forEach(function (c) { grid.appendChild(c); });
+    var label = $("[data-sort-label]");
+    if (label) label.textContent = opt.textContent.trim();
+    closeDropdowns(null);
+  });
+
+  /* Tab statistik (delegasi) */
+  document.addEventListener("click", function (e) {
+    var tab = e.target.closest ? e.target.closest("[data-stab]") : null;
+    if (!tab) return;
+    $$("[data-stab]").forEach(function (t) { t.classList.toggle("is-active", t === tab); });
+    $$("[data-spanel]").forEach(function (p) { p.hidden = p.getAttribute("data-spanel") !== tab.getAttribute("data-stab"); });
   });
 
   /* Strip pembayaran: tutup per order, diingat di perangkat ini */
-  $$("[data-strip]").forEach(function (strip) {
-    var key = "ht-strip-" + strip.getAttribute("data-strip");
-    try { if (localStorage.getItem(key)) strip.style.display = "none"; } catch (e) {}
-    var x = $("[data-strip-dismiss]", strip);
-    if (x) x.addEventListener("click", function () {
-      strip.style.display = "none";
-      try { localStorage.setItem(key, "1"); } catch (e) {}
+  function initStrips(root) {
+    $$("[data-strip]", root || document).forEach(function (strip) {
+      var key = "ht-strip-" + strip.getAttribute("data-strip");
+      try { if (localStorage.getItem(key)) strip.style.display = "none"; } catch (e) {}
     });
+  }
+  document.addEventListener("click", function (e) {
+    var x = e.target.closest ? e.target.closest("[data-strip-dismiss]") : null;
+    if (!x) return;
+    var strip = x.closest("[data-strip]");
+    if (!strip) return;
+    strip.style.display = "none";
+    try { localStorage.setItem("ht-strip-" + strip.getAttribute("data-strip"), "1"); } catch (err) {}
   });
+  initStrips(document);
 
-  /* Saklar mode gelap (kunci penyimpanan sama dengan tema) */
-  $$("[data-theme-switch]").forEach(function (sw) {
-    sw.addEventListener("click", function () {
-      var html = document.documentElement;
-      var next = html.getAttribute("data-halo-tg2-theme") === "dark" ? "light" : "dark";
-      html.setAttribute("data-halo-tg2-theme", next);
-      try { localStorage.setItem("halo-tg2-theme", next); } catch (e) {}
-    });
+  /* Saklar mode gelap (delegasi; kunci penyimpanan sama dengan tema) */
+  document.addEventListener("click", function (e) {
+    var sw = e.target.closest ? e.target.closest("[data-theme-switch]") : null;
+    if (!sw) return;
+    var html = document.documentElement;
+    var next = html.getAttribute("data-halo-tg2-theme") === "dark" ? "light" : "dark";
+    html.setAttribute("data-halo-tg2-theme", next);
+    try { localStorage.setItem("halo-tg2-theme", next); } catch (err) {}
   });
 
   /* Tab geser di layar kecil + tips "Geser" otomatis (tour sekali tampil).
@@ -165,6 +180,7 @@
     if (!window.matchMedia("(max-width: 768px)").matches) return;
     $$(".ht-panel__tabs").forEach(function (tabs) {
       if (tabs.closest(".ht-panel__toolbar")) return;
+      if (tabs.parentElement && tabs.parentElement.classList.contains("ht-panel__tabsbox")) return;
       if (tabs.scrollWidth <= tabs.clientWidth + 2) return;
       var box = document.createElement("div");
       box.className = "ht-panel__tabsbox is-scrollable";
@@ -205,4 +221,10 @@
   } else {
     requestAnimationFrame(initSwipeTabs);
   }
+
+  /* Setelah navigasi lembut menukar konten: hidupkan lagi widget
+     yang bergantung pada node konten (tab geser, strip pembayaran). */
+  document.addEventListener("ht:softnav:loaded", function () {
+    requestAnimationFrame(function () { initSwipeTabs(); initStrips(document); });
+  });
 })();
