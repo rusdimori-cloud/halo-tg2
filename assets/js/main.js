@@ -1,6 +1,7 @@
-/* halo-tg2 — skrip utama tema (Fase 1)
-   Toggle tema, menu mobile (animasi dari Customizer via kelas body),
-   dan cart drawer. Tanpa dependensi. */
+/* halo-tg2 — skrip utama tema
+   Toggle tema (tombol header + switch Mode Gelap di dropdown akun),
+   menu mobile fullscreen, dropdown akun header, dan cart drawer.
+   Tanpa dependensi. */
 (function () {
   "use strict";
   var d = document;
@@ -10,7 +11,7 @@
   function $(s, c) { return (c || d).querySelector(s); }
   function $$(s, c) { return [].slice.call((c || d).querySelectorAll(s)); }
 
-  /* ===== Toggle tema (gelap/terang) ===== */
+  /* ===== Tema (gelap/terang) ===== */
   var rootEl = d.documentElement;
   var themeBtn = $("[data-theme-toggle]");
   function syncThemeBtn() {
@@ -18,45 +19,66 @@
     var dark = rootEl.getAttribute("data-halo-tg2-theme") === "dark";
     themeBtn.setAttribute("aria-label", dark ? "Aktifkan tema terang" : "Aktifkan tema gelap");
   }
-  if (themeBtn) {
-    themeBtn.addEventListener("click", function () {
-      var next = rootEl.getAttribute("data-halo-tg2-theme") === "dark" ? "light" : "dark";
-      rootEl.setAttribute("data-halo-tg2-theme", next);
-      try { localStorage.setItem("halo-tg2-theme", next); } catch (e) {}
-      syncThemeBtn();
-    });
+  function toggleTheme() {
+    var next = rootEl.getAttribute("data-halo-tg2-theme") === "dark" ? "light" : "dark";
+    rootEl.setAttribute("data-halo-tg2-theme", next);
+    try { localStorage.setItem("halo-tg2-theme", next); } catch (e) {}
+    syncThemeBtn();
   }
+  if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
+  $$("[data-theme-switch]").forEach(function (b) { b.addEventListener("click", toggleTheme); });
   syncThemeBtn();
 
-  /* ===== Menu mobile ===== */
+  /* ===== Menu mobile (fullscreen) ===== */
   var burger = $("[data-burger]");
   var menu = $("[data-mobile-menu]");
-  var menuTimer = null;
-  function closeMenu(force) {
+  function setMenuLock(open) { d.body.classList.toggle("halo-tg2__menu-open", open); }
+  function closeMenu() {
     if (!menu || !menu.classList.contains("is-open")) return;
+    menu.classList.remove("is-open");
     burger.setAttribute("aria-expanded", "false");
     burger.setAttribute("aria-label", "Buka menu");
-    if (force || reduced) {
-      menu.classList.remove("is-open", "is-closing");
-      return;
-    }
-    menu.classList.add("is-closing");
-    menu.classList.remove("is-open");
-    clearTimeout(menuTimer);
-    menuTimer = setTimeout(function () { menu.classList.remove("is-closing"); }, 170);
+    setMenuLock(false);
   }
   if (burger && menu) {
     burger.addEventListener("click", function () {
-      if (menu.classList.contains("is-open")) { closeMenu(false); return; }
-      clearTimeout(menuTimer);
-      menu.classList.remove("is-closing");
+      if (menu.classList.contains("is-open")) { closeMenu(); return; }
       menu.classList.add("is-open");
       burger.setAttribute("aria-expanded", "true");
       burger.setAttribute("aria-label", "Tutup menu");
+      setMenuLock(true);
     });
-    $$("a", menu).forEach(function (a) { a.addEventListener("click", function () { closeMenu(true); }); });
-    d.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(false); });
+    $$("a", menu).forEach(function (a) { a.addEventListener("click", closeMenu); });
+    d.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenu(); });
   }
+
+  /* ===== Dropdown akun header ===== */
+  $$("[data-user-dd]").forEach(function (wrap) {
+    var btn = $("[data-user-dd-btn]", wrap);
+    var panel = $("[data-user-dd-panel]", wrap);
+    if (!btn || !panel) return;
+    var timer = null;
+    function closeDd() {
+      if (panel.hidden) return;
+      btn.setAttribute("aria-expanded", "false");
+      if (reduced) { panel.hidden = true; return; }
+      panel.classList.add("is-closing");
+      clearTimeout(timer);
+      timer = setTimeout(function () { panel.hidden = true; panel.classList.remove("is-closing"); }, 160);
+    }
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (!panel.hidden) { closeDd(); return; }
+      clearTimeout(timer);
+      panel.classList.remove("is-closing");
+      panel.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+    });
+    panel.addEventListener("click", function (e) { e.stopPropagation(); });
+    d.addEventListener("click", function () { closeDd(); });
+    d.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDd(); });
+    wrap._htCloseDd = closeDd;
+  });
 
   /* ===== Cart drawer ===== */
   var drawer = $("[data-cart-drawer]");

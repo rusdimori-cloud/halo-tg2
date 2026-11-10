@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('HALO_TG2_VERSION', '1.2.3');
+define('HALO_TG2_VERSION', '1.3.0');
 
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/woocommerce.php';
@@ -160,6 +160,55 @@ function halo_tg2_login_url() {
 	$auth = halo_tg2_auth_page_url();
 	return '' !== $auth ? $auth : wp_login_url(home_url('/'));
 }
+
+/**
+ * Butir menu bawaan tema (dipakai cadangan header & pembuat menu otomatis).
+ *
+ * @return array[] Daftar ['title' => string, 'url' => string].
+ */
+function halo_tg2_default_menu_items() {
+	$catalog = get_post_type_archive_link('courses');
+	return array(
+		array('title' => 'Beranda', 'url' => home_url('/')),
+		array('title' => 'Katalog Kelas', 'url' => $catalog ? $catalog : home_url('/courses/')),
+		array('title' => 'Testimoni', 'url' => home_url('/#testimoni')),
+		array('title' => 'FAQ', 'url' => home_url('/#faq')),
+	);
+}
+
+/**
+ * Buatkan menu "Menu Utama" sekali jalan bila lokasi header belum
+ * terisi menu apa pun (tidak pernah menimpa menu buatan pengguna).
+ */
+function halo_tg2_maybe_create_default_menu() {
+	if (get_option('halo_tg2_default_menu_v1')) {
+		return;
+	}
+	$locations = (array) get_theme_mod('nav_menu_locations', array());
+	if (empty($locations['header'])) {
+		$menu_obj = wp_get_nav_menu_object('Menu Utama');
+		$menu_id  = $menu_obj ? (int) $menu_obj->term_id : wp_create_nav_menu('Menu Utama');
+		if ($menu_id && !is_wp_error($menu_id)) {
+			if (!$menu_obj) {
+				foreach (halo_tg2_default_menu_items() as $item) {
+					wp_update_nav_menu_item((int) $menu_id, 0, array(
+						'menu-item-title'  => $item['title'],
+						'menu-item-url'    => $item['url'],
+						'menu-item-type'   => 'custom',
+						'menu-item-status' => 'publish',
+					));
+				}
+			}
+			$locations['header'] = (int) $menu_id;
+			if (empty($locations['mobile'])) {
+				$locations['mobile'] = (int) $menu_id;
+			}
+			set_theme_mod('nav_menu_locations', $locations);
+		}
+	}
+	update_option('halo_tg2_default_menu_v1', 1);
+}
+add_action('admin_init', 'halo_tg2_maybe_create_default_menu');
 
 /**
  * URL CTA header: dari pengaturan; kosong = halaman pendaftaran.

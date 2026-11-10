@@ -3,7 +3,7 @@ Theme Name: halo-tg2
 Theme URI: https://halo-tg2.com
 Author: halo TG2
 Description: Tema mandiri halo TG2 — dibangun dari Halo TG2 Template Desain. Mesin WooCommerce & Tutor LMS, kulit tema ini. Header pill, footer gradasi navy (satu-satunya gradasi resmi), cart drawer, satu pintu login.
-Version: 1.2.3
+Version: 1.3.0
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -113,20 +113,55 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .halo-tg2__burger[aria-expanded="true"] .ic-bars{display:none}
 .halo-tg2__burger[aria-expanded="true"] .ic-x{display:block}
 
-/* ============ MENU MOBILE (animasi: Turun / Geser Kiri / Fade — Customizer) ============ */
-.halo-tg2__mobile-menu{position:absolute;top:calc(100% + 10px);left:20px;right:20px;z-index:1;background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:var(--ht-sp-md);display:grid;gap:4px;opacity:0;pointer-events:none}
-.halo-tg2__mobile-menu ul{list-style:none;display:grid;gap:4px}
-.halo-tg2__mobile-menu a{display:block;padding:10px 12px;border-radius:var(--ht-r-md);font-size:16px;font-weight:500;color:var(--ht-fg)}
-.halo-tg2__mobile-menu a:hover{background:var(--ht-fill)}
-.halo-tg2__mnav-actions{display:grid;gap:var(--ht-sp-sm);margin-top:var(--ht-sp-sm);justify-items:stretch;text-align:center}
-.halo-tg2__mobile-menu.is-open{opacity:1;pointer-events:auto}
-.halo-tg2__mobile-menu.is-closing{opacity:0;pointer-events:none}
-body.ht-menu-anim-turun .halo-tg2__mobile-menu{transform:translateY(-10px);transition:opacity .18s var(--ht-ease),transform .18s var(--ht-ease)}
-body.ht-menu-anim-turun .halo-tg2__mobile-menu.is-open{transform:translateY(0)}
-body.ht-menu-anim-geser .halo-tg2__mobile-menu{transform:translateX(28px);transition:opacity .18s var(--ht-ease),transform .18s var(--ht-ease)}
-body.ht-menu-anim-geser .halo-tg2__mobile-menu.is-open{transform:translateX(0)}
-body.ht-menu-anim-fade .halo-tg2__mobile-menu{transition:opacity .18s var(--ht-ease)}
-@media (prefers-reduced-motion:reduce){.halo-tg2__mobile-menu{transition:none!important}}
+/* ============ MENU MOBILE (fullscreen seperti mockup landing) ============ */
+.halo-tg2__mobile-menu{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:var(--ht-sp-xs);background:var(--ht-bg);padding:104px 28px 24px;overflow-y:auto;transform:translateY(-102%);visibility:hidden;transition:transform .55s var(--ht-ease),visibility 0s .55s}
+.halo-tg2__mobile-menu.is-open{transform:translateY(0);visibility:visible;transition:transform .55s var(--ht-ease)}
+.halo-tg2__mobile-menu ul{list-style:none;display:grid;gap:2px}
+.halo-tg2__mobile-menu li a{display:block;font-size:20px;font-weight:500;line-height:28px;letter-spacing:-.01em;color:var(--ht-text-2);padding:12px 0;opacity:0;transform:translateY(18px);transition:opacity .4s ease,transform .5s var(--ht-ease),color .2s}
+.halo-tg2__mobile-menu li a:hover{color:var(--ht-fg)}
+.halo-tg2__mobile-menu.is-open li a{opacity:1;transform:none}
+.halo-tg2__mobile-menu.is-open li:nth-child(1) a{transition-delay:.10s}
+.halo-tg2__mobile-menu.is-open li:nth-child(2) a{transition-delay:.16s}
+.halo-tg2__mobile-menu.is-open li:nth-child(3) a{transition-delay:.22s}
+.halo-tg2__mobile-menu.is-open li:nth-child(4) a{transition-delay:.28s}
+.halo-tg2__mobile-menu.is-open li:nth-child(5) a{transition-delay:.34s}
+.halo-tg2__mobile-menu.is-open li:nth-child(6) a{transition-delay:.40s}
+.halo-tg2__mnav-actions{margin-top:auto;display:grid;gap:var(--ht-sp-sm);justify-items:center;text-align:center;opacity:0;transform:translateY(18px);transition:opacity .4s ease,transform .5s var(--ht-ease)}
+.halo-tg2__mobile-menu.is-open .halo-tg2__mnav-actions{opacity:1;transform:none;transition-delay:.46s}
+.halo-tg2__mnav-actions .halo-tg2__btn--block{width:100%}
+.halo-tg2__mnav-profile{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border:1px solid var(--ht-line);border-radius:var(--ht-r-md);background:var(--ht-surface);color:var(--ht-fg)}
+.halo-tg2__mnav-pinfo{display:grid;line-height:1.25;min-width:0}
+.halo-tg2__mnav-pinfo strong{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.halo-tg2__mnav-pinfo small{font-size:12px;color:var(--ht-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.halo-tg2__mnav-quick{display:flex;gap:8px;width:100%}
+.halo-tg2__mnav-quick a{flex:1;text-align:center;padding:10px 6px;border:1px solid var(--ht-line);border-radius:var(--ht-r-md);background:var(--ht-surface);color:var(--ht-fg);font-size:13.6px;font-weight:500}
+.halo-tg2__mnav-logout{color:var(--ht-error);font-weight:500;padding:8px;font-size:14px}
+body.halo-tg2__menu-open{overflow:hidden}
+@media (prefers-reduced-motion:reduce){.halo-tg2__mobile-menu,.halo-tg2__mobile-menu li a,.halo-tg2__mnav-actions{transition:none!important}}
+
+/* ============ DROPDOWN AKUN HEADER (persis panel) ============ */
+.halo-tg2__usermenu{position:relative}
+.halo-tg2__avatarbtn{width:40px;height:40px;border:0;border-radius:9999px;background:transparent;padding:2px;cursor:pointer;display:grid;place-items:center}
+.halo-tg2__avatar{width:36px;height:36px;border-radius:9999px;background:#EEF4FF;color:var(--ht-primary);display:grid;place-items:center;font-weight:700;font-size:15px;overflow:hidden;flex:none}
+.halo-tg2__avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.halo-tg2__userdd{position:absolute;right:0;top:calc(100% + 10px);z-index:80;min-width:248px;background:#fff;color:#0A0B0D;border:1px solid var(--ht-line);border-radius:18px;box-shadow:0 12px 32px rgba(10,11,13,.13);padding:8px;animation:halo-tg2-dd-in .18s var(--ht-ease)}
+.halo-tg2__userdd.is-closing{animation:halo-tg2-dd-out .16s var(--ht-ease) forwards}
+@keyframes halo-tg2-dd-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes halo-tg2-dd-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-4px)}}
+.halo-tg2__userdd-head{display:flex;align-items:center;gap:10px;padding:8px 12px 10px;border-bottom:1px solid var(--ht-line);margin-bottom:6px}
+.halo-tg2__userdd-head>span:last-child{display:grid;line-height:1.25;min-width:0}
+.halo-tg2__userdd-head strong{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.halo-tg2__userdd-head small{font-size:12px;color:#5B6472;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.halo-tg2__userdd a,.halo-tg2__userdd-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:12px;font-size:14px;font-weight:400;color:#0A0B0D;background:none;border:0;cursor:pointer;text-align:left;font-family:inherit;text-decoration:none}
+.halo-tg2__userdd a:hover,.halo-tg2__userdd-row:hover{background:#F2F5F9}
+.halo-tg2__userdd a svg,.halo-tg2__userdd-row svg{width:18px;height:18px;flex:none}
+.halo-tg2__userdd a.is-danger{color:var(--ht-error)}
+.halo-tg2__userdd-row{justify-content:space-between}
+.halo-tg2__userdd-label{display:inline-flex;align-items:center;gap:10px}
+.halo-tg2__switch{width:38px;height:22px;border-radius:9999px;background:rgba(3,5,11,.18);position:relative;flex:none;transition:background-color .18s}
+.halo-tg2__switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:9999px;background:#fff;transition:left .18s}
+html[data-halo-tg2-theme="dark"] .halo-tg2__switch{background:var(--ht-primary)}
+html[data-halo-tg2-theme="dark"] .halo-tg2__switch::after{left:19px}
 
 /* ============ CART DRAWER (satu fitur, dari kanan) ============ */
 .halo-tg2__scrim{position:fixed;inset:0;z-index:65;background:rgba(10,11,13,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .2s var(--ht-ease)}
@@ -188,9 +223,8 @@ body.halo-tg2__locked{overflow:hidden}
 }
 @media (max-width:640px){
   .halo-tg2__header{padding:10px 12px 0}
-  .halo-tg2__header .halo-tg2__btn-link{display:none}
+  .halo-tg2__header-cta .halo-tg2__btn-link{display:none}
   .halo-tg2__header-cta>.halo-tg2__btn{display:none}
-  .halo-tg2__mobile-menu{left:12px;right:12px}
   .halo-tg2__footer-links{grid-template-columns:1fr 1fr}
   .halo-tg2__footer-tag{font-size:17px;line-height:26px}
 }
