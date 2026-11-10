@@ -42,9 +42,12 @@ $ht_titles  = array(
 	'pengaturan' => 'Pengaturan',
 );
 $ht_initial = strtoupper(substr($ht_user->display_name, 0, 1));
+$ht_photo_id  = (int) get_user_meta($ht_uid, '_tutor_profile_photo', true);
+$ht_photo_url = $ht_photo_id ? (string) wp_get_attachment_image_url($ht_photo_id, 'thumbnail') : '';
 $ht_contact_status = isset($_GET['hubungi']) ? sanitize_key(wp_unslash($_GET['hubungi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_profil_status  = isset($_GET['profil']) ? sanitize_key(wp_unslash($_GET['profil'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_sandi_status   = isset($_GET['sandi']) ? sanitize_key(wp_unslash($_GET['sandi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$ht_foto_status    = isset($_GET['foto']) ? sanitize_key(wp_unslash($_GET['foto'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 /**
  * Cetak satu kartu kelas (gaya mockup v16: sampul penuh, teks putih).
@@ -116,7 +119,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 		</nav>
 		<div class="ht-panel__userbox">
 			<button type="button" class="ht-panel__userchip" data-dd-btn aria-haspopup="true">
-				<span class="ht-panel__avatar"><?php echo esc_html($ht_initial); ?></span>
+				<span class="ht-panel__avatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
 				<span class="ht-panel__userinfo"><strong><?php echo esc_html($ht_user->display_name); ?></strong><small><?php echo esc_html($ht_user->user_email); ?></small></span>
 			</button>
 			<div class="ht-panel__dropdown is-up" data-dd-panel hidden>
@@ -148,11 +151,11 @@ $ht_logout = wp_logout_url(home_url('/'));
 				</div>
 				<div class="ht-panel__ddwrap">
 					<button type="button" class="ht-panel__avatarbtn" data-dd-btn aria-haspopup="true">
-						<span class="ht-panel__avatar"><?php echo esc_html($ht_initial); ?></span>
+						<span class="ht-panel__avatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
 					</button>
 					<div class="ht-panel__dropdown" data-dd-panel hidden>
 						<div class="ht-panel__dd-head">
-							<span class="ht-panel__avatar"><?php echo esc_html($ht_initial); ?></span>
+							<span class="ht-panel__avatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
 							<span><strong><?php echo esc_html($ht_user->display_name); ?></strong><small><?php echo esc_html($ht_user->user_email); ?></small></span>
 						</div>
 						<?php halo_tg2_panel_user_menu($ht_logout); ?>
@@ -285,8 +288,17 @@ $ht_logout = wp_logout_url(home_url('/'));
 				if ('' === $ht_tz) { $ht_tz = 'Asia/Tokyo'; }
 				$ht_tz_list = function_exists('tutor_global_timezone_lists') ? tutor_global_timezone_lists() : array();
 				if (empty($ht_tz_list)) { foreach (timezone_identifiers_list() as $z) { $ht_tz_list[$z] = $z; } }
+				$ht_cover_id  = (int) get_user_meta($ht_uid, '_tutor_cover_photo', true);
+				$ht_cover_url = $ht_cover_id ? (string) wp_get_attachment_image_url($ht_cover_id, 'large') : '';
 				$ht_return = $ht_url('pengaturan');
 				?>
+				<?php if ('tersimpan' === $ht_foto_status) : ?>
+					<p class="ht-panel__notice is-ok">Foto tersimpan.</p>
+				<?php elseif ('dihapus' === $ht_foto_status) : ?>
+					<p class="ht-panel__notice is-ok">Foto dihapus.</p>
+				<?php elseif ('gagal' === $ht_foto_status) : ?>
+					<p class="ht-panel__notice is-error">Foto belum tersimpan — pastikan berkasnya JPG/PNG dan ukurannya tidak melebihi batas server.</p>
+				<?php endif; ?>
 				<?php if ('tersimpan' === $ht_profil_status) : ?>
 					<p class="ht-panel__notice is-ok">Profil tersimpan.</p>
 				<?php elseif ('gagal' === $ht_profil_status) : ?>
@@ -297,6 +309,56 @@ $ht_logout = wp_logout_url(home_url('/'));
 				<?php elseif (isset($ht_sandi_errors[$ht_sandi_status])) : ?>
 					<p class="ht-panel__notice is-error"><?php echo esc_html($ht_sandi_errors[$ht_sandi_status]); ?></p>
 				<?php endif; ?>
+
+				<section class="ht-panel__setting-card">
+					<h2>Foto Profil &amp; Sampul</h2>
+					<p class="ht-panel__modal-sub">Foto profil tampil di panel dan di profil publikmu; sampul tampil di bagian atas profil publik.</p>
+					<div class="ht-panel__cover-preview">
+						<?php if ('' !== $ht_cover_url) : ?>
+							<img src="<?php echo esc_url($ht_cover_url); ?>" alt="">
+						<?php else : ?>
+							<span>Belum ada foto sampul</span>
+						<?php endif; ?>
+					</div>
+					<form method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+						<input type="hidden" name="action" value="halo_tg2_save_photo">
+						<?php wp_nonce_field('halo_tg2_save_photo', '_htfnonce'); ?>
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+						<div class="ht-panel__form-grid">
+							<label class="ht-panel__field">Foto Profil (JPG/PNG)
+								<input type="file" name="profile_photo" accept=".jpg,.jpeg,.png">
+							</label>
+							<label class="ht-panel__field">Foto Sampul (JPG/PNG)
+								<input type="file" name="cover_photo" accept=".jpg,.jpeg,.png">
+							</label>
+						</div>
+						<div class="ht-panel__modal-actions">
+							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Foto</button>
+						</div>
+					</form>
+					<?php if ($ht_photo_id || $ht_cover_id) : ?>
+						<div class="ht-panel__photo-actions">
+							<?php if ($ht_photo_id) : ?>
+								<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+									<input type="hidden" name="action" value="halo_tg2_remove_photo">
+									<?php wp_nonce_field('halo_tg2_remove_photo', '_htrnonce'); ?>
+									<input type="hidden" name="jenis" value="profil">
+									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+									<button type="submit" class="halo-tg2__btn ht-panel__danger-btn">Hapus Foto Profil</button>
+								</form>
+							<?php endif; ?>
+							<?php if ($ht_cover_id) : ?>
+								<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+									<input type="hidden" name="action" value="halo_tg2_remove_photo">
+									<?php wp_nonce_field('halo_tg2_remove_photo', '_htrnonce'); ?>
+									<input type="hidden" name="jenis" value="sampul">
+									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+									<button type="submit" class="halo-tg2__btn ht-panel__danger-btn">Hapus Sampul</button>
+								</form>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+				</section>
 
 				<section class="ht-panel__setting-card">
 					<h2>Profil</h2>
