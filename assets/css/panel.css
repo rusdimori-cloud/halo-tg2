@@ -47,11 +47,14 @@
   animation:ht-dd-in .18s var(--ht-ease);
 }
 .ht-panel__dropdown.is-up{top:auto;bottom:calc(100% + 8px);left:0;right:auto;width:100%}
-.ht-panel__dropdown a,.ht-panel__dropdown button.ht-panel__menu-row{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+.ht-panel__dropdown a,.ht-panel__dropdown>button{
+  display:flex;align-items:center;gap:10px;width:100%;
   padding:9px 12px;border-radius:10px;font-size:14px;color:#0A0B0D;text-align:left;
   background:none;border:0;cursor:pointer;font-family:inherit;
 }
+.ht-panel__dropdown button.ht-panel__menu-row{justify-content:space-between}
+.ht-panel__dropdown a svg,.ht-panel__dropdown button svg{width:16px;height:16px;flex:none}
+.ht-panel__menu-label{display:inline-flex;align-items:center;gap:10px}
 .ht-panel__dropdown a:hover,.ht-panel__dropdown button:hover{background:var(--ht-fill)}
 .ht-panel__dropdown a.is-danger{color:var(--ht-error)}
 .ht-panel__dd-head{display:flex;align-items:center;gap:10px;padding:8px 12px 10px;border-bottom:1px solid var(--ht-line);margin-bottom:6px}
