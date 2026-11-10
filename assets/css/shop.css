@@ -1,0 +1,112 @@
+/* ============================================================
+   halo-tg2 — Kulit toko (Fase 4): cart, checkout, terima kasih,
+   katalog. Mesin WooCommerce & Tutor tetap bawaan; file ini
+   hanya menyelaraskan tampilannya ke Halo TG2 Template Desain.
+   Semua aturan memakai token --ht-* dari style.css tema.
+   ============================================================ */
+
+/* ---------- Umum Woo di dalam tema ---------- */
+.woocommerce .button,
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button{
+  background:#0F0F0F;color:#fff;border:1px solid var(--ht-line-strong);
+  border-radius:var(--ht-r-full);height:44px;padding:0 22px;
+  font-family:var(--ht-font);font-size:14px;font-weight:500;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  transition:background-color .2s,transform .15s var(--ht-ease);
+}
+.woocommerce .button:hover,.woocommerce a.button:hover,
+.woocommerce button.button:hover,.woocommerce input.button:hover{background:#000;color:#fff}
+.woocommerce .button:active{transform:scale(.98)}
+.woocommerce .button.alt,.woocommerce #place_order{background:var(--ht-primary);border-color:var(--ht-primary)}
+.woocommerce .button.alt:hover,.woocommerce #place_order:hover{background:var(--ht-primary-70)}
+.woocommerce .input-text,.woocommerce select,.woocommerce textarea{
+  border:1px solid var(--ht-line-strong);border-radius:var(--ht-r-md);
+  background:var(--ht-surface);color:var(--ht-fg);
+  padding:11px 14px;font-family:var(--ht-font);font-size:14.6px;width:100%;
+}
+.woocommerce .input-text:focus,.woocommerce select:focus,.woocommerce textarea:focus{
+  outline:2px solid var(--ht-primary-soft);border-color:var(--ht-primary);
+}
+.woocommerce form .form-row label{font-weight:600;font-size:13.6px;margin-bottom:6px}
+.woocommerce-message,.woocommerce-info,.woocommerce-error{
+  border:1px solid var(--ht-line);border-top:3px solid var(--ht-primary);
+  border-radius:var(--ht-r-md);background:var(--ht-surface);box-shadow:var(--ht-shadow);
+  font-size:14px;padding:14px 18px 14px 46px;
+}
+.woocommerce-error{border-top-color:var(--ht-error)}
+
+/* ---------- Cart ---------- */
+.woocommerce-cart .woocommerce-cart-form{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:8px var(--ht-sp-md);
+}
+.woocommerce table.shop_table{border:0;margin:0}
+.woocommerce table.shop_table td,.woocommerce table.shop_table th{border-top:1px solid var(--ht-line);padding:16px 8px}
+.woocommerce table.shop_table thead th{border-top:0;font-family:var(--ht-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ht-text-3)}
+.woocommerce-cart .product-thumbnail img{width:64px;height:64px;object-fit:cover;border-radius:var(--ht-r-md)}
+.woocommerce-cart .cart-collaterals .cart_totals{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:var(--ht-sp-md);
+}
+.woocommerce-cart .cart_totals h2{font-size:18px;font-weight:600;margin-bottom:var(--ht-sp-sm)}
+.woocommerce .quantity .qty{width:76px;text-align:center}
+.woocommerce a.remove{color:var(--ht-error)!important;border-radius:var(--ht-r-full)}
+.woocommerce a.remove:hover{background:var(--ht-error);color:#fff!important}
+.woocommerce .cart-empty,.woocommerce .return-to-shop{text-align:center}
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button{width:100%;height:52px;font-size:15.6px}
+
+/* ---------- Checkout ---------- */
+.woocommerce-checkout .col2-set .col-1,.woocommerce-checkout .col2-set .col-2,
+.woocommerce-checkout #order_review{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:var(--ht-sp-md);
+}
+.woocommerce-checkout h3{font-size:18px;font-weight:600;margin-bottom:var(--ht-sp-sm)}
+.woocommerce-checkout #payment{background:var(--ht-fill);border-radius:var(--ht-r-md)}
+.woocommerce-checkout #place_order{width:100%;height:52px;font-size:15.6px;margin-top:var(--ht-sp-sm)}
+.woocommerce-checkout .woocommerce-privacy-policy-text{font-size:12.6px;color:var(--ht-text-2)}
+
+/* ---------- Terima kasih (order received) ---------- */
+.halo-tg2__thanks{
+  display:flex;align-items:center;gap:var(--ht-sp-md);flex-wrap:wrap;
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);
+  padding:var(--ht-sp-md);margin-bottom:var(--ht-sp-lg);
+}
+.halo-tg2__thanks-icon{
+  width:54px;height:54px;flex:none;border-radius:var(--ht-r-full);
+  background:rgba(18,138,67,.12);color:var(--ht-success);
+  display:grid;place-items:center;
+}
+.halo-tg2__thanks-icon svg{width:28px;height:28px}
+.halo-tg2__thanks-text{flex:1;min-width:240px}
+.halo-tg2__thanks-text h2{font-size:19px;font-weight:600;margin-bottom:4px}
+.halo-tg2__thanks-text p{color:var(--ht-text-2);font-size:14px}
+.woocommerce .woocommerce-order-overview{
+  display:flex;flex-wrap:wrap;gap:var(--ht-sp-md);
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:var(--ht-sp-md);list-style:none;
+}
+.woocommerce ul.order_details li{border:0;margin:0;padding:0;font-size:13px;color:var(--ht-text-2)}
+.woocommerce ul.order_details li strong{display:block;color:var(--ht-fg);font-size:15px;margin-top:2px}
+
+/* ---------- Katalog kursus (arsip Tutor) & produk Woo ---------- */
+.post-type-archive-courses .tutor-course-card,
+.tax-course-category .tutor-course-card{
+  border-radius:var(--ht-r-lg);border:1px solid var(--ht-line);
+  box-shadow:var(--ht-shadow);overflow:hidden;background:var(--ht-surface);
+}
+.woocommerce ul.products li.product{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:14px;
+}
+.woocommerce ul.products li.product .button{margin-top:10px}
+
+/* ---------- Responsif ---------- */
+@media (max-width:768px){
+  .woocommerce table.shop_table td,.woocommerce table.shop_table th{padding:12px 6px}
+  .halo-tg2__thanks{flex-direction:column;align-items:flex-start}
+  .woocommerce .woocommerce-order-overview{flex-direction:column;gap:var(--ht-sp-sm)}
+}

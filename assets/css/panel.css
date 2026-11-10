@@ -1,0 +1,216 @@
+/* ============================================================
+   halo-tg2 — Dashboard kustom (Fase 8), mengikuti mockup yang
+   disetujui: ukuran kecil, jarak sedang, panel selalu putih,
+   tanpa garis aksen kiri, dropdown kustom, dock bawah.
+   ============================================================ */
+.ht-panel{display:grid;grid-template-columns:264px 1fr;min-height:100vh;background:var(--ht-bg)}
+
+/* ---------- Sidebar (selalu putih) ---------- */
+.ht-panel__side{
+  background:#fff;color:#0A0B0D;border-right:1px solid var(--ht-line);
+  padding:20px 14px;display:flex;flex-direction:column;gap:18px;
+  position:sticky;top:0;height:100vh;z-index:70;
+}
+.ht-panel__side .halo-tg2__wordmark{font-size:23px;padding:0 8px}
+.ht-panel__nav{display:grid;gap:2px;align-content:start;flex:1}
+.ht-panel__nav a,.ht-panel__nav button{
+  display:flex;align-items:center;gap:10px;text-align:left;width:100%;
+  padding:9px 12px;border-radius:12px;font-size:14px;font-weight:400;color:#0A0B0D;
+  background:none;border:0;cursor:pointer;font-family:inherit;
+}
+.ht-panel__nav a:hover,.ht-panel__nav button:hover{background:var(--ht-fill)}
+.ht-panel__nav a.is-active{background:#EEF4FF;color:var(--ht-primary);font-weight:600}
+.ht-panel__group{
+  font-family:var(--ht-mono);font-size:10.6px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ht-text-3);padding:14px 12px 5px;
+}
+.ht-panel__userbox{position:relative}
+.ht-panel__userchip{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  background:var(--ht-fill);border:1px solid var(--ht-line);border-radius:14px;
+  padding:9px 12px;cursor:pointer;font-family:inherit;color:#0A0B0D;
+}
+.ht-panel__avatar{
+  width:36px;height:36px;flex:none;border-radius:9999px;background:#EEF4FF;color:var(--ht-primary);
+  display:grid;place-items:center;font-weight:700;font-size:15px;
+}
+.ht-panel__userinfo{display:grid;line-height:1.25;min-width:0}
+.ht-panel__userinfo strong{font-size:13.6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht-panel__userinfo small,.ht-panel__dd-head small{font-size:12px;color:var(--ht-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- Dropdown (selalu putih) ---------- */
+.ht-panel__ddwrap{position:relative}
+.ht-panel__dropdown{
+  position:absolute;right:0;top:calc(100% + 8px);z-index:80;min-width:230px;
+  background:#fff;color:#0A0B0D;border:1px solid var(--ht-line);border-radius:18px;
+  box-shadow:0 12px 32px rgba(10,11,13,.13);padding:8px;
+  animation:ht-dd-in .18s var(--ht-ease);
+}
+.ht-panel__dropdown.is-up{top:auto;bottom:calc(100% + 8px);left:0;right:auto;width:100%}
+.ht-panel__dropdown a,.ht-panel__dropdown button.ht-panel__menu-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  padding:9px 12px;border-radius:10px;font-size:14px;color:#0A0B0D;text-align:left;
+  background:none;border:0;cursor:pointer;font-family:inherit;
+}
+.ht-panel__dropdown a:hover,.ht-panel__dropdown button:hover{background:var(--ht-fill)}
+.ht-panel__dropdown a.is-danger{color:var(--ht-error)}
+.ht-panel__dd-head{display:flex;align-items:center;gap:10px;padding:8px 12px 10px;border-bottom:1px solid var(--ht-line);margin-bottom:6px}
+.ht-panel__dd-head span:last-child{display:grid;line-height:1.25;min-width:0}
+.ht-panel__dd-head strong{font-size:14px;font-weight:600}
+.ht-panel__notif{width:340px;padding:12px}
+@keyframes ht-dd-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.ht-panel__switch{
+  width:38px;height:22px;border-radius:9999px;background:rgba(3,5,11,.18);position:relative;flex:none;transition:background-color .18s;
+}
+.ht-panel__switch::after{
+  content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:9999px;background:#fff;transition:left .18s;
+}
+html[data-halo-tg2-theme="dark"] .ht-panel__switch{background:var(--ht-primary)}
+html[data-halo-tg2-theme="dark"] .ht-panel__switch::after{left:19px}
+
+/* ---------- Kolom utama ---------- */
+.ht-panel__main{display:flex;flex-direction:column;min-width:0}
+.ht-panel__topbar{
+  display:flex;align-items:center;gap:12px;padding:14px 22px;
+  position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--ht-bg) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--ht-line);
+}
+.ht-panel__topbar h1{font-size:19px;font-weight:600;flex:1}
+.ht-panel__burger{display:none;background:none;border:0;padding:6px;cursor:pointer;color:var(--ht-fg)}
+.ht-panel__burger svg{width:22px;height:22px;display:block}
+.ht-panel__top-actions{display:flex;align-items:center;gap:8px}
+.ht-panel__iconbtn{
+  width:40px;height:40px;border-radius:9999px;border:1px solid var(--ht-line);
+  background:var(--ht-surface);color:var(--ht-fg);display:grid;place-items:center;cursor:pointer;
+}
+.ht-panel__iconbtn svg{width:20px;height:20px}
+.ht-panel__avatarbtn{background:none;border:0;cursor:pointer;padding:0}
+.ht-panel__content{padding:22px;max-width:1060px;width:100%;margin:0 auto;padding-bottom:110px}
+.ht-panel__greeting{font-size:16.6px;margin-bottom:18px}
+.ht-panel__notice{border-radius:14px;padding:11px 14px;font-size:14px;margin-bottom:16px}
+.ht-panel__notice.is-ok{background:rgba(18,138,67,.09);border:1px solid rgba(18,138,67,.35);color:var(--ht-success)}
+.ht-panel__notice.is-error{background:rgba(217,45,32,.08);border:1px solid rgba(217,45,32,.35);color:var(--ht-error)}
+
+/* Strip pesanan belum lunas */
+.ht-panel__strip{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:18px;
+  box-shadow:var(--ht-shadow);padding:14px 18px;margin-bottom:18px;font-size:14px;
+}
+.ht-panel__strip p{flex:1;min-width:230px}
+.ht-panel__strip-actions{display:flex;align-items:center;gap:8px}
+.ht-panel__strip-x{background:none;border:0;cursor:pointer;color:var(--ht-text-3);font-size:14px;padding:6px}
+
+/* Kartu kelas (mockup v16: sampul penuh) */
+.ht-panel__section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.ht-panel__section-head h2{font-size:18px;font-weight:600}
+.ht-panel__section-head a{color:var(--ht-primary);font-weight:500;font-size:14px}
+.ht-panel__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:14px}
+.ht-panel__course{
+  position:relative;display:block;min-height:184px;border-radius:20px;overflow:hidden;
+  background:linear-gradient(160deg,#4D84FF,#1463FF 48%,#0A36A8);
+  box-shadow:var(--ht-shadow);color:#fff;
+}
+.ht-panel__course-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ht-panel__course-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,11,13,0) 34%,rgba(10,11,13,.62))}
+.ht-panel__course-body{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;display:grid;gap:7px}
+.ht-panel__course-title{font-weight:600;font-size:15.6px;line-height:1.3}
+.ht-panel__course-bar{height:6px;border-radius:9999px;background:rgba(255,255,255,.35);overflow:hidden}
+.ht-panel__course-bar span{display:block;height:100%;background:#fff;border-radius:9999px}
+.ht-panel__course-meta{font-size:12.6px;opacity:.92}
+
+/* Toolbar kelas & tab pil */
+.ht-panel__toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.ht-panel__tabs{
+  display:inline-flex;gap:4px;background:var(--ht-fill);border:1px solid var(--ht-line);
+  border-radius:9999px;padding:4px;margin-bottom:16px;
+}
+.ht-panel__toolbar .ht-panel__tabs{margin-bottom:0}
+.ht-panel__tabs button{
+  border:0;background:none;cursor:pointer;font-family:inherit;font-size:13.6px;font-weight:600;
+  color:var(--ht-text-2);padding:7px 16px;border-radius:9999px;
+}
+.ht-panel__tabs button.is-active{background:var(--ht-surface);color:var(--ht-fg);box-shadow:var(--ht-shadow)}
+.ht-panel__sortbtn{
+  background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:9999px;
+  padding:9px 16px;font-family:inherit;font-size:13.6px;font-weight:500;color:var(--ht-fg);cursor:pointer;
+}
+
+/* Keadaan kosong (komponen global Template) */
+.halo-tg2__empty{
+  border:1.6px dashed var(--ht-line-strong);border-radius:20px;background:var(--ht-surface);
+  padding:26px;display:grid;justify-items:center;text-align:center;gap:8px;
+}
+.halo-tg2__empty-icon{width:56px;height:56px;border-radius:9999px;background:var(--ht-primary-soft);color:var(--ht-primary);display:grid;place-items:center}
+.halo-tg2__empty-icon svg{width:28px;height:28px}
+.halo-tg2__empty h3{font-size:16px;font-weight:600;color:var(--ht-fg)}
+.halo-tg2__empty p{color:var(--ht-text-2);font-size:13.6px;max-width:380px}
+
+/* Dock bawah */
+.ht-panel__dock{
+  position:fixed;left:264px;right:0;bottom:0;z-index:55;
+  display:flex;justify-content:center;gap:4px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+  background:rgba(244,246,251,.85);backdrop-filter:blur(14px);border-top:1px solid var(--ht-line);
+}
+html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
+.ht-panel__dock a,.ht-panel__dock button{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:7px 16px;border-radius:14px;font-size:11.6px;font-weight:500;color:var(--ht-text-2);
+  background:none;border:0;cursor:pointer;font-family:inherit;
+}
+.ht-panel__dock svg{width:19px;height:19px}
+.ht-panel__nav a svg,.ht-panel__nav button svg{width:17px;height:17px;flex:none}
+.ht-panel__dock a.is-active{background:#EEF4FF;color:var(--ht-primary);font-weight:600}
+
+/* Modal Hubungi Kami */
+.ht-panel__scrim{
+  position:fixed;inset:0;z-index:65;background:rgba(10,11,13,.45);backdrop-filter:blur(3px);
+}
+.ht-panel__modal{
+  position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:16px;
+  background:rgba(10,11,13,.45);backdrop-filter:blur(3px);
+}
+.ht-panel__modal[hidden]{display:none}
+.ht-panel__modal-card{
+  background:var(--ht-surface);color:var(--ht-fg);border-radius:24px;box-shadow:var(--ht-shadow);
+  width:min(480px,100%);padding:24px;animation:ht-dd-in .18s var(--ht-ease);
+}
+.ht-panel__modal-card h2{font-size:19px;font-weight:600}
+.ht-panel__modal-sub{color:var(--ht-text-2);font-size:13.6px;margin:4px 0 16px}
+.ht-panel__chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ht-panel__chips input{position:absolute;opacity:0;pointer-events:none}
+.ht-panel__chips span{
+  display:inline-block;padding:7px 14px;border-radius:9999px;border:1px solid var(--ht-line-strong);
+  font-size:13.6px;font-weight:500;cursor:pointer;
+}
+.ht-panel__chips input:checked + span{background:var(--ht-primary-soft);border-color:var(--ht-primary);color:var(--ht-primary)}
+.ht-panel__field{display:grid;gap:6px;font-weight:600;font-size:13.6px;margin-bottom:12px}
+.ht-panel__field input,.ht-panel__field textarea{
+  border:1px solid var(--ht-line-strong);border-radius:14px;background:var(--ht-surface);color:var(--ht-fg);
+  padding:11px 14px;font:inherit;font-weight:400;width:100%;resize:vertical;
+}
+.ht-panel__modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+.ht-panel__modal .halo-tg2__btn--ghost{background:transparent;border:1px solid var(--ht-line-strong);color:var(--ht-fg)}
+
+/* ---------- Responsif ---------- */
+@media (max-width:900px){
+  .ht-panel{grid-template-columns:1fr}
+  .ht-panel__side{
+    position:fixed;left:0;top:0;bottom:0;width:min(258px,76vw);height:auto;
+    transform:translateX(-102%);transition:transform .22s var(--ht-ease);
+    box-shadow:0 12px 32px rgba(10,11,13,.18);
+  }
+  .ht-panel__side.is-open{transform:none}
+  .ht-panel__burger{display:block}
+  .ht-panel__dock{left:0}
+  .ht-panel__content{padding:16px;padding-bottom:104px}
+  .ht-panel__notif{position:fixed;left:8px;right:8px;top:64px;width:auto}
+  .ht-panel__strip{flex-direction:column;align-items:stretch}
+  .ht-panel__strip-actions .halo-tg2__btn{flex:1}
+  .ht-panel__modal{place-items:end center;padding:0}
+  .ht-panel__modal-card{border-radius:24px 24px 0 0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  .ht-panel__dropdown,.ht-panel__modal-card{animation:none}
+  .ht-panel__side{transition:none}
+}

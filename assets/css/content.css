@@ -1,0 +1,69 @@
+/* ============================================================
+   halo-tg2 — Konten umum (Fase 7): halaman, artikel, arsip,
+   pencarian. Bahasa Template; ukuran terbaca, lebar baris wajar.
+   ============================================================ */
+.halo-tg2__prose-wrap{max-width:780px}
+.halo-tg2__prose{font-size:16.6px;line-height:1.75;color:var(--ht-fg)}
+.halo-tg2__prose p{margin-bottom:var(--ht-sp-sm)}
+.halo-tg2__prose h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:var(--ht-sp-lg) 0 var(--ht-sp-xs)}
+.halo-tg2__prose h3{font-size:19px;font-weight:600;margin:var(--ht-sp-md) 0 var(--ht-sp-xs)}
+.halo-tg2__prose ul,.halo-tg2__prose ol{margin:0 0 var(--ht-sp-sm) 22px}
+.halo-tg2__prose li{margin-bottom:6px}
+.halo-tg2__prose a{color:var(--ht-primary);text-decoration:underline;text-underline-offset:3px}
+.halo-tg2__prose img{border-radius:var(--ht-r-md);max-width:100%;height:auto}
+.halo-tg2__prose blockquote{
+  border-left:3px solid var(--ht-primary);padding-left:var(--ht-sp-sm);
+  color:var(--ht-text-2);margin:var(--ht-sp-md) 0;
+}
+.halo-tg2__post-meta{font-family:var(--ht-mono);font-size:12px;letter-spacing:.06em;color:var(--ht-text-3);text-transform:uppercase}
+.halo-tg2__post-hero{margin-bottom:var(--ht-sp-md)}
+.halo-tg2__post-hero img{width:100%;height:auto;border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow)}
+.halo-tg2__post-nav{
+  display:flex;justify-content:space-between;gap:var(--ht-sp-md);
+  margin-top:var(--ht-sp-xl);padding-top:var(--ht-sp-md);border-top:1px solid var(--ht-line);
+  font-weight:500;font-size:14.6px;
+}
+.halo-tg2__post-nav a{color:var(--ht-primary)}
+
+/* Arsip */
+.halo-tg2__post-grid{
+  display:grid;gap:var(--ht-sp-md);
+  grid-template-columns:repeat(var(--ht-cols-desktop),1fr);
+}
+.halo-tg2__post-card{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.halo-tg2__post-thumb img{width:100%;height:180px;object-fit:cover;display:block}
+.halo-tg2__post-card .halo-tg2__post-meta{padding:var(--ht-sp-sm) var(--ht-sp-md) 0}
+.halo-tg2__post-title{font-size:18px;font-weight:600;padding:4px var(--ht-sp-md) 0}
+.halo-tg2__post-title a{color:var(--ht-fg)}
+.halo-tg2__post-title a:hover{color:var(--ht-primary)}
+.halo-tg2__post-excerpt{color:var(--ht-text-2);font-size:14px;padding:6px var(--ht-sp-md) var(--ht-sp-md)}
+.halo-tg2__pagination{margin-top:var(--ht-sp-lg);text-align:center}
+.halo-tg2__pagination .page-numbers{
+  display:inline-block;padding:8px 14px;border-radius:var(--ht-r-full);
+  border:1px solid var(--ht-line);background:var(--ht-surface);color:var(--ht-fg);font-size:14px;margin:0 2px;
+}
+.halo-tg2__pagination .page-numbers.current{background:var(--ht-primary);border-color:var(--ht-primary);color:#fff}
+
+/* Pencarian */
+.halo-tg2__search-list{display:grid;gap:var(--ht-sp-sm)}
+.halo-tg2__search-item{
+  background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);
+  box-shadow:var(--ht-shadow);padding:var(--ht-sp-md);
+}
+.halo-tg2__search-tag{
+  display:inline-block;font-family:var(--ht-mono);font-size:10.6px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ht-primary);background:var(--ht-primary-soft);
+  border-radius:var(--ht-r-full);padding:4px 10px;margin-bottom:8px;
+}
+.halo-tg2__search-item h2{font-size:18px;font-weight:600;margin-bottom:4px}
+.halo-tg2__search-item h2 a{color:var(--ht-fg)}
+.halo-tg2__search-item p{color:var(--ht-text-2);font-size:14px}
+
+@media (max-width:1024px){
+  .halo-tg2__post-grid{grid-template-columns:repeat(var(--ht-cols-tablet),1fr)}
+}
+@media (max-width:640px){
+  .halo-tg2__post-grid{grid-template-columns:repeat(var(--ht-cols-mobile),1fr)}
+  .halo-tg2__prose{font-size:15.6px}
+  .halo-tg2__post-nav{flex-direction:column}
+}

@@ -1,0 +1,196 @@
+/*
+Theme Name: halo-tg2
+Theme URI: https://halo-tg2.com
+Author: halo TG2
+Description: Tema mandiri halo TG2 — dibangun dari Halo TG2 Template Desain. Mesin WooCommerce & Tutor LMS, kulit tema ini. Header pill, footer gradasi navy (satu-satunya gradasi resmi), cart drawer, satu pintu login.
+Version: 1.1.2
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 7.4
+Text Domain: halo-tg2
+*/
+
+/* ============================================================
+   HALO TG2 TEMPLATE DESAIN — TOKEN
+   Bawaan publik: tema TERANG (Bagian 5 dokumen arsitektur).
+   Tema gelap aktif lewat [data-halo-tg2-theme="dark"] di <html>.
+   Warna/font/skala TIDAK dibuka sebagai pengaturan (Bagian 6).
+   ============================================================ */
+:root{
+  --ht-primary:#1463FF; --ht-primary-60:#5A93FF; --ht-primary-70:#0F53D8; --ht-primary-80:#A9C2FF;
+  --ht-tertiary:#7C8BFF; --ht-error:#D92D20; --ht-success:#128A43; --ht-amber:#FEC221;
+  --ht-bg:#F4F6FB; --ht-surface:#FFFFFF; --ht-ink:#03050B; --ht-fg:#0A0B0D; --ht-white:#FFFFFF;
+  color-scheme:light;
+  --ht-line:rgba(3,5,11,.1); --ht-line-strong:rgba(3,5,11,.22);
+  --ht-text-2:rgba(3,5,11,.66); --ht-text-3:rgba(3,5,11,.46);
+  --ht-fill:rgba(3,5,11,.04); --ht-primary-soft:rgba(20,99,255,.1);
+  --ht-shadow:0 1px 2px rgba(10,11,13,.04),0 12px 32px rgba(10,11,13,.07);
+  --ht-header-bg:rgba(255,255,255,.72);
+  --ht-r-sm:6px; --ht-r-md:14px; --ht-r-lg:24px; --ht-r-xl:28px; --ht-r-full:9999px;
+  --ht-sp-xs:6px; --ht-sp-sm:14px; --ht-sp-md:24px; --ht-sp-lg:32px; --ht-sp-xl:40px; --ht-sp-gutter:48px; --ht-sp-margin:64px;
+  --ht-font:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ht-mono:"Geist Mono",ui-monospace,"SF Mono",monospace;
+  --ht-ease:cubic-bezier(.16,1,.3,1);
+  /* diisi dari Customizer (Bagian 6): lebar logo & kolom grid kartu */
+  --ht-logo-w:132px; --ht-logo-maxh:40px;
+  --ht-cols-desktop:3; --ht-cols-tablet:2; --ht-cols-mobile:1;
+}
+[data-halo-tg2-theme="dark"]{
+  --ht-primary-70:#7AA7FF;
+  --ht-bg:#03050B; --ht-surface:#0A0B0D; --ht-fg:#FFFFFF;
+  color-scheme:dark;
+  --ht-line:rgba(255,255,255,.09); --ht-line-strong:rgba(255,255,255,.18);
+  --ht-text-2:rgba(255,255,255,.68); --ht-text-3:rgba(255,255,255,.48);
+  --ht-fill:rgba(255,255,255,.04); --ht-primary-soft:rgba(20,99,255,.14);
+  --ht-shadow:0 8px 24px rgba(0,0,0,.28);
+  --ht-header-bg:rgba(10,11,13,.72);
+}
+
+/* ============ RESET & DASAR ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--ht-bg);color:var(--ht-fg);font-family:var(--ht-font);font-size:14px;line-height:21px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+::selection{background:var(--ht-primary);color:#fff}
+.screen-reader-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ============ TYPE (skala Template) ============ */
+.halo-tg2__t-display{font-size:clamp(47px,8vw,74px);font-weight:700;line-height:1.2}
+.halo-tg2__t-h-lg{font-size:clamp(38px,5.2vw,59px);font-weight:600;line-height:1.19;letter-spacing:-.056em}
+.halo-tg2__t-h-md{font-size:clamp(32px,4vw,47px);font-weight:600;line-height:1.19;letter-spacing:-.016em}
+.halo-tg2__t-h-sm{font-size:clamp(28px,3.2vw,38px);font-weight:600;line-height:1.21}
+.halo-tg2__t-body-lg{font-size:clamp(24px,2.6vw,30px);font-weight:600;line-height:1.5;letter-spacing:-.04em}
+.halo-tg2__t-body-md{font-size:18px;font-weight:500;line-height:28px;letter-spacing:-.02em}
+.halo-tg2__t-body-sm{font-size:14px;font-weight:400;line-height:21px}
+.halo-tg2__t-label-lg{font-size:13.6px;font-weight:500;line-height:20px;letter-spacing:.02em}
+.halo-tg2__t-label-md{font-size:12px;font-weight:500;line-height:18px;letter-spacing:.08em}
+.halo-tg2__t-label-sm{font-family:var(--ht-mono);font-size:11px;font-weight:500;line-height:16px;letter-spacing:.14em;text-transform:uppercase}
+.halo-tg2__t-mono-sm{font-family:var(--ht-mono);font-size:10px;font-weight:400;line-height:14px;letter-spacing:.16em;text-transform:uppercase}
+
+/* ============ LAYOUT & KOMPONEN DASAR ============ */
+.halo-tg2__wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 var(--ht-sp-md)}
+.halo-tg2__section{padding:calc(var(--ht-sp-gutter)*2) 0}
+.halo-tg2__card{background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow)}
+.halo-tg2__btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--ht-sp-xs);height:40px;padding:11px 16px;border-radius:var(--ht-r-full);font-size:13.6px;font-weight:500;line-height:20px;letter-spacing:.02em;border:1px solid transparent;transition:background-color .2s,color .2s,border-color .2s,transform .15s var(--ht-ease);white-space:nowrap}
+.halo-tg2__btn:active{transform:scale(.98)}
+.halo-tg2__btn--primary{background:#0F0F0F;color:#fff;border-color:var(--ht-line-strong)}
+.halo-tg2__btn--primary:hover{background:#000}
+.halo-tg2__btn--white{background:#fff;color:#0A0B0D}
+.halo-tg2__btn--block{width:100%}
+.halo-tg2__btn-link{font-size:14px;font-weight:500;color:var(--ht-text-2);transition:color .2s}
+.halo-tg2__btn-link:hover{color:var(--ht-fg)}
+.halo-tg2__icon-btn{width:40px;height:40px;border-radius:var(--ht-r-full);display:grid;place-items:center;background:transparent;color:var(--ht-text-2);border:1px solid transparent;transition:background-color .2s,color .2s}
+.halo-tg2__icon-btn:hover{background:var(--ht-fill);color:var(--ht-fg)}
+.halo-tg2__icon-btn svg{width:20px;height:20px}
+
+/* ============ BAR PENGUMUMAN ============ */
+.halo-tg2__announce{background:var(--ht-primary);color:#fff;text-align:center;padding:9px var(--ht-sp-md);font-size:13px;font-weight:500;position:relative;z-index:60}
+.halo-tg2__announce a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+
+/* ============ HEADER (pill melayang, seperti landing) ============ */
+.halo-tg2__header{position:fixed;inset:0 0 auto 0;z-index:50;background:transparent;padding:14px 20px 0}
+.halo-tg2__header-in{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:var(--ht-sp-md);height:58px;padding:0 8px 0 20px;background:var(--ht-header-bg);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--ht-line);border-radius:var(--ht-r-full);box-shadow:var(--ht-shadow)}
+.halo-tg2__wordmark{font-size:18px;font-weight:700;letter-spacing:-.02em;display:inline-flex;align-items:baseline;gap:var(--ht-sp-xs);color:var(--ht-fg)}
+.halo-tg2__wordmark em{font-style:normal;color:var(--ht-primary)}
+.halo-tg2__logo img{width:var(--ht-logo-w);max-height:var(--ht-logo-maxh);height:auto;object-fit:contain}
+.halo-tg2__logo .halo-tg2__logo-dark{display:none}
+[data-halo-tg2-theme="dark"] .halo-tg2__logo .halo-tg2__logo-light{display:none}
+[data-halo-tg2-theme="dark"] .halo-tg2__logo .halo-tg2__logo-dark{display:block}
+.halo-tg2__nav{display:flex;align-items:center;gap:var(--ht-sp-lg)}
+.halo-tg2__nav ul{display:flex;align-items:center;gap:var(--ht-sp-lg);list-style:none}
+.halo-tg2__nav a{font-size:14px;color:var(--ht-text-2);transition:color .2s}
+.halo-tg2__nav a:hover,.halo-tg2__nav .current-menu-item>a{color:var(--ht-fg)}
+.halo-tg2__header-cta{display:flex;align-items:center;gap:var(--ht-sp-sm)}
+.halo-tg2__cart-btn{position:relative}
+.halo-tg2__cart-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:var(--ht-r-full);background:var(--ht-primary);color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.halo-tg2__theme-toggle .ic-sun{display:none}
+[data-halo-tg2-theme="dark"] .halo-tg2__theme-toggle .ic-sun{display:block}
+[data-halo-tg2-theme="dark"] .halo-tg2__theme-toggle .ic-moon{display:none}
+.halo-tg2__burger{display:none}
+.halo-tg2__burger .ic-x{display:none}
+.halo-tg2__burger[aria-expanded="true"] .ic-bars{display:none}
+.halo-tg2__burger[aria-expanded="true"] .ic-x{display:block}
+
+/* ============ MENU MOBILE (animasi: Turun / Geser Kiri / Fade — Customizer) ============ */
+.halo-tg2__mobile-menu{position:absolute;top:calc(100% + 10px);left:20px;right:20px;z-index:1;background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:var(--ht-sp-md);display:grid;gap:4px;opacity:0;pointer-events:none}
+.halo-tg2__mobile-menu ul{list-style:none;display:grid;gap:4px}
+.halo-tg2__mobile-menu a{display:block;padding:10px 12px;border-radius:var(--ht-r-md);font-size:16px;font-weight:500;color:var(--ht-fg)}
+.halo-tg2__mobile-menu a:hover{background:var(--ht-fill)}
+.halo-tg2__mnav-actions{display:grid;gap:var(--ht-sp-sm);margin-top:var(--ht-sp-sm);justify-items:stretch;text-align:center}
+.halo-tg2__mobile-menu.is-open{opacity:1;pointer-events:auto}
+.halo-tg2__mobile-menu.is-closing{opacity:0;pointer-events:none}
+body.ht-menu-anim-turun .halo-tg2__mobile-menu{transform:translateY(-10px);transition:opacity .18s var(--ht-ease),transform .18s var(--ht-ease)}
+body.ht-menu-anim-turun .halo-tg2__mobile-menu.is-open{transform:translateY(0)}
+body.ht-menu-anim-geser .halo-tg2__mobile-menu{transform:translateX(28px);transition:opacity .18s var(--ht-ease),transform .18s var(--ht-ease)}
+body.ht-menu-anim-geser .halo-tg2__mobile-menu.is-open{transform:translateX(0)}
+body.ht-menu-anim-fade .halo-tg2__mobile-menu{transition:opacity .18s var(--ht-ease)}
+@media (prefers-reduced-motion:reduce){.halo-tg2__mobile-menu{transition:none!important}}
+
+/* ============ CART DRAWER (satu fitur, dari kanan) ============ */
+.halo-tg2__scrim{position:fixed;inset:0;z-index:65;background:rgba(10,11,13,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .2s var(--ht-ease)}
+.halo-tg2__scrim.is-open{opacity:1;pointer-events:auto}
+.halo-tg2__drawer{position:fixed;top:0;right:0;bottom:0;z-index:70;width:min(400px,92vw);background:var(--ht-surface);color:var(--ht-fg);box-shadow:-16px 0 40px rgba(10,11,13,.18);transform:translateX(105%);transition:transform .26s var(--ht-ease);display:flex;flex-direction:column}
+.halo-tg2__drawer.is-open{transform:translateX(0)}
+.halo-tg2__drawer-head{display:flex;align-items:center;justify-content:space-between;padding:var(--ht-sp-md);border-bottom:1px solid var(--ht-line)}
+.halo-tg2__drawer-head h2{font-size:18px;font-weight:600}
+.halo-tg2__drawer-body{flex:1;overflow-y:auto;padding:var(--ht-sp-md)}
+.halo-tg2__drawer-foot{padding:var(--ht-sp-md);border-top:1px solid var(--ht-line);display:grid;gap:var(--ht-sp-sm)}
+.halo-tg2__empty{border:1.5px dashed var(--ht-line-strong);border-radius:var(--ht-r-lg);padding:var(--ht-sp-lg);text-align:center;display:grid;gap:var(--ht-sp-xs);justify-items:center}
+.halo-tg2__empty h3{font-size:16px;font-weight:600}
+.halo-tg2__empty p{color:var(--ht-text-2);font-size:13.6px}
+body.halo-tg2__locked{overflow:hidden}
+.halo-tg2__drawer .woocommerce-mini-cart{list-style:none;display:grid;gap:var(--ht-sp-sm)}
+.halo-tg2__drawer .woocommerce-mini-cart-item{display:flex;gap:var(--ht-sp-sm);align-items:center;font-size:13.6px}
+.halo-tg2__drawer .woocommerce-mini-cart-item img{width:48px;height:48px;border-radius:var(--ht-r-sm);object-fit:cover}
+.halo-tg2__drawer .woocommerce-mini-cart__total{margin-top:var(--ht-sp-md);padding-top:var(--ht-sp-sm);border-top:1px solid var(--ht-line);display:flex;justify-content:space-between}
+.halo-tg2__drawer .woocommerce-mini-cart__buttons,.halo-tg2__drawer .woocommerce-mini-cart__empty-message{display:none}
+@media (prefers-reduced-motion:reduce){.halo-tg2__drawer,.halo-tg2__scrim{transition:none!important}}
+
+/* ============ FOOTER (gradasi navy — satu-satunya pengecualian resmi) ============ */
+.halo-tg2__footer{--ht-fg:#FFFFFF;--ht-text-2:rgba(226,233,248,.78);--ht-text-3:rgba(226,233,248,.45);--ht-line:rgba(255,255,255,.09);--ht-line-strong:rgba(255,255,255,.22);--ht-primary-70:#7AA7FF;background:linear-gradient(180deg,#0B1E42 0%,#060D20 52%,#000000 100%);color:#fff;padding:calc(var(--ht-sp-gutter)*1.5) 0 var(--ht-sp-xl);margin-top:calc(var(--ht-sp-gutter)*2)}
+.halo-tg2__footer .halo-tg2__wordmark{color:#fff}
+.halo-tg2__footer-main{display:grid;grid-template-columns:5fr 7fr;gap:calc(var(--ht-sp-gutter)*1.5);margin-bottom:calc(var(--ht-sp-gutter)*1.5)}
+.halo-tg2__footer-brand{display:grid;gap:var(--ht-sp-md);align-content:start;justify-items:start}
+.halo-tg2__footer-logo{font-size:28px}
+.halo-tg2__footer-tag{font-size:20px;font-weight:500;line-height:30px;color:var(--ht-text-2);max-width:420px}
+.halo-tg2__footer-contacts{display:grid;gap:var(--ht-sp-sm);justify-items:start}
+.halo-tg2__footer-contact{font-size:18px;line-height:28px;color:#fff;border-bottom:1px solid var(--ht-line-strong);padding-bottom:4px;display:inline-flex;align-items:center;gap:var(--ht-sp-xs);transition:border-color .2s}
+.halo-tg2__footer-contact:hover{border-color:#fff}
+.halo-tg2__footer-links{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--ht-sp-lg)}
+.halo-tg2__footer-col{display:grid;gap:var(--ht-sp-sm);align-content:start}
+.halo-tg2__footer-head{font-family:var(--ht-mono);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ht-text-3);margin-bottom:2px}
+.halo-tg2__footer-col a,.halo-tg2__footer-col li{font-size:14.6px;color:var(--ht-text-2);list-style:none}
+.halo-tg2__footer-col a:hover{color:#fff}
+.halo-tg2__footer-col ul{list-style:none;display:grid;gap:var(--ht-sp-sm)}
+.halo-tg2__footer-bottom{display:flex;flex-wrap:wrap;gap:var(--ht-sp-sm);justify-content:space-between;border-top:1px solid var(--ht-line);padding-top:var(--ht-sp-md);color:var(--ht-text-3)}
+
+/* ============ TOMBOL LINE MELAYANG ============ */
+.halo-tg2__float-line{position:fixed;right:20px;bottom:20px;z-index:55;width:56px;height:56px;border-radius:var(--ht-r-full);background:#06C755;color:#fff;display:grid;place-items:center;box-shadow:var(--ht-shadow);transition:transform .15s var(--ht-ease)}
+.halo-tg2__float-line:hover{transform:translateY(-2px)}
+.halo-tg2__float-line svg{width:28px;height:28px}
+
+/* ============ KONTEN DASAR (fallback Fase 1; dipoles fase berikutnya) ============ */
+.halo-tg2__main{padding-top:calc(72px + var(--ht-sp-xl));min-height:60vh}
+.halo-tg2__entry{display:grid;gap:var(--ht-sp-md);max-width:760px}
+.halo-tg2__entry h1,.halo-tg2__entry h2{font-weight:600;letter-spacing:-.02em}
+.halo-tg2__post-list{display:grid;gap:var(--ht-sp-md)}
+.halo-tg2__post-item{padding:var(--ht-sp-md)}
+.halo-tg2__post-item h2{font-size:20px;font-weight:600;margin-bottom:6px}
+.halo-tg2__post-item p{color:var(--ht-text-2)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:900px){
+  .halo-tg2__nav{display:none}
+  .halo-tg2__burger{display:grid}
+  .halo-tg2__footer-main{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .halo-tg2__header{padding:10px 12px 0}
+  .halo-tg2__header .halo-tg2__btn-link{display:none}
+  .halo-tg2__header-cta>.halo-tg2__btn{display:none}
+  .halo-tg2__mobile-menu{left:12px;right:12px}
+  .halo-tg2__footer-links{grid-template-columns:1fr 1fr}
+  .halo-tg2__footer-tag{font-size:17px;line-height:26px}
+}

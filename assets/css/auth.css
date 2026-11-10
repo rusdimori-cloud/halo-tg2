@@ -1,0 +1,70 @@
+/* ============================================================
+   halo-tg2 — Satu pintu (Fase 5): halaman auth + poles layar
+   wp-login.php bawaan untuk alur atur ulang kata sandi.
+   ============================================================ */
+.halo-tg2__auth-shell{
+  min-height:100vh;display:grid;justify-items:center;align-content:center;
+  gap:var(--ht-sp-md);padding:var(--ht-sp-lg) var(--ht-sp-md);
+}
+.halo-tg2__auth-logo{font-size:26px}
+.halo-tg2__auth-card{width:min(440px,100%);padding:var(--ht-sp-lg)}
+.halo-tg2__auth-tabs{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  background:var(--ht-fill);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-full);padding:4px;margin-bottom:var(--ht-sp-md);
+}
+.halo-tg2__auth-tabs a{
+  text-align:center;padding:9px 0;border-radius:var(--ht-r-full);
+  font-weight:600;font-size:14px;color:var(--ht-text-2);transition:background-color .18s,color .18s;
+}
+.halo-tg2__auth-tabs a.is-active{background:var(--ht-surface);color:var(--ht-fg);box-shadow:var(--ht-shadow)}
+.halo-tg2__auth-title{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
+.halo-tg2__auth-sub{color:var(--ht-text-2);font-size:14px;margin-bottom:var(--ht-sp-md)}
+.halo-tg2__auth-form{display:grid;gap:var(--ht-sp-sm)}
+.halo-tg2__auth-form label{display:grid;gap:6px;font-weight:600;font-size:13.6px}
+.halo-tg2__auth-form input[type="text"],
+.halo-tg2__auth-form input[type="password"],
+.halo-tg2__auth-form input[type="email"]{
+  border:1px solid var(--ht-line-strong);border-radius:var(--ht-r-md);
+  background:var(--ht-surface);color:var(--ht-fg);
+  padding:12px 14px;font:inherit;font-weight:400;width:100%;
+}
+.halo-tg2__auth-form input:focus{outline:2px solid var(--ht-primary-soft);border-color:var(--ht-primary)}
+.halo-tg2__auth-row{display:flex;justify-content:space-between;align-items:center;gap:var(--ht-sp-sm);font-size:13.6px}
+.halo-tg2__auth-row a{color:var(--ht-primary);font-weight:500}
+.halo-tg2__auth-check{display:inline-flex!important;align-items:center;gap:8px;font-weight:500!important}
+.halo-tg2__auth-check input{width:17px;height:17px;accent-color:var(--ht-primary)}
+.halo-tg2__auth-note{font-size:12.6px;color:var(--ht-text-2)}
+.halo-tg2__auth-back{margin-top:var(--ht-sp-md);text-align:center}
+.halo-tg2__auth-back a{color:var(--ht-primary);font-weight:500;font-size:14px}
+.halo-tg2__auth-msg{
+  border-radius:var(--ht-r-md);padding:11px 14px;font-size:13.6px;margin-bottom:var(--ht-sp-md);
+}
+.halo-tg2__auth-msg.is-error{background:rgba(217,45,32,.08);border:1px solid rgba(217,45,32,.35);color:var(--ht-error)}
+.halo-tg2__auth-msg.is-ok{background:rgba(18,138,67,.09);border:1px solid rgba(18,138,67,.35);color:var(--ht-success)}
+.halo-tg2__auth-home{color:var(--ht-text-2);font-size:13.6px}
+.halo-tg2__auth-home:hover{color:var(--ht-fg)}
+
+/* ---------- Layar wp-login.php (alur atur ulang sandi) ---------- */
+body.login{background:#F4F6FB;font-family:"Geist",system-ui,sans-serif}
+body.login #login{width:min(400px,92vw)}
+body.login form{
+  border:1px solid rgba(3,5,11,.1);border-radius:24px;
+  box-shadow:0 1px 2px rgba(10,11,13,.04),0 12px 32px rgba(10,11,13,.07);
+  padding:28px;
+}
+body.login label{font-weight:600;font-size:13.6px;color:#0A0B0D}
+body.login .input{
+  border:1px solid rgba(3,5,11,.22);border-radius:14px;padding:11px 14px;font-size:14.6px;
+}
+body.login .button-primary{
+  background:#0F0F0F;border-color:rgba(3,5,11,.22);border-radius:9999px;
+  height:44px;padding:0 22px;font-size:14px;font-weight:500;box-shadow:none;text-shadow:none;
+}
+body.login .button-primary:hover{background:#000}
+body.login #nav,body.login #backtoblog{text-align:center}
+body.login #nav a,body.login #backtoblog a{color:#1463FF}
+body.login h1 a{
+  background:none;width:auto;height:auto;text-indent:0;
+  font-size:26px;font-weight:700;color:#0A0B0D;letter-spacing:-.02em;
+}

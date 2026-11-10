@@ -1,0 +1,90 @@
+/* ============================================================
+   halo-tg2 — Kulit dashboard siswa (Fase 6).
+   Kerangka tetap milik Tutor LMS; file ini menyelaraskannya ke
+   Halo TG2 Template Desain mengikuti mockup yang disetujui:
+   panel selalu putih, ukuran kecil, jarak sedang, tanpa aksen
+   garis kiri. Selektor sengaja defensif lintas versi Tutor 4.x.
+   ============================================================ */
+body.halo-tg2-dashboard{background:var(--ht-bg)}
+body.halo-tg2-dashboard .halo-tg2__main{padding-top:var(--ht-sp-lg)}
+
+.tutor-dashboard{font-family:var(--ht-font);color:var(--ht-fg)}
+
+/* ---------- Panel samping ---------- */
+.tutor-dashboard .tutor-dashboard-sidebar,
+.tutor-dashboard .tutor-dashboard-menu,
+.tutor-dashboard .tutor-dashboard-permalinks-wrap{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);
+}
+.tutor-dashboard-menu-item{margin:2px 8px}
+.tutor-dashboard-menu-item-link{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:var(--ht-r-md);
+  font-size:14px;font-weight:400;color:var(--ht-fg);
+  transition:background-color .15s;
+}
+.tutor-dashboard-menu-item-link:hover{background:var(--ht-fill)}
+.tutor-dashboard-menu-item.active .tutor-dashboard-menu-item-link,
+.tutor-dashboard-menu-item-link.active,
+.tutor-dashboard-menu-item.is-active .tutor-dashboard-menu-item-link{
+  background:var(--ht-primary-soft);color:var(--ht-primary);font-weight:600;
+}
+.tutor-dashboard-menu-item-icon{font-size:16px;width:20px;text-align:center}
+.tutor-dashboard-menu-separator,
+.tutor-dashboard .tutor-dashboard-menu-divider{
+  font-family:var(--ht-mono);font-size:10.6px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ht-text-3);
+  padding:14px 20px 6px;list-style:none;
+}
+
+/* ---------- Konten ---------- */
+.tutor-dashboard-content{background:transparent}
+.tutor-dashboard-content h1,.tutor-dashboard-content h2,
+.halo-tg2__dash-tab-title{
+  font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:var(--ht-sp-md);
+}
+.tutor-dashboard .tutor-card,
+.tutor-dashboard-info-cards .tutor-info-card,
+.tutor-dashboard .tutor-dashboard-info-card{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);
+}
+.tutor-dashboard .tutor-btn,
+.tutor-dashboard a.tutor-btn{
+  border-radius:var(--ht-r-full);font-weight:500;
+}
+.tutor-dashboard .tutor-btn-primary,
+.tutor-dashboard button.tutor-btn-primary{
+  background:#0F0F0F;border-color:var(--ht-line-strong);
+}
+.tutor-dashboard input[type="text"],.tutor-dashboard input[type="email"],
+.tutor-dashboard input[type="password"],.tutor-dashboard select,.tutor-dashboard textarea{
+  border:1px solid var(--ht-line-strong);border-radius:var(--ht-r-md);
+  background:var(--ht-surface);color:var(--ht-fg);padding:10px 14px;font-size:14.6px;
+}
+.tutor-dashboard table{font-size:14px}
+.tutor-course-list .tutor-card,.tutor-dashboard .tutor-course-card{
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);border:1px solid var(--ht-line);
+}
+
+/* ---------- Komponen global: keadaan kosong ---------- */
+.halo-tg2__empty{
+  border:1.6px dashed var(--ht-line-strong);border-radius:var(--ht-r-lg);
+  background:var(--ht-surface);padding:var(--ht-sp-lg);
+  display:grid;justify-items:center;text-align:center;gap:8px;
+}
+.halo-tg2__empty-icon{
+  width:64px;height:64px;border-radius:var(--ht-r-full);
+  background:var(--ht-primary-soft);color:var(--ht-primary);
+  display:grid;place-items:center;
+}
+.halo-tg2__empty-icon svg{width:32px;height:32px}
+.halo-tg2__empty h3{font-size:16.6px;font-weight:600}
+.halo-tg2__empty p{color:var(--ht-text-2);font-size:14px;max-width:380px}
+
+/* ---------- Responsif ---------- */
+@media (max-width:900px){
+  .tutor-dashboard .tutor-dashboard-sidebar{margin-bottom:var(--ht-sp-md)}
+  .tutor-dashboard-content h1,.tutor-dashboard-content h2{font-size:20px}
+}
