@@ -41,6 +41,37 @@ foreach ($ht_courses as $ht_sc) {
 	$ht_stat_sum += (int) (is_array($ht_sc) && isset($ht_sc['percent']) ? $ht_sc['percent'] : 0);
 }
 $ht_stat_avg = $ht_stat_total > 0 ? (int) round($ht_stat_sum / $ht_stat_total) : 0;
+// Kelengkapan profil — perhitungan resmi Tutor LMS
+// (tutor_utils()->user_profile_completion: foto profil, tautan
+// sosial, bio; + metode penarikan untuk instruktur approved).
+// Kartu panel tampil sampai 100% (saklar Tutor hanya mengatur
+// dashboard Tutor sendiri yang kini mengarah ke panel).
+$ht_complete_items = array();
+$ht_complete_pct   = 100;
+if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'user_profile_completion')) {
+	$ht_raw_completion = tutor_utils()->user_profile_completion($ht_uid);
+	if (is_array($ht_raw_completion) && !empty($ht_raw_completion)) {
+		$ht_labels = array(
+			'_tutor_profile_photo'        => 'Pasang Foto Profil',
+			'_tutor_social_links'         => 'Tambahkan Tautan Sosial',
+			'_tutor_profile_bio'          => 'Isi Bio Profil',
+			'_tutor_withdraw_method_data' => 'Atur Metode Penarikan',
+		);
+		$ht_done_count = 0;
+		foreach ($ht_raw_completion as $ht_key => $ht_item) {
+			$ht_is_set = !empty($ht_item['is_set']);
+			if ($ht_is_set) {
+				$ht_done_count++;
+			}
+			$ht_complete_items[] = array(
+				'label'  => isset($ht_labels[$ht_key]) ? $ht_labels[$ht_key] : (string) $ht_item['text'],
+				'is_set' => $ht_is_set,
+				'url'    => add_query_arg(array('tampilan' => 'pengaturan', 'bagian' => '_tutor_social_links' === $ht_key ? 'sosial' : 'akun'), $ht_base),
+			);
+		}
+		$ht_complete_pct = (int) round($ht_done_count / count($ht_raw_completion) * 100);
+	}
+}
 $ht_dash    = halo_tg2_dashboard_url();
 $ht_titles  = array(
 	'beranda'   => 'Dashboard',
@@ -245,6 +276,36 @@ $ht_logout = wp_logout_url(home_url('/'));
 						</div>
 						<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_url('pengaturan')); ?>#pengingat-ujian">Atur Tanggal Ujian</a>
 					</div>
+				<?php endif; ?>
+				<?php if ($ht_complete_pct < 100 && !empty($ht_complete_items)) : ?>
+					<section class="ht-panel__complete" aria-label="Kelengkapan profil">
+						<div class="ht-panel__complete-main">
+							<div class="ht-panel__cring" aria-hidden="true">
+								<?php $ht_cc = 2 * M_PI * 26; ?>
+								<svg viewBox="0 0 64 64">
+									<circle class="bg" cx="32" cy="32" r="26"/>
+									<circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="<?php echo esc_attr(round($ht_cc, 1)); ?>" stroke-dashoffset="<?php echo esc_attr(round($ht_cc * (1 - $ht_complete_pct / 100), 1)); ?>"/>
+								</svg>
+								<span><?php echo esc_html($ht_complete_pct); ?>%</span>
+							</div>
+							<div class="ht-panel__complete-text">
+								<strong>Lengkapi Profil Kamu</strong>
+								<span>Profilmu baru <?php echo esc_html($ht_complete_pct); ?>% lengkap. Lengkapi sisanya supaya profil publikmu tampil maksimal.</span>
+							</div>
+						</div>
+						<ul class="ht-panel__complete-list">
+							<?php foreach ($ht_complete_items as $ht_ci) : ?>
+								<li class="<?php echo $ht_ci['is_set'] ? 'is-done' : 'is-todo'; ?>">
+									<span class="ht-panel__complete-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><path d="m4.5 12.5 5 5 10-11"/></svg></span>
+									<?php if ($ht_ci['is_set']) : ?>
+										<span><?php echo esc_html($ht_ci['label']); ?></span>
+									<?php else : ?>
+										<a href="<?php echo esc_url($ht_ci['url']); ?>"><?php echo esc_html($ht_ci['label']); ?><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+									<?php endif; ?>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</section>
 				<?php endif; ?>
 				<section class="ht-panel__ministat" aria-label="Statistik belajar">
 					<div class="ht-panel__ministat-head">
