@@ -269,15 +269,18 @@ html[data-halo-tg2-theme="dark"] .ht-panel__switch::after{left:19px}
 .ht-panel__dock{
   position:fixed;left:264px;right:0;bottom:0;z-index:55;
   display:flex;gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));
-  background:rgba(244,246,251,.85);backdrop-filter:blur(14px);border-top:2px solid var(--ht-primary);
+  background:rgba(244,246,251,.85);backdrop-filter:blur(14px);border-top:1px solid var(--ht-line);
 }
 /* Pil penanda aktif: meluncur dengan pantulan ke tab aktif
    (diposisikan panel.js); latar tab aktif sendiri jadi transparan. */
-.ht-panel__dockpill{position:absolute;left:0;top:0;width:60px;height:40px;background:#EEF4FF;border-radius:14px;z-index:0;pointer-events:none;transition:transform .5s cubic-bezier(.34,1.45,.64,1),width .5s cubic-bezier(.34,1.45,.64,1),height .5s cubic-bezier(.34,1.45,.64,1),opacity .25s ease}
+.ht-panel__dockpill{position:absolute;left:0;top:0;width:60px;height:40px;opacity:0;background:#EEF4FF;border-radius:14px;z-index:0;pointer-events:none;transition:transform .5s cubic-bezier(.34,1.45,.64,1),width .5s cubic-bezier(.34,1.45,.64,1),height .5s cubic-bezier(.34,1.45,.64,1),opacity .25s ease}
+/* Bilah biru penanda di tepi atas TAB AKTIF saja (bukan garis
+   membentang penuh): menumpang di tepi atas dock, ikut meluncur. */
+.ht-panel__dockbar{position:absolute;left:0;top:-3px;height:6px;width:60px;opacity:0;background:var(--ht-primary);border-radius:99px;z-index:2;pointer-events:none;box-shadow:0 2px 10px rgba(20,99,255,.45);transition:transform .5s cubic-bezier(.34,1.45,.64,1),width .5s cubic-bezier(.34,1.45,.64,1),opacity .25s ease}
 html[data-halo-tg2-theme="dark"] .ht-panel__dockpill{background:rgba(20,99,255,.22)}
 .ht-panel__dock.has-pill a,.ht-panel__dock.has-pill button{position:relative;z-index:1}
 .ht-panel__dock.has-pill a.is-active{background:transparent}
-@media (prefers-reduced-motion:reduce){.ht-panel__dockpill{transition:none}}
+@media (prefers-reduced-motion:reduce){.ht-panel__dockpill,.ht-panel__dockbar{transition:none}}
 html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
 .ht-panel__dock a,.ht-panel__dock button{
   flex:1 1 0;min-width:0;
@@ -506,4 +509,88 @@ html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
 @media (prefers-reduced-motion: reduce){
   .ht-panel__course-img{transition:none}
   .ht-panel__course:hover .ht-panel__course-img,.ht-panel__course:focus-visible .ht-panel__course-img{transform:none}
+}
+
+/* ============ KATALOG COURSE (view Course panel) ============
+   Kartu khusus panel skala sm, mengikuti referensi ClassAI:
+   grid = sampul penuh di atas + harga & tombol kecil di bawah;
+   list = sampul kiri + info + tautan teks, TANPA tombol. */
+.ht-shop{display:grid;gap:12px}
+.ht-shop__toolbar{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.ht-shop__search{flex:1 1 240px;display:flex;align-items:center;gap:10px;background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:999px;padding:0 18px;height:46px;transition:border-color .15s ease,box-shadow .15s ease}
+.ht-shop__search:focus-within{border-color:var(--ht-primary);box-shadow:0 0 0 4px rgba(20,99,255,.12)}
+.ht-shop__search svg{width:19px;height:19px;color:var(--ht-text-2);flex:0 0 auto}
+.ht-shop__search input{flex:1;min-width:0;border:0;background:none;outline:none;font:inherit;font-size:14.5px;color:var(--ht-fg)}
+.ht-shop__search input::placeholder{color:var(--ht-text-2)}
+.ht-shop__viewtoggle{display:flex;background:rgba(10,11,13,.05);border:1px solid var(--ht-line);border-radius:999px;padding:3px;gap:3px}
+html[data-halo-tg2-theme="dark"] .ht-shop__viewtoggle{background:rgba(255,255,255,.07)}
+.ht-shop__viewtoggle button{width:30px;height:30px;border:0;border-radius:999px;background:transparent;color:var(--ht-text-2);cursor:pointer;display:grid;place-items:center}
+.ht-shop__viewtoggle button svg{width:15px;height:15px}
+.ht-shop__viewtoggle button.is-active{background:var(--ht-fg);color:var(--ht-bg)}
+.ht-shop__meta{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin:0;font-size:13px;color:var(--ht-text-2)}
+.ht-shop__hint{color:var(--ht-primary);font-weight:600}
+.ht-shop__results{position:relative}
+.ht-shop__skel{position:absolute;inset:0;z-index:3;background:var(--ht-bg)}
+.ht-shop__skel[hidden],.ht-shop .halo-tg2__empty[hidden]{display:none!important}
+/* --- Kartu --- */
+.ht-shop__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:1150px){.ht-shop__grid{grid-template-columns:repeat(3,1fr)}}
+.ht-shop__card{background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--ht-shadow)}
+.ht-shop__cover{position:relative;display:block;aspect-ratio:16/9;background:linear-gradient(120deg,#1463FF,#4E8DFF);overflow:hidden;flex:0 0 auto}
+.ht-shop__cover--2{background:linear-gradient(120deg,#0F53D8,#2E74FF)}
+.ht-shop__cover--3{background:linear-gradient(120deg,#123E8F,#1463FF)}
+.ht-shop__cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ht-shop__cover-txt{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;padding:12px;color:#fff}
+.ht-shop__cover-txt span{font-size:11px;opacity:.85}
+.ht-shop__cover-txt b{font-size:17px;letter-spacing:-.01em}
+.ht-shop__badge{position:absolute;top:8px;left:8px;z-index:2;font-size:11px;font-weight:700;letter-spacing:.02em;padding:4px 9px;border-radius:999px;line-height:1.2}
+.ht-shop__badge.is-free{background:#fff;color:#0A0B0D;box-shadow:0 4px 12px rgba(10,11,13,.18)}
+.ht-shop__badge.is-sale{background:var(--ht-accent);color:#0A0B0D;box-shadow:0 4px 12px rgba(10,11,13,.18)}
+.ht-shop__cover-link{position:absolute;inset:0;display:block}
+.ht-shop__wish{position:absolute;top:8px;right:8px;z-index:3;width:32px;height:32px;border-radius:999px;border:0;background:rgba(255,255,255,.96);color:#0A0B0D;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 12px rgba(10,11,13,.16);-webkit-tap-highlight-color:transparent}
+.ht-shop__wish svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;transition:fill .2s ease,stroke .2s ease}
+.ht-shop__wish.is-on svg{fill:#F43F5E;stroke:#F43F5E}
+.ht-shop__wish.is-anim svg{animation:ht-heart-pop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes ht-heart-pop{0%{transform:scale(1)}35%{transform:scale(1.4)}60%{transform:scale(.88)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.ht-shop__wish.is-anim svg{animation:none}}
+.ht-shop__body{padding:10px 13px 12px;display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.ht-shop__cat{margin:0;font-size:11.5px;line-height:1.25;color:var(--ht-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht-shop__title{margin:0;font-size:15px;font-weight:600;line-height:1.26;letter-spacing:-.01em}
+.ht-shop__title a{color:var(--ht-fg);text-decoration:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ht-shop__meta2{margin:0;font-size:12.5px;line-height:1.3;color:var(--ht-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht-shop__pbar{height:5px;border-radius:99px;background:rgba(10,11,13,.09);overflow:hidden;margin-top:3px}
+html[data-halo-tg2-theme="dark"] .ht-shop__pbar{background:rgba(255,255,255,.14)}
+.ht-shop__pbar i{display:block;height:100%;background:var(--ht-primary);border-radius:99px}
+.ht-shop__status{margin:0;font-size:12px;line-height:1.3;color:var(--ht-text-2)}
+.ht-shop__foot{margin-top:auto;padding-top:7px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ht-shop__price{font-size:16px;font-weight:700;color:var(--ht-fg);line-height:1.1;min-width:0}
+.ht-shop__price del{display:block;font-size:12px;font-weight:500;color:var(--ht-text-2)}
+.ht-shop__price ins{text-decoration:none}
+.ht-shop__price .amount{white-space:nowrap}
+.ht-shop__buyrow{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.ht-shop__buy{display:inline-flex;align-items:center;justify-content:center;height:33px;padding:0 15px;border-radius:999px;background:var(--ht-primary);color:#fff!important;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;box-shadow:0 8px 18px rgba(20,99,255,.32);transition:background .15s ease}
+.ht-shop__buy:hover{background:#0F53D8}
+.ht-shop__buy.is-continue{background:#EEF4FF;color:var(--ht-primary)!important;box-shadow:none}
+html[data-halo-tg2-theme="dark"] .ht-shop__buy.is-continue{background:rgba(20,99,255,.18)}
+.ht-shop__buyrow{flex-wrap:wrap;justify-content:flex-end}
+.ht-shop__go{display:none;margin-top:6px;font-size:13.5px;font-weight:600;color:var(--ht-primary);text-decoration:none}
+/* --- Mode daftar: sampul kiri, info kanan, tanpa tombol --- */
+.ht-shop__grid.is-list{grid-template-columns:1fr}
+.ht-shop__grid.is-list .ht-shop__card{flex-direction:row;padding:10px;gap:13px;align-items:stretch}
+.ht-shop__grid.is-list .ht-shop__cover{flex:0 0 118px;width:118px;aspect-ratio:auto;border-radius:12px;min-height:96px}
+.ht-shop__grid.is-list .ht-shop__body{padding:3px 2px 3px 0}
+.ht-shop__grid.is-list .ht-shop__buyrow{display:none}
+.ht-shop__grid.is-list .ht-shop__wish{width:28px;height:28px;top:6px;right:6px}
+.ht-shop__grid.is-list .ht-shop__wish svg{width:15px;height:15px}
+.ht-shop__grid.is-list .ht-shop__go{display:inline-flex;align-items:center;gap:5px}
+@media (min-width:641px){
+  .ht-shop__grid.is-list .ht-shop__cover{flex-basis:172px;width:172px;min-height:110px}
+  .ht-shop__grid.is-list .ht-shop__title{font-size:15.5px}
+}
+@media (max-width:640px){
+  .ht-shop__grid{gap:10px}
+  .ht-shop__body{padding:10px 11px 12px}
+  .ht-shop__title{font-size:14px}
+  .ht-shop__price{font-size:15px}
+  .ht-shop__buy{height:31px;padding:0 13px;font-size:12.5px}
 }

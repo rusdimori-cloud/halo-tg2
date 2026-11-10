@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('HALO_TG2_VERSION', '1.4.1');
+define('HALO_TG2_VERSION', '1.5.3');
 
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/woocommerce.php';

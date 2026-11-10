@@ -88,45 +88,63 @@
     if (btn) btn.click();
   });
 
-  /* Pil penanda aktif dock: meluncur dengan pantulan ringan ke tab
-     aktif setiap kali tampilan berpindah (navigasi lembut). Posisi
-     terakhir disimpan di luar node karena isi dock bisa bertukar. */
+  /* Pil penanda aktif dock + bilah biru di tepi atas tab aktif:
+     keduanya meluncur dengan pantulan ringan. Pil bergerak
+     OPTIMISTIS sejak tautan diklik (tidak menunggu server), lalu
+     dikonfirmasi oleh posisi server saat navigasi lembut selesai.
+     Posisi terakhir disimpan di luar node karena isi dock bisa
+     bertukar saat sinkronisasi navigasi lembut. */
   var dockEl = $(".ht-panel__dock");
-  var dockPill = null;
-  var pillPos = null;
-  function dockPlace(animate) {
-    if (!dockEl) return;
-    var active = dockEl.querySelector("a.is-active");
-    if (!dockPill || !dockEl.contains(dockPill)) {
-      dockPill = document.createElement("span");
-      dockPill.className = "ht-panel__dockpill";
-      dockPill.setAttribute("aria-hidden", "true");
-      dockEl.appendChild(dockPill);
-      dockEl.classList.add("has-pill");
-      if (pillPos) {
-        dockPill.style.transition = "none";
-        dockPill.style.transform = "translate(" + pillPos.x + "px," + pillPos.y + "px)";
-        dockPill.style.width = pillPos.w + "px";
-        dockPill.style.height = pillPos.h + "px";
-        dockPill.style.opacity = pillPos.visible ? "1" : "0";
-        void dockPill.offsetWidth;
-        dockPill.style.transition = "";
-      }
-    }
-    if (!active) {
-      dockPill.style.opacity = "0";
-      if (pillPos) pillPos.visible = false;
-      return;
-    }
-    var dr = dockEl.getBoundingClientRect(), ar = active.getBoundingClientRect();
-    var pos = { x: ar.left - dr.left, y: ar.top - dr.top, w: ar.width, h: ar.height, visible: true };
-    if (!animate) dockPill.style.transition = "none";
-    dockPill.style.opacity = "1";
+  var dockPill = null, dockBar = null, pillPos = null;
+  function dockEls() {
+    if (dockPill && dockEl.contains(dockPill)) return;
+    dockPill = document.createElement("span");
+    dockPill.className = "ht-panel__dockpill";
+    dockPill.setAttribute("aria-hidden", "true");
+    dockEl.appendChild(dockPill);
+    dockBar = document.createElement("span");
+    dockBar.className = "ht-panel__dockbar";
+    dockBar.setAttribute("aria-hidden", "true");
+    dockEl.appendChild(dockBar);
+    dockEl.classList.add("has-pill");
+    if (pillPos) applyDockPos(pillPos, false);
+  }
+  function applyDockPos(pos, animate) {
+    dockEls();
+    [dockPill, dockBar].forEach(function (el) { el.style.transition = animate ? "" : "none"; });
+    dockPill.style.opacity = pos.visible ? "1" : "0";
     dockPill.style.transform = "translate(" + pos.x + "px," + pos.y + "px)";
     dockPill.style.width = pos.w + "px";
     dockPill.style.height = pos.h + "px";
-    if (!animate) { void dockPill.offsetWidth; dockPill.style.transition = ""; }
+    var bw = Math.max(34, Math.round(pos.w * 0.44));
+    dockBar.style.opacity = pos.visible ? "1" : "0";
+    dockBar.style.transform = "translateX(" + Math.round(pos.x + (pos.w - bw) / 2) + "px)";
+    dockBar.style.width = bw + "px";
+    if (!animate) { void dockPill.offsetWidth; dockPill.style.transition = ""; dockBar.style.transition = ""; }
     pillPos = pos;
+  }
+  function dockPosFor(item) {
+    var dr = dockEl.getBoundingClientRect(), ar = item.getBoundingClientRect();
+    return { x: ar.left - dr.left, y: ar.top - dr.top, w: ar.width, h: ar.height, visible: true };
+  }
+  function dockPlace(animate) {
+    if (!dockEl) return;
+    var active = dockEl.querySelector("a.is-active");
+    if (!active) {
+      dockEls();
+      if (pillPos) applyDockPos(Object.assign({}, pillPos, { visible: false }), animate);
+      return;
+    }
+    applyDockPos(dockPosFor(active), animate);
+  }
+  function dockViewItem(view) {
+    var found = null;
+    $$(".ht-panel__dock a[href]").forEach(function (l) {
+      var v = "beranda";
+      try { v = new URL(l.href, location.href).searchParams.get("tampilan") || "beranda"; } catch (e) {}
+      if (v === view) found = l;
+    });
+    return found;
   }
   if (dockEl) {
     requestAnimationFrame(function () { dockPlace(false); });
@@ -136,6 +154,20 @@
       /* Koreksi senyap setelah luncuran selesai: lebar dock bisa
          bergeser seukuran scrollbar saat tinggi konten berubah. */
       setTimeout(function () { dockPlace(false); }, 560);
+    });
+    /* Gerak optimistis: pil + bilah meluncur begitu tautan panel
+       diklik, sebelum jawaban server tiba. */
+    document.addEventListener("click", function (e) {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest("a[href]") : null;
+      if (!a) return;
+      var u;
+      try { u = new URL(a.href, location.href); } catch (err) { return; }
+      if (u.pathname.replace(/\/$/, "") !== location.pathname.replace(/\/$/, "")) return;
+      var view = u.searchParams.get("tampilan") || "beranda";
+      var item = dockViewItem(view);
+      if (item) applyDockPos(dockPosFor(item), true);
+      else if (pillPos) applyDockPos(Object.assign({}, pillPos, { visible: false }), true);
     });
   }
 
@@ -274,9 +306,109 @@
     requestAnimationFrame(initSwipeTabs);
   }
 
+  /* ---------- Katalog course (view Course) ----------
+     Pencarian aktif mulai 3 huruf, saringan kategori, dan alih
+     grid/list — semua di sisi klien dari kartu yang dirender
+     server; skeleton singkat menandai setiap perubahan saringan. */
+  var shopQ = "", shopCat = "semua", shopTimer = null, shopSkelTimer = null;
+  function shopApply() {
+    var grid = $("[data-shop-grid]");
+    if (!grid) return;
+    var q = shopQ.trim().toLowerCase();
+    var searching = q.length >= 3;
+    var n = 0;
+    $$(".ht-shop__card", grid).forEach(function (card) {
+      var okCat = shopCat === "semua" || (" " + (card.getAttribute("data-cats") || "") + " ").indexOf(" " + shopCat + " ") >= 0;
+      var okQ = !searching || (card.getAttribute("data-search") || "").indexOf(q) >= 0;
+      var show = okCat && okQ;
+      card.style.display = show ? "" : "none";
+      if (show) n++;
+    });
+    var count = $("[data-shop-count]");
+    if (count) count.textContent = n + " course";
+    var empty = $("[data-shop-empty]");
+    if (empty) empty.hidden = n > 0;
+    var hint = $("[data-shop-hint]");
+    if (hint) hint.hidden = !(q.length > 0 && q.length < 3);
+  }
+  function shopRefresh(withSkel) {
+    var skel = $("[data-shop-skel]"), grid = $("[data-shop-grid]");
+    if (withSkel && skel && grid) {
+      skel.hidden = false;
+      clearTimeout(shopSkelTimer);
+      shopSkelTimer = setTimeout(function () { skel.hidden = true; shopApply(); }, 380);
+    } else {
+      shopApply();
+    }
+  }
+  document.addEventListener("input", function (e) {
+    if (!e.target.matches || !e.target.matches("[data-shop-search]")) return;
+    shopQ = e.target.value || "";
+    clearTimeout(shopTimer);
+    if (shopQ.trim().length >= 3) {
+      shopTimer = setTimeout(function () { shopRefresh(true); }, 260);
+    } else {
+      shopTimer = setTimeout(function () { shopRefresh(false); }, 180);
+    }
+  });
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest) return;
+    var vt = e.target.closest("[data-shop-view]");
+    if (vt) {
+      var mode = vt.getAttribute("data-shop-view") || "grid";
+      var grid = $("[data-shop-grid]");
+      if (grid) grid.classList.toggle("is-list", mode === "list");
+      $$("[data-shop-view]").forEach(function (b) { b.classList.toggle("is-active", b === vt); });
+      try { localStorage.setItem("ht-shop-view", mode); } catch (err) {}
+    }
+  });
+  /* Tombol hati wishlist di sampul kartu katalog: alih status
+     secara optimistis (dengan animasi pop), lalu sinkronkan ke
+     server lewat AJAX; gagal = kembalikan state semula. */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("[data-wish-btn]") : null;
+    if (!btn) return;
+    e.preventDefault();
+    var cid = btn.getAttribute("data-course-id");
+    var on = btn.classList.toggle("is-on");
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.classList.remove("is-anim");
+    void btn.offsetWidth;
+    btn.classList.add("is-anim");
+    if (!window.HT_PANEL || !window.fetch || !cid) return;
+    var fd = new FormData();
+    fd.append("action", "halo_tg2_wishlist_toggle");
+    fd.append("nonce", window.HT_PANEL.wishNonce);
+    fd.append("course_id", cid);
+    fetch(window.HT_PANEL.ajaxUrl, { method: "POST", body: fd, credentials: "same-origin" })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.success) throw new Error("bad");
+        var serverOn = j.data && j.data.state === "added";
+        if (serverOn !== on) {
+          btn.classList.toggle("is-on", serverOn);
+          btn.setAttribute("aria-pressed", serverOn ? "true" : "false");
+        }
+      })
+      .catch(function () {
+        btn.classList.toggle("is-on", !on);
+        btn.setAttribute("aria-pressed", !on ? "true" : "false");
+      });
+  });
+  function shopInit() {
+    if (!$("[data-shop-grid]")) return;
+    shopQ = ""; shopCat = "semua";
+    var mode = "grid";
+    try { mode = localStorage.getItem("ht-shop-view") || "grid"; } catch (e) {}
+    var grid = $("[data-shop-grid]");
+    grid.classList.toggle("is-list", mode === "list");
+    $$("[data-shop-view]").forEach(function (b) { b.classList.toggle("is-active", b.getAttribute("data-shop-view") === mode); });
+  }
+  shopInit();
+
   /* Setelah navigasi lembut menukar konten: hidupkan lagi widget
      yang bergantung pada node konten (tab geser, strip pembayaran). */
   document.addEventListener("ht:softnav:loaded", function () {
-    requestAnimationFrame(function () { initSwipeTabs(); initStrips(document); });
+    requestAnimationFrame(function () { initSwipeTabs(); initStrips(document); shopInit(); });
   });
 })();

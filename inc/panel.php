@@ -114,6 +114,123 @@ function halo_tg2_panel_unpaid_orders($user_id) {
 	));
 }
 
+/**
+ * Data satu course untuk kartu katalog (dipakai view Course panel).
+ * Mengikuti perhitungan kartu arsip: harga WooCommerce, lencana
+ * diskon, rating, durasi, jumlah siswa, level — semua data nyata.
+ *
+ * @param int   $course_id     ID course Tutor.
+ * @param int   $user_id       ID pengguna (status kepemilikan).
+ * @param int[] $enrolled_ids  ID course yang sudah dimiliki pengguna.
+ * @return array<string,mixed>
+ */
+function halo_tg2_course_card_data($course_id, $user_id, $enrolled_ids = array()) {
+	$cats      = function_exists('get_tutor_course_categories') ? get_tutor_course_categories($course_id) : array();
+	$cat_name  = (!empty($cats) && is_array($cats)) ? (string) $cats[0]->name : 'Kelas';
+	$cat_slugs = array();
+	if (!empty($cats) && is_array($cats)) {
+		foreach ($cats as $ht_c) {
+			$cat_slugs[] = (string) $ht_c->slug;
+		}
+	}
+	$duration = '';
+	if (function_exists('get_tutor_course_duration_context')) {
+		$duration = trim(wp_strip_all_tags((string) get_tutor_course_duration_context($course_id, true)));
+	}
+	$students = 0;
+	$rating   = null;
+	if (function_exists('tutor_utils')) {
+		$students = (int) tutor_utils()->count_enrolled_users_by_course($course_id);
+		$rating   = tutor_utils()->get_course_rating($course_id);
+	}
+	$level_map = array(
+		'Beginner'     => 'Pemula',
+		'Intermediate' => 'Menengah',
+		'Expert'       => 'Mahir',
+		'All Levels'   => 'Semua Level',
+	);
+	$level_raw = function_exists('get_tutor_course_level') ? get_tutor_course_level($course_id) : '';
+	$level     = $level_raw && isset($level_map[$level_raw]) ? $level_map[$level_raw] : ($level_raw ? (string) $level_raw : 'Semua Level');
+
+	$free       = true;
+	$discount   = 0;
+	$price_html = '';
+	$product_id = 0;
+	if (function_exists('tutor_utils') && tutor_utils()->is_course_purchasable($course_id)) {
+		$product_id = (int) tutor_utils()->get_course_product_id($course_id);
+		$product    = ($product_id && function_exists('wc_get_product')) ? wc_get_product($product_id) : null;
+		if ($product) {
+			$free       = false;
+			$price_html = (string) $product->get_price_html();
+			if ($product->is_on_sale()) {
+				$reg  = (float) $product->get_regular_price();
+				$sale = (float) $product->get_sale_price();
+				if ($reg > 0 && $sale > 0 && $sale < $reg) {
+					$discount = (int) round((1 - $sale / $reg) * 100);
+				}
+			}
+		} else {
+			$raw = tutor_utils()->get_course_price($course_id);
+			if (null !== $raw && '' !== $raw) {
+				$free       = false;
+				$price_html = is_numeric($raw) ? (function_exists('wc_price') ? wc_price((float) $raw) : number_format((float) $raw)) : (string) $raw;
+			}
+		}
+	}
+	$enrolled = in_array((int) $course_id, array_map('intval', (array) $enrolled_ids), true);
+	$percent  = 0;
+	if ($enrolled && function_exists('tutor_utils') && method_exists(tutor_utils(), 'get_course_completed_percent')) {
+		$percent = (int) tutor_utils()->get_course_completed_percent($course_id, $user_id);
+	}
+	return array(
+		'id'         => (int) $course_id,
+		'title'      => get_the_title($course_id),
+		'url'        => get_permalink($course_id),
+		'thumb'      => has_post_thumbnail($course_id) ? (string) get_the_post_thumbnail_url($course_id, 'medium_large') : '',
+		'variant'    => ((int) $course_id % 3) + 1,
+		'cat_name'   => $cat_name,
+		'cat_slugs'  => $cat_slugs,
+		'duration'   => $duration,
+		'students'   => $students,
+		'rating_avg' => ($rating && isset($rating->rating_count) && $rating->rating_count > 0) ? number_format((float) $rating->rating_avg, 1) : '',
+		'rating_cnt' => ($rating && isset($rating->rating_count)) ? (int) $rating->rating_count : 0,
+		'level'      => $level,
+		'free'       => $free,
+		'price_html' => $price_html,
+		'discount'   => $discount,
+		'product_id' => $product_id,
+		'enrolled'   => $enrolled,
+		'percent'    => $percent,
+	);
+}
+
+add_action('wp_ajax_halo_tg2_wishlist_toggle', 'halo_tg2_wishlist_toggle');
+/**
+ * Alih status wishlist sebuah course untuk pengguna saat ini
+ * (AJAX dari tombol hati di katalog panel). Penyimpanan mengikuti
+ * Tutor LMS: user meta _tutor_course_wishlist (satu baris/course).
+ */
+function halo_tg2_wishlist_toggle() {
+	check_ajax_referer('halo_tg2_wish_toggle', 'nonce');
+	$user_id   = get_current_user_id();
+	$course_id = isset($_POST['course_id']) ? absint(wp_unslash($_POST['course_id'])) : 0;
+	if (!$user_id || !$course_id || 'courses' !== get_post_type($course_id)) {
+		wp_send_json_error(array('message' => 'Permintaan tidak valid.'), 400);
+	}
+	$ids = array();
+	if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'get_wishlist')) {
+		foreach ((array) tutor_utils()->get_wishlist($user_id) as $ht_wp) {
+			$ids[] = (int) $ht_wp->ID;
+		}
+	}
+	if (in_array($course_id, $ids, true)) {
+		delete_user_meta($user_id, '_tutor_course_wishlist', $course_id);
+		wp_send_json_success(array('state' => 'removed'));
+	}
+	add_user_meta($user_id, '_tutor_course_wishlist', $course_id);
+	wp_send_json_success(array('state' => 'added'));
+}
+
 add_action('wp_enqueue_scripts', 'halo_tg2_panel_assets');
 /**
  * Muat aset panel hanya pada halaman dashboard kustom.
@@ -122,6 +239,10 @@ function halo_tg2_panel_assets() {
 	if (is_page_template('page-templates/panel.php')) {
 		wp_enqueue_style('halo-tg2-panel', get_template_directory_uri() . '/assets/css/panel.css', array('halo-tg2'), HALO_TG2_VERSION);
 		wp_enqueue_script('halo-tg2-panel', get_template_directory_uri() . '/assets/js/panel.js', array(), HALO_TG2_VERSION, true);
+		wp_localize_script('halo-tg2-panel', 'HT_PANEL', array(
+			'ajaxUrl'   => admin_url('admin-ajax.php'),
+			'wishNonce' => wp_create_nonce('halo_tg2_wish_toggle'),
+		));
 	}
 }
 

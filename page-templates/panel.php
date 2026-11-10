@@ -23,7 +23,7 @@ if (!is_user_logged_in()) {
 $ht_user    = wp_get_current_user();
 $ht_uid     = get_current_user_id();
 $ht_view    = isset($_GET['tampilan']) ? sanitize_key(wp_unslash($_GET['tampilan'])) : 'beranda'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-if (!in_array($ht_view, array('beranda', 'kelas', 'wishlist', 'pesanan', 'akun', 'statistik', 'notifikasi', 'pengaturan'), true)) {
+if (!in_array($ht_view, array('beranda', 'kelas', 'course', 'wishlist', 'pesanan', 'akun', 'statistik', 'notifikasi', 'pengaturan'), true)) {
 	$ht_view = 'beranda';
 }
 $ht_base    = get_permalink();
@@ -89,6 +89,7 @@ $ht_titles  = array(
 	'statistik' => 'Statistik',
 	'notifikasi' => 'Notifikasi',
 	'wishlist' => 'Wishlist',
+	'course'    => 'Katalog Course',
 	'pengaturan' => 'Pengaturan',
 );
 $ht_initial = strtoupper(substr($ht_user->display_name, 0, 1));
@@ -99,6 +100,32 @@ $ht_wish_status = isset($_GET['status']) ? sanitize_key(wp_unslash($_GET['status
 $ht_wishlist    = array();
 if ('wishlist' === $ht_view && function_exists('tutor_utils') && method_exists(tutor_utils(), 'get_wishlist')) {
 	$ht_wishlist = (array) tutor_utils()->get_wishlist($ht_uid);
+}
+$ht_shop      = array();
+$ht_shop_cats = array();
+if ('course' === $ht_view) {
+	$ht_enrolled_ids = array();
+	if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'get_enrolled_courses_ids_by_user')) {
+		$ht_enrolled_ids = array_map('intval', (array) tutor_utils()->get_enrolled_courses_ids_by_user($ht_uid));
+	}
+	$ht_shop_posts = get_posts(array(
+		'post_type'      => 'courses',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+	));
+	$ht_wish_ids = array();
+	if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'get_wishlist')) {
+		foreach ((array) tutor_utils()->get_wishlist($ht_uid) as $ht_wish_post) {
+			$ht_wish_ids[] = (int) $ht_wish_post->ID;
+		}
+	}
+	foreach ((array) $ht_shop_posts as $ht_spost) {
+		$ht_sdata               = halo_tg2_course_card_data($ht_spost->ID, $ht_uid, $ht_enrolled_ids);
+		$ht_sdata['wishlisted'] = in_array((int) $ht_spost->ID, $ht_wish_ids, true);
+		$ht_shop[]              = $ht_sdata;
+	}
 }
 $ht_profil_status  = isset($_GET['profil']) ? sanitize_key(wp_unslash($_GET['profil'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_sandi_status   = isset($_GET['sandi']) ? sanitize_key(wp_unslash($_GET['sandi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -174,6 +201,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<p class="ht-panel__group">Menu</p>
 			<a class="<?php echo 'beranda' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('beranda')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg><span>Dashboard</span></a>
 			<a class="<?php echo 'kelas' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('kelas')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg><span>Kelas Saya</span></a>
+			<a class="<?php echo 'course' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('course')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.1 4.9-4.9 2.1 2.1-4.9Z"/></svg><span>Katalog Course</span></a>
 			<a class="<?php echo 'wishlist' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('wishlist')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6A4.6 4.6 0 0 1 8 5c1.7 0 3.2.9 4 2.2C12.8 5.9 14.3 5 16 5a4.6 4.6 0 0 1 4.5 4.6c0 3.7-3.5 6.9-8.5 10.9Z"/></svg><span>Wishlist</span></a>
 			<a class="<?php echo 'statistik' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('statistik')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 20V10M10 20V4M16 20v-8M21 20H3"/></svg>Statistik</a>
 			<a class="<?php echo 'notifikasi' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('notifikasi')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg><span>Notifikasi</span><?php if ($ht_notif_unread > 0) : ?><span class="ht-panel__badge"><?php echo esc_html($ht_notif_unread > 99 ? '99+' : $ht_notif_unread); ?></span><?php endif; ?></a>
@@ -400,7 +428,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 						</div>
 						<h3>Wishlist masih kosong</h3>
 						<p>Tekan ikon hati di halaman kelas untuk menyimpan kelas yang kamu incar di sini.</p>
-						<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url(home_url('/courses/')); ?>">Lihat Katalog Kelas</a>
+						<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_url('course')); ?>">Lihat Katalog Kelas</a>
 					</div>
 				<?php else : ?>
 					<div class="ht-panel__wish-grid">
@@ -467,6 +495,110 @@ $ht_logout = wp_logout_url(home_url('/'));
 						<?php endforeach; wp_reset_postdata(); ?>
 					</div>
 				<?php endif; ?>
+
+			<?php elseif ('course' === $ht_view) : ?>
+				<div class="ht-shop">
+					<?php if (empty($ht_shop)) : ?>
+						<div class="halo-tg2__empty">
+							<div class="halo-tg2__empty-icon" aria-hidden="true">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.1 4.9-4.9 2.1 2.1-4.9Z"/></svg>
+							</div>
+							<h3>Belum ada course diterbitkan</h3>
+							<p>Katalog akan tampil di sini begitu ada course yang diterbitkan.</p>
+						</div>
+					<?php else : ?>
+						<div class="ht-shop__toolbar">
+							<label class="ht-shop__search">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.6 16.6"/></svg>
+								<input type="search" data-shop-search placeholder="Cari course favoritmu…" autocomplete="off" aria-label="Cari course">
+							</label>
+							<div class="ht-shop__viewtoggle" role="group" aria-label="Mode tampilan katalog">
+								<button type="button" data-shop-view="grid" class="is-active" aria-label="Tampilan grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg></button>
+								<button type="button" data-shop-view="list" aria-label="Tampilan daftar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 6h11M8.5 12h11M8.5 18h11"/><circle cx="4.8" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.8" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.8" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg></button>
+							</div>
+						</div>
+						<p class="ht-shop__meta"><span data-shop-count><?php echo esc_html(count($ht_shop)); ?> course</span><span class="ht-shop__hint" data-shop-hint hidden>Ketik minimal 3 huruf untuk mulai mencari.</span></p>
+						<div class="ht-shop__results">
+							<div class="ht-shop__grid" data-shop-grid>
+								<?php foreach ($ht_shop as $ht_c) :
+									$ht_meta_parts = array();
+									if ('' !== $ht_c['duration']) {
+										$ht_meta_parts[] = $ht_c['duration'];
+									}
+									if ($ht_c['students'] > 0) {
+										$ht_meta_parts[] = $ht_c['students'] . ' siswa';
+									}
+									$ht_search_text = strtolower($ht_c['title'] . ' ' . $ht_c['cat_name'] . ' ' . $ht_c['level']);
+									?>
+									<article class="ht-shop__card" data-cats="<?php echo esc_attr(implode(' ', $ht_c['cat_slugs'])); ?>" data-search="<?php echo esc_attr($ht_search_text); ?>">
+										<div class="ht-shop__cover ht-shop__cover--<?php echo esc_attr($ht_c['variant']); ?>">
+											<a class="ht-shop__cover-link" href="<?php echo esc_url($ht_c['url']); ?>" tabindex="-1" aria-hidden="true">
+												<?php if ('' !== $ht_c['thumb']) : ?>
+													<img src="<?php echo esc_url($ht_c['thumb']); ?>" alt="" loading="lazy">
+												<?php else : ?>
+													<span class="ht-shop__cover-txt"><span><?php echo esc_html($ht_c['cat_name']); ?> · Kelas Online</span><b>halo TG2</b></span>
+												<?php endif; ?>
+											</a>
+											<?php if ($ht_c['free']) : ?>
+												<span class="ht-shop__badge is-free">Gratis</span>
+											<?php elseif ($ht_c['discount'] > 0) : ?>
+												<span class="ht-shop__badge is-sale">Hemat <?php echo esc_html($ht_c['discount']); ?>%</span>
+											<?php endif; ?>
+											<button type="button" class="ht-shop__wish<?php echo $ht_c['wishlisted'] ? ' is-on' : ''; ?>" data-wish-btn data-course-id="<?php echo esc_attr($ht_c['id']); ?>" aria-pressed="<?php echo $ht_c['wishlisted'] ? 'true' : 'false'; ?>" aria-label="Simpan ke wishlist" title="Simpan ke wishlist"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6A4.6 4.6 0 0 1 8 5c1.7 0 3.2.9 4 2.2C12.8 5.9 14.3 5 16 5a4.6 4.6 0 0 1 4.5 4.6c0 3.7-3.5 6.9-8.5 10.9Z"/></svg></button>
+										</div>
+										<div class="ht-shop__body">
+											<p class="ht-shop__cat"><?php echo esc_html($ht_c['cat_name']); ?><?php if ('' !== $ht_c['rating_avg']) : ?> · ★ <?php echo esc_html($ht_c['rating_avg']); ?> (<?php echo esc_html($ht_c['rating_cnt']); ?>)<?php endif; ?></p>
+											<h3 class="ht-shop__title"><a href="<?php echo esc_url($ht_c['url']); ?>"><?php echo esc_html($ht_c['title']); ?></a></h3>
+											<?php
+											$ht_meta_line = implode(' · ', $ht_meta_parts);
+											if ('' !== $ht_meta_line) {
+												$ht_meta_line .= ' · ';
+											}
+											$ht_meta_line .= $ht_c['level'];
+											?>
+											<p class="ht-shop__meta2"><?php echo esc_html($ht_meta_line); ?></p>
+											<?php if ($ht_c['enrolled']) : ?>
+												<div class="ht-shop__pbar"><i style="width:<?php echo esc_attr($ht_c['percent']); ?>%"></i></div>
+												<p class="ht-shop__status"><?php echo 100 === (int) $ht_c['percent'] ? 'Selesai' : esc_html($ht_c['percent']) . '% selesai'; ?></p>
+											<?php endif; ?>
+											<div class="ht-shop__foot">
+												<div class="ht-shop__price">
+													<?php if ($ht_c['free']) : ?>
+														<b>Gratis</b>
+													<?php else : ?>
+														<?php echo wp_kses_post($ht_c['price_html']); ?>
+													<?php endif; ?>
+												</div>
+												<div class="ht-shop__buyrow">
+													<?php if ($ht_c['enrolled']) : ?>
+														<a class="ht-shop__buy is-continue" href="<?php echo esc_url($ht_c['url']); ?>">Lanjutkan</a>
+													<?php else : ?>
+														<a class="ht-shop__buy" href="<?php echo esc_url($ht_c['url']); ?>"><?php echo $ht_c['free'] ? 'Mulai' : 'Beli'; ?></a>
+													<?php endif; ?>
+												</div>
+											</div>
+											<a class="ht-shop__go" href="<?php echo esc_url($ht_c['url']); ?>"><?php echo $ht_c['enrolled'] ? 'Lanjutkan belajar' : 'Lihat Kelas'; ?> <span aria-hidden="true">→</span></a>
+										</div>
+									</article>
+								<?php endforeach; ?>
+							</div>
+							<div class="ht-shop__skel" data-shop-skel hidden aria-hidden="true">
+								<div class="ht-soft-skel__grid">
+									<?php for ($ht_i = 0; $ht_i < 6; $ht_i++) : ?>
+										<div class="ht-soft-skel__card"><div class="ht-skel ht-skel--block" style="height:120px"></div><div class="ht-skel ht-skel--line" style="width:70%"></div><div class="ht-skel ht-skel--line" style="width:45%"></div></div>
+									<?php endfor; ?>
+								</div>
+							</div>
+						</div>
+						<div class="halo-tg2__empty" data-shop-empty hidden>
+							<div class="halo-tg2__empty-icon" aria-hidden="true">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.6 16.6"/></svg>
+							</div>
+							<h3>Tidak ada course yang cocok</h3>
+							<p>Coba kata kunci atau kategori lain.</p>
+						</div>
+					<?php endif; ?>
+				</div>
 
 			<?php elseif ('pesanan' === $ht_view) : ?>
 				<?php
@@ -869,7 +1001,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 		<nav class="ht-panel__dock" aria-label="Navigasi bawah">
 			<a class="<?php echo 'beranda' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('beranda')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg><span>Dashboard</span></a>
 			<a class="<?php echo 'kelas' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('kelas')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg><span>Kelas</span></a>
-			<a href="<?php echo esc_url(home_url('/courses/')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5Z"/></svg><span>Course</span></a>
+			<a class="<?php echo 'course' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('course')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5Z"/></svg><span>Course</span></a>
 			<button type="button" data-dock-profil><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg><span>Profil</span></button>
 		</nav>
 	</div>

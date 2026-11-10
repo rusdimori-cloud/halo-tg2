@@ -59,7 +59,7 @@
     var inner;
     if (SHELL === "lesson") {
       inner = '<div class="ht-skel ht-skel--video"></div>' + skelLine(60) + skelLine(92) + skelLine(96) + skelLine(78) + skelLine(40);
-    } else if (view === "kelas" || view === "wishlist") {
+    } else if (view === "kelas" || view === "wishlist" || view === "course") {
       inner = skelLine(34) + skelCards(4);
     } else if (view === "statistik") {
       inner = skelLine(34) + skelBlock(180) + skelRows(3);
