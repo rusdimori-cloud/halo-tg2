@@ -31,7 +31,8 @@
     panel: [
       { sel: ".ht-panel__topbar h1", mode: "text" },
       { sel: ".ht-panel__nav", mode: "html" },
-      { sel: ".ht-panel__top-actions", mode: "html" }
+      { sel: ".ht-panel__top-actions", mode: "html" },
+      { sel: ".ht-panel__dock", mode: "html" }
     ],
     lesson: [
       { sel: ".tutor-course-single-sidebar-wrapper", mode: "html" },

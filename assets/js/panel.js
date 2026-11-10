@@ -80,12 +80,64 @@
     if (e.key === "Escape") { closeDropdowns(null); setDrawer(false); closeModal(); }
   });
 
-  /* Dock Profil → buka dropdown avatar topbar */
-  var dockProfil = $("[data-dock-profil]");
-  if (dockProfil) dockProfil.addEventListener("click", function () {
+  /* Dock Profil → buka dropdown avatar topbar (delegasi: isi dock
+     disinkronkan ulang oleh navigasi lembut) */
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest("[data-dock-profil]")) return;
     var btn = $(".ht-panel__top-actions [data-dd-btn].ht-panel__avatarbtn") || $(".ht-panel__avatarbtn");
     if (btn) btn.click();
   });
+
+  /* Pil penanda aktif dock: meluncur dengan pantulan ringan ke tab
+     aktif setiap kali tampilan berpindah (navigasi lembut). Posisi
+     terakhir disimpan di luar node karena isi dock bisa bertukar. */
+  var dockEl = $(".ht-panel__dock");
+  var dockPill = null;
+  var pillPos = null;
+  function dockPlace(animate) {
+    if (!dockEl) return;
+    var active = dockEl.querySelector("a.is-active");
+    if (!dockPill || !dockEl.contains(dockPill)) {
+      dockPill = document.createElement("span");
+      dockPill.className = "ht-panel__dockpill";
+      dockPill.setAttribute("aria-hidden", "true");
+      dockEl.appendChild(dockPill);
+      dockEl.classList.add("has-pill");
+      if (pillPos) {
+        dockPill.style.transition = "none";
+        dockPill.style.transform = "translate(" + pillPos.x + "px," + pillPos.y + "px)";
+        dockPill.style.width = pillPos.w + "px";
+        dockPill.style.height = pillPos.h + "px";
+        dockPill.style.opacity = pillPos.visible ? "1" : "0";
+        void dockPill.offsetWidth;
+        dockPill.style.transition = "";
+      }
+    }
+    if (!active) {
+      dockPill.style.opacity = "0";
+      if (pillPos) pillPos.visible = false;
+      return;
+    }
+    var dr = dockEl.getBoundingClientRect(), ar = active.getBoundingClientRect();
+    var pos = { x: ar.left - dr.left, y: ar.top - dr.top, w: ar.width, h: ar.height, visible: true };
+    if (!animate) dockPill.style.transition = "none";
+    dockPill.style.opacity = "1";
+    dockPill.style.transform = "translate(" + pos.x + "px," + pos.y + "px)";
+    dockPill.style.width = pos.w + "px";
+    dockPill.style.height = pos.h + "px";
+    if (!animate) { void dockPill.offsetWidth; dockPill.style.transition = ""; }
+    pillPos = pos;
+  }
+  if (dockEl) {
+    requestAnimationFrame(function () { dockPlace(false); });
+    window.addEventListener("resize", function () { dockPlace(false); });
+    document.addEventListener("ht:softnav:loaded", function () {
+      dockPlace(true);
+      /* Koreksi senyap setelah luncuran selesai: lebar dock bisa
+         bergeser seukuran scrollbar saat tinggi konten berubah. */
+      setTimeout(function () { dockPlace(false); }, 560);
+    });
+  }
 
   /* Modal Hubungi Kami (delegasi; modal dicari saat kejadian) */
   function contactModal() { return $("[data-contact-modal]"); }
