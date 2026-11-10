@@ -50,9 +50,6 @@ $ht_profil_status  = isset($_GET['profil']) ? sanitize_key(wp_unslash($_GET['pro
 $ht_sandi_status   = isset($_GET['sandi']) ? sanitize_key(wp_unslash($_GET['sandi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_foto_status    = isset($_GET['foto']) ? sanitize_key(wp_unslash($_GET['foto'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $ht_ujian_status   = isset($_GET['ujian']) ? sanitize_key(wp_unslash($_GET['ujian'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$ht_cover_id_top   = (int) get_user_meta($ht_uid, '_tutor_cover_photo', true);
-$ht_cover_url_top  = $ht_cover_id_top ? (string) wp_get_attachment_image_url($ht_cover_id_top, 'large') : '';
-$ht_job_top        = (string) get_user_meta($ht_uid, '_tutor_profile_job_title', true);
 $ht_exam_date      = (string) get_user_meta($ht_uid, 'halo_tg2_exam_date', true);
 $ht_exam_name      = (string) get_user_meta($ht_uid, 'halo_tg2_exam_name', true);
 $ht_exam_days      = null;
@@ -61,10 +58,7 @@ if ('' !== $ht_exam_date) {
 }
 $ht_notif_unread = function_exists('halo_tg2_core_notif_unread') ? halo_tg2_core_notif_unread($ht_uid) : 0;
 $ht_notif_latest = function_exists('halo_tg2_core_notif_list') ? halo_tg2_core_notif_list($ht_uid, 5) : array();
-$ht_public_profile = function_exists('tutor_utils') ? (string) tutor_utils()->profile_url($ht_user) : '';
-if ('' === $ht_public_profile || '#' === $ht_public_profile) {
-	$ht_public_profile = home_url('/profile/' . $ht_user->user_nicename . '/');
-}
+
 
 /**
  * Cetak satu kartu kelas (gaya mockup v16: sampul penuh, teks putih).
@@ -206,24 +200,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<?php endif; ?>
 
 			<?php if ('beranda' === $ht_view) : ?>
-				<section class="ht-panel__pwidget">
-					<div class="ht-panel__pcover">
-						<?php if ('' !== $ht_cover_url_top) : ?>
-							<img src="<?php echo esc_url($ht_cover_url_top); ?>" alt="">
-						<?php endif; ?>
-					</div>
-					<div class="ht-panel__pbody">
-						<span class="ht-panel__pavatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
-						<div class="ht-panel__pinfo">
-							<h2><?php echo esc_html($ht_user->display_name); ?></h2>
-							<p><?php echo esc_html('' !== $ht_job_top ? $ht_job_top : $ht_user->user_email); ?></p>
-						</div>
-						<div class="ht-panel__pactions">
-							<a class="halo-tg2__btn halo-tg2__btn--ghost" href="<?php echo esc_url($ht_public_profile); ?>">Profil Publik</a>
-							<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_url('pengaturan')); ?>">Ubah Profil</a>
-						</div>
-					</div>
-				</section>
+				<p class="ht-panel__greeting">Halo, <strong><?php echo esc_html($ht_user->first_name ? $ht_user->first_name : $ht_user->display_name); ?></strong> — siap lanjut belajar?</p>
 				<?php if (null !== $ht_exam_days && $ht_exam_days >= 0) : ?>
 					<div class="ht-panel__exam">
 						<div class="ht-panel__exam-text">
@@ -672,13 +649,6 @@ $ht_logout = wp_logout_url(home_url('/'));
 								<option value="auto" <?php selected($ht_prefs['motion_effects'], 'auto'); ?>>Otomatis (bawaan sistem)</option>
 								<option value="reduce" <?php selected($ht_prefs['motion_effects'], 'reduce'); ?>>Kurangi animasi</option>
 								<option value="standard" <?php selected($ht_prefs['motion_effects'], 'standard'); ?>>Standar</option>
-							</select></span>
-						</label>
-						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Tema Halaman Belajar</strong><small>Tampilan terang/gelap di halaman lesson.</small></span>
-							<span class="ht-panel__pref-control"><select name="theme">
-								<option value="light" <?php selected($ht_prefs['theme'], 'light'); ?>>Terang</option>
-								<option value="dark" <?php selected($ht_prefs['theme'], 'dark'); ?>>Gelap</option>
-								<option value="system" <?php selected($ht_prefs['theme'], 'system'); ?>>Otomatis (bawaan sistem)</option>
 							</select></span>
 						</label>
 						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Mode Belajar</strong><small>Gaya tampilan materi belajar.</small></span>

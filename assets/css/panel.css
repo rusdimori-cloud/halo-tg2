@@ -357,28 +357,7 @@ html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
 }
 .ht-panel__profile-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* ---------- Widget profil + banner pengingat ujian (beranda) ---------- */
-.ht-panel__pwidget{
-  background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);
-  overflow:hidden;margin-bottom:16px;
-}
-.ht-panel__pcover{
-  height:118px;background:linear-gradient(120deg,#0A2A6E,#1463FF 55%,#5B93FF);
-  background-size:cover;background-position:center;
-}
-.ht-panel__pcover img{width:100%;height:100%;object-fit:cover;display:block}
-.ht-panel__pcover:has(img){background:none}
-.ht-panel__pbody{display:flex;align-items:center;gap:14px;padding:0 20px 18px;flex-wrap:wrap}
-.ht-panel__pavatar{
-  width:68px;height:68px;border-radius:9999px;flex:0 0 auto;margin-top:-30px;
-  border:3px solid var(--ht-surface);box-shadow:var(--ht-shadow);overflow:hidden;background:#EEF4FF;
-  color:var(--ht-primary);display:grid;place-items:center;font-weight:700;font-size:24px;
-}
-.ht-panel__pavatar img{width:100%;height:100%;object-fit:cover;display:block}
-.ht-panel__pinfo{min-width:0;flex:1 1 180px;padding-top:10px}
-.ht-panel__pinfo h2{font-size:19px;font-weight:700;line-height:1.25;margin:0}
-.ht-panel__pinfo p{font-size:13px;color:var(--ht-text-2);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ht-panel__pactions{display:flex;gap:8px;padding-top:10px;flex-wrap:wrap}
+/* ---------- Banner pengingat ujian (beranda) ---------- */
 
 .ht-panel__exam{
   display:flex;align-items:center;gap:16px;margin-bottom:16px;
@@ -404,10 +383,7 @@ html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
 .ht-panel__exam.is-empty{background:var(--ht-surface);color:var(--ht-fg);border:1.4px dashed var(--ht-line);box-shadow:none}
 .ht-panel__exam.is-empty .ht-panel__exam-text span{color:var(--ht-text-2);opacity:1}
 @media (max-width:640px){
-  .ht-panel__pcover{height:92px}
-  .ht-panel__pbody{padding:0 16px 16px}
-  .ht-panel__pactions{width:100%}
-  .ht-panel__exam{padding:14px 16px}
+        .ht-panel__exam{padding:14px 16px}
 }
 .ht-panel__pref-row{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
