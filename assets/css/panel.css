@@ -249,3 +249,36 @@ html[data-halo-tg2-theme="dark"] .ht-panel__dock{background:rgba(13,16,22,.85)}
 .ht-panel__cover-preview img{width:100%;height:100%;object-fit:cover;display:block}
 .ht-panel__photo-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 .ht-panel__field input[type="file"]{padding:9px 12px}
+
+/* ---------- Pengaturan 4 bagian (Akun/Keamanan/Sosial/Preferensi) ---------- */
+.ht-panel__tabs--links a{
+  font-size:13.6px;font-weight:600;color:var(--ht-text-2);padding:7px 16px;border-radius:9999px;text-decoration:none;
+}
+.ht-panel__tabs--links a.is-active{background:var(--ht-surface);color:var(--ht-fg);box-shadow:var(--ht-shadow)}
+.ht-panel__profile-head{position:relative;margin-bottom:42px}
+.ht-panel__profile-head .ht-panel__cover-preview{margin-bottom:0}
+.ht-panel__profile-avatar{
+  position:absolute;left:16px;bottom:-28px;width:72px;height:72px;border-radius:9999px;
+  border:3px solid #fff;box-shadow:var(--ht-shadow);overflow:hidden;background:#EEF4FF;
+  color:var(--ht-primary);display:grid;place-items:center;font-weight:700;font-size:25px;
+}
+.ht-panel__profile-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.ht-panel__pref-row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:12px 0;border-bottom:1px solid var(--ht-line);font-weight:400;cursor:pointer;
+}
+.ht-panel__pref-row:last-of-type{border-bottom:0}
+.ht-panel__pref-text{display:grid;gap:2px;min-width:0}
+.ht-panel__pref-text strong{font-size:14px;font-weight:600}
+.ht-panel__pref-text small{font-size:12.6px;color:var(--ht-text-2)}
+.ht-panel__pref-control select{
+  border:1px solid var(--ht-line-strong);border-radius:12px;background:var(--ht-surface);color:var(--ht-fg);
+  padding:9px 32px 9px 12px;font:inherit;font-size:13.6px;appearance:none;-webkit-appearance:none;max-width:230px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%235B6472' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.ht-panel__switchwrap{position:relative;display:inline-flex;flex:none}
+.ht-panel__switchwrap input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.ht-panel__switchwrap input:checked + .ht-panel__switch{background:var(--ht-primary)}
+.ht-panel__switchwrap input:checked + .ht-panel__switch::after{left:19px}
+.ht-panel__reset-form{margin-top:14px;display:flex;justify-content:flex-end}

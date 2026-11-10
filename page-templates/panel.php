@@ -273,7 +273,13 @@ $ht_logout = wp_logout_url(home_url('/'));
 				</div>
 			<?php elseif ('pengaturan' === $ht_view) : ?>
 				<?php
-				$ht_sandi_errors = array(
+				$ht_bagian = isset($_GET['bagian']) ? sanitize_key(wp_unslash($_GET['bagian'])) : 'akun'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				if (!in_array($ht_bagian, array('akun', 'keamanan', 'sosial', 'preferensi'), true)) {
+					$ht_bagian = 'akun';
+				}
+				$ht_sosial_status = isset($_GET['sosial']) ? sanitize_key(wp_unslash($_GET['sosial'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$ht_pref_status   = isset($_GET['preferensi']) ? sanitize_key(wp_unslash($_GET['preferensi'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$ht_sandi_errors  = array(
 					'lama_salah'        => 'Kata sandi lama salah.',
 					'baru_kosong'       => 'Kata sandi baru wajib diisi.',
 					'konfirmasi_kosong' => 'Konfirmasi kata sandi wajib diisi.',
@@ -290,7 +296,37 @@ $ht_logout = wp_logout_url(home_url('/'));
 				if (empty($ht_tz_list)) { foreach (timezone_identifiers_list() as $z) { $ht_tz_list[$z] = $z; } }
 				$ht_cover_id  = (int) get_user_meta($ht_uid, '_tutor_cover_photo', true);
 				$ht_cover_url = $ht_cover_id ? (string) wp_get_attachment_image_url($ht_cover_id, 'large') : '';
-				$ht_return = $ht_url('pengaturan');
+				$ht_base_set  = $ht_url('pengaturan');
+				$ht_ret       = function ($bagian) use ($ht_base_set) {
+					return 'akun' === $bagian ? $ht_base_set : add_query_arg('bagian', $bagian, $ht_base_set);
+				};
+				$ht_social_fields = array(
+					'_tutor_profile_facebook' => 'Facebook',
+					'_tutor_profile_twitter'  => 'X (Twitter)',
+					'_tutor_profile_linkedin' => 'LinkedIn',
+					'_tutor_profile_github'   => 'GitHub',
+					'_tutor_profile_website'  => 'Website',
+				);
+				if (function_exists('tutor_utils') && method_exists(tutor_utils(), 'tutor_user_social_icons')) {
+					$ht_icons = tutor_utils()->tutor_user_social_icons();
+					if (is_array($ht_icons) && !empty($ht_icons)) {
+						$ht_social_fields = array();
+						foreach ($ht_icons as $k => $f) {
+							$ht_social_fields[$k] = isset($f['label']) ? $f['label'] : $k;
+						}
+					}
+				}
+				$ht_prefs = array();
+				if (class_exists('\TUTOR\UserPreference')) {
+					$ht_prefs = \TUTOR\UserPreference::get_preferences($ht_uid);
+				}
+				if (!is_array($ht_prefs) || empty($ht_prefs)) {
+					$ht_saved = get_user_meta($ht_uid, 'tutor_user_preferences', true);
+					$ht_prefs = array_merge(
+						array('auto_play_next' => false, 'theme' => 'system', 'vision' => 'normal', 'contrast' => '', 'motion_effects' => 'auto', 'font_scale' => 100, 'learning_mood' => 'modern'),
+						is_array($ht_saved) ? $ht_saved : array()
+					);
+				}
 				?>
 				<?php if ('tersimpan' === $ht_foto_status) : ?>
 					<p class="ht-panel__notice is-ok">Foto tersimpan.</p>
@@ -309,21 +345,44 @@ $ht_logout = wp_logout_url(home_url('/'));
 				<?php elseif (isset($ht_sandi_errors[$ht_sandi_status])) : ?>
 					<p class="ht-panel__notice is-error"><?php echo esc_html($ht_sandi_errors[$ht_sandi_status]); ?></p>
 				<?php endif; ?>
+				<?php if ('tersimpan' === $ht_sosial_status) : ?>
+					<p class="ht-panel__notice is-ok">Akun sosial tersimpan.</p>
+				<?php elseif ('gagal' === $ht_sosial_status) : ?>
+					<p class="ht-panel__notice is-error">Akun sosial belum tersimpan. Coba lagi sebentar lagi.</p>
+				<?php endif; ?>
+				<?php if ('tersimpan' === $ht_pref_status) : ?>
+					<p class="ht-panel__notice is-ok">Preferensi tersimpan.</p>
+				<?php elseif ('diatur-ulang' === $ht_pref_status) : ?>
+					<p class="ht-panel__notice is-ok">Preferensi diatur ulang ke bawaan.</p>
+				<?php elseif ('gagal' === $ht_pref_status) : ?>
+					<p class="ht-panel__notice is-error">Preferensi belum tersimpan. Coba lagi sebentar lagi.</p>
+				<?php endif; ?>
 
+				<nav class="ht-panel__tabs ht-panel__tabs--links" aria-label="Bagian pengaturan">
+					<a class="<?php echo 'akun' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('akun')); ?>">Akun</a>
+					<a class="<?php echo 'keamanan' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('keamanan')); ?>">Keamanan</a>
+					<a class="<?php echo 'sosial' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('sosial')); ?>">Akun Sosial</a>
+					<a class="<?php echo 'preferensi' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('preferensi')); ?>">Preferensi</a>
+				</nav>
+
+				<?php if ('akun' === $ht_bagian) : ?>
 				<section class="ht-panel__setting-card">
 					<h2>Foto Profil &amp; Sampul</h2>
 					<p class="ht-panel__modal-sub">Foto profil tampil di panel dan di profil publikmu; sampul tampil di bagian atas profil publik.</p>
-					<div class="ht-panel__cover-preview">
-						<?php if ('' !== $ht_cover_url) : ?>
-							<img src="<?php echo esc_url($ht_cover_url); ?>" alt="">
-						<?php else : ?>
-							<span>Belum ada foto sampul</span>
-						<?php endif; ?>
+					<div class="ht-panel__profile-head">
+						<div class="ht-panel__cover-preview">
+							<?php if ('' !== $ht_cover_url) : ?>
+								<img src="<?php echo esc_url($ht_cover_url); ?>" alt="">
+							<?php else : ?>
+								<span>Belum ada foto sampul</span>
+							<?php endif; ?>
+						</div>
+						<span class="ht-panel__profile-avatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
 					</div>
 					<form method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_save_photo">
 						<?php wp_nonce_field('halo_tg2_save_photo', '_htfnonce'); ?>
-						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
 						<div class="ht-panel__form-grid">
 							<label class="ht-panel__field">Foto Profil (JPG/PNG)
 								<input type="file" name="profile_photo" accept=".jpg,.jpeg,.png">
@@ -343,7 +402,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 									<input type="hidden" name="action" value="halo_tg2_remove_photo">
 									<?php wp_nonce_field('halo_tg2_remove_photo', '_htrnonce'); ?>
 									<input type="hidden" name="jenis" value="profil">
-									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
 									<button type="submit" class="halo-tg2__btn ht-panel__danger-btn">Hapus Foto Profil</button>
 								</form>
 							<?php endif; ?>
@@ -352,7 +411,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 									<input type="hidden" name="action" value="halo_tg2_remove_photo">
 									<?php wp_nonce_field('halo_tg2_remove_photo', '_htrnonce'); ?>
 									<input type="hidden" name="jenis" value="sampul">
-									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
 									<button type="submit" class="halo-tg2__btn ht-panel__danger-btn">Hapus Sampul</button>
 								</form>
 							<?php endif; ?>
@@ -366,7 +425,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_save_profile">
 						<?php wp_nonce_field('halo_tg2_save_profile', '_htpnonce'); ?>
-						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
 						<div class="ht-panel__form-grid">
 							<label class="ht-panel__field">Nama Depan
 								<input type="text" name="first_name" value="<?php echo esc_attr($ht_user->first_name); ?>" autocomplete="given-name">
@@ -413,13 +472,29 @@ $ht_logout = wp_logout_url(home_url('/'));
 					</form>
 				</section>
 
+				<section class="ht-panel__setting-card is-danger">
+					<h2>Hapus Akun</h2>
+					<p class="ht-panel__modal-sub">Menghapus akun bersifat permanen — akses kelas dan riwayat belajarmu ikut hilang. Demi keamanan, penghapusan diproses manual lewat email agar tidak ada yang terhapus karena tidak sengaja.</p>
+					<button type="button" class="halo-tg2__btn ht-panel__danger-btn" data-contact-open>Minta Hapus Akun</button>
+				</section>
+
+				<?php elseif ('keamanan' === $ht_bagian) : ?>
+				<section class="ht-panel__setting-card">
+					<h2>Info Masuk</h2>
+					<p class="ht-panel__modal-sub">Email ini dipakai untuk masuk dan menerima pemberitahuan akun.</p>
+					<label class="ht-panel__field">Email Akun
+						<input type="email" value="<?php echo esc_attr($ht_user->user_email); ?>" readonly>
+					</label>
+					<p class="ht-panel__modal-sub">Perubahan alamat email dilakukan lewat admin demi keamanan akunmu.</p>
+				</section>
+
 				<section class="ht-panel__setting-card">
 					<h2>Kata Sandi</h2>
 					<p class="ht-panel__modal-sub">Ganti kata sandi masukmu. Kamu tetap masuk setelah sandi berganti.</p>
 					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 						<input type="hidden" name="action" value="halo_tg2_change_password">
 						<?php wp_nonce_field('halo_tg2_change_password', '_htsnonce'); ?>
-						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_return); ?>">
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('keamanan')); ?>">
 						<label class="ht-panel__field">Kata Sandi Lama
 							<input type="password" name="previous_password" autocomplete="current-password" required>
 						</label>
@@ -437,11 +512,88 @@ $ht_logout = wp_logout_url(home_url('/'));
 					</form>
 				</section>
 
-				<section class="ht-panel__setting-card is-danger">
-					<h2>Hapus Akun</h2>
-					<p class="ht-panel__modal-sub">Menghapus akun bersifat permanen — akses kelas dan riwayat belajarmu ikut hilang. Demi keamanan, penghapusan diproses manual lewat email agar tidak ada yang terhapus karena tidak sengaja.</p>
-					<button type="button" class="halo-tg2__btn ht-panel__danger-btn" data-contact-open>Minta Hapus Akun</button>
+				<?php elseif ('sosial' === $ht_bagian) : ?>
+				<section class="ht-panel__setting-card">
+					<h2>Akun Sosial</h2>
+					<p class="ht-panel__modal-sub">Tautan media sosial yang tertaut ke profil publikmu. Kosongkan untuk melepas tautan.</p>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+						<input type="hidden" name="action" value="halo_tg2_save_social">
+						<?php wp_nonce_field('halo_tg2_save_social', '_htsononce'); ?>
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('sosial')); ?>">
+						<?php foreach ($ht_social_fields as $skey => $slabel) : ?>
+							<label class="ht-panel__field"><?php echo esc_html($slabel); ?>
+								<input type="url" name="<?php echo esc_attr($skey); ?>" value="<?php echo esc_attr((string) get_user_meta($ht_uid, $skey, true)); ?>" placeholder="https://">
+							</label>
+						<?php endforeach; ?>
+						<div class="ht-panel__modal-actions">
+							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Akun Sosial</button>
+						</div>
+					</form>
 				</section>
+
+				<?php elseif ('preferensi' === $ht_bagian) : ?>
+				<section class="ht-panel__setting-card">
+					<h2>Preferensi Belajar</h2>
+					<p class="ht-panel__modal-sub">Atur pengalaman belajarmu di halaman lesson — sama seperti preferensi di dasbor Tutor.</p>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+						<input type="hidden" name="action" value="halo_tg2_save_preferences">
+						<?php wp_nonce_field('halo_tg2_save_preferences', '_htpnonce2'); ?>
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('preferensi')); ?>">
+						<div class="ht-panel__pref-row">
+							<span class="ht-panel__pref-text"><strong>Putar Lesson Berikutnya Otomatis</strong><small>Langsung lanjut ke lesson berikutnya setelah selesai.</small></span>
+							<span class="ht-panel__switchwrap"><input type="checkbox" name="auto_play_next" value="1" <?php checked(!empty($ht_prefs['auto_play_next'])); ?>><span class="ht-panel__switch" aria-hidden="true"></span></span>
+						</div>
+						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Efek Gerak</strong><small>Batasi animasi bila mata cepat lelah.</small></span>
+							<span class="ht-panel__pref-control"><select name="motion_effects">
+								<option value="auto" <?php selected($ht_prefs['motion_effects'], 'auto'); ?>>Otomatis (bawaan sistem)</option>
+								<option value="reduce" <?php selected($ht_prefs['motion_effects'], 'reduce'); ?>>Kurangi animasi</option>
+								<option value="standard" <?php selected($ht_prefs['motion_effects'], 'standard'); ?>>Standar</option>
+							</select></span>
+						</label>
+						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Tema Halaman Belajar</strong><small>Tampilan terang/gelap di halaman lesson.</small></span>
+							<span class="ht-panel__pref-control"><select name="theme">
+								<option value="light" <?php selected($ht_prefs['theme'], 'light'); ?>>Terang</option>
+								<option value="dark" <?php selected($ht_prefs['theme'], 'dark'); ?>>Gelap</option>
+								<option value="system" <?php selected($ht_prefs['theme'], 'system'); ?>>Otomatis (bawaan sistem)</option>
+							</select></span>
+						</label>
+						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Mode Belajar</strong><small>Gaya tampilan materi belajar.</small></span>
+							<span class="ht-panel__pref-control"><select name="learning_mood">
+								<option value="modern" <?php selected($ht_prefs['learning_mood'], 'modern'); ?>>Modern</option>
+								<option value="kids" <?php selected($ht_prefs['learning_mood'], 'kids'); ?>>Anak</option>
+							</select></span>
+						</label>
+						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Skala Font</strong><small>Ukuran huruf di halaman belajar.</small></span>
+							<span class="ht-panel__pref-control"><select name="font_scale">
+								<?php foreach (array(60, 80, 100, 120, 140, 160, 180, 200) as $fs) : ?>
+									<option value="<?php echo esc_attr($fs); ?>" <?php selected((int) $ht_prefs['font_scale'], $fs); ?>><?php echo esc_html($fs); ?>%</option>
+								<?php endforeach; ?>
+							</select></span>
+						</label>
+						<div class="ht-panel__pref-row">
+							<span class="ht-panel__pref-text"><strong>Kontras Tinggi</strong><small>Naikkan kontras agar teks lebih mudah dibaca.</small></span>
+							<span class="ht-panel__switchwrap"><input type="checkbox" name="contrast" value="1" <?php checked('high' === $ht_prefs['contrast']); ?>><span class="ht-panel__switch" aria-hidden="true"></span></span>
+						</div>
+						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Penglihatan</strong><small>Saringan warna sesuai kebutuhan penglihatanmu.</small></span>
+							<span class="ht-panel__pref-control"><select name="vision">
+								<option value="normal" <?php selected($ht_prefs['vision'], 'normal'); ?>>Normal</option>
+								<option value="protanopia" <?php selected($ht_prefs['vision'], 'protanopia'); ?>>Protanopia</option>
+								<option value="deuteranopia" <?php selected($ht_prefs['vision'], 'deuteranopia'); ?>>Deuteranopia</option>
+								<option value="deuteranomaly" <?php selected($ht_prefs['vision'], 'deuteranomaly'); ?>>Deuteranomaly</option>
+							</select></span>
+						</label>
+						<div class="ht-panel__modal-actions">
+							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Preferensi</button>
+						</div>
+					</form>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="ht-panel__reset-form">
+						<input type="hidden" name="action" value="halo_tg2_reset_preferences">
+						<?php wp_nonce_field('halo_tg2_reset_preferences', '_htrnonce2'); ?>
+						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('preferensi')); ?>">
+						<button type="submit" class="halo-tg2__btn halo-tg2__btn--ghost">Atur Ulang ke Bawaan</button>
+					</form>
+				</section>
+				<?php endif; ?>
 			<?php endif; ?>
 		</main>
 
