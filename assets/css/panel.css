@@ -144,6 +144,8 @@ html[data-halo-tg2-theme="dark"] .ht-panel__switch::after{left:19px}
   border:1.6px dashed var(--ht-line-strong);border-radius:20px;background:var(--ht-surface);
   padding:26px;display:grid;justify-items:center;text-align:center;gap:8px;
 }
+/* Atribut hidden selalu menang atas display komponen di dalam panel */
+.ht-panel [hidden]{display:none!important}
 .halo-tg2__empty-icon{width:56px;height:56px;border-radius:9999px;background:var(--ht-primary-soft);color:var(--ht-primary);display:grid;place-items:center}
 .halo-tg2__empty-icon svg{width:28px;height:28px}
 .halo-tg2__empty h3{font-size:16px;font-weight:600;color:var(--ht-fg)}
