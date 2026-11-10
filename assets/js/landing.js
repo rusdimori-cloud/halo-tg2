@@ -120,20 +120,28 @@
       var tlSteps=$$('.halo-tg2__tl-step', tl),
           tlBodies=tlSteps.map(function(s){ return $('.halo-tg2__tl-body', s); });
       tl.classList.add('is-armed');
-      var tlTick=false;
+      var tlTick=false, tlPeak=0, tlDone=false;
       var tlUpdate=function(){
         tlTick=false;
+        if(tlDone) return;
         var r=tl.getBoundingClientRect(), vh=window.innerHeight;
         var anchor = window.innerWidth<=760 ? 0.40 : 0.42;
         var p=(vh*anchor - r.top)/r.height; p=Math.max(0,Math.min(1,p));
-        tlFill.style.height=(p*100)+'%';
-        var lineY=r.top + p*r.height;
+        if(p>tlPeak) tlPeak=p; /* hanya maju: scroll ke atas tidak memundurkan garis */
+        tlFill.style.height=(tlPeak*100)+'%';
+        var lineY=r.top + tlPeak*r.height;
         tlNodes.forEach(function(n, i){
           var nr=n.getBoundingClientRect();
-          var reached = lineY >= nr.top + nr.height/2;
-          n.classList.toggle('is-on', reached);
-          if(tlBodies[i]) tlBodies[i].classList.toggle('is-shown', reached);
+          if(lineY >= nr.top + nr.height/2){
+            n.classList.add('is-on');
+            if(tlBodies[i]) tlBodies[i].classList.add('is-shown');
+          }
         });
+        if(tlPeak>=1){
+          tlDone=true;
+          window.removeEventListener('scroll', tlReq);
+          window.removeEventListener('resize', tlReq);
+        }
       };
       var tlReq=function(){ if(!tlTick){ tlTick=true; requestAnimationFrame(tlUpdate); } };
       window.addEventListener('scroll', tlReq, {passive:true});
@@ -235,7 +243,6 @@
         suCursor=$('.halo-tg2__demo-cursor',su),
         suTimers=[], suRunning=false;
     function suLater(fn,ms){ suTimers.push(setTimeout(fn,ms)); }
-    function suClear(){ suTimers.forEach(clearTimeout); suTimers=[]; }
     function suType(el,text,start,speed){ for(var i=1;i<=text.length;i++){ (function(n){ suLater(function(){ el.textContent=text.slice(0,n); }, start+n*speed); })(i); } return start+text.length*speed; }
     function suMoveTo(el){ if(!el || !suCursor) return; var fr=suForm.getBoundingClientRect(), r=el.getBoundingClientRect(); suCursor.style.transform='translate('+Math.round(r.left-fr.left+r.width*.55)+'px,'+Math.round(r.top-fr.top+r.height*.62)+'px)'; suCursor.style.opacity='1'; }
     function suReset(){ su.classList.remove('is-success'); suBtn.classList.remove('is-loading','is-press'); suBtnLabel.textContent='Daftar Gratis'; suUser.textContent=''; suEmail.textContent=''; suFUser.classList.remove('is-active','has-text'); suFEmail.classList.remove('is-active','has-text'); if(suCursor) suCursor.style.opacity='0'; suForm.classList.remove('is-in'); }
@@ -251,16 +258,14 @@
       suLater(function(){ suMoveTo(suBtn); }, t2+300);
       suLater(function(){ suFEmail.classList.remove('is-active'); suBtn.classList.add('is-press'); }, t2+850);
       suLater(function(){ suBtn.classList.remove('is-press'); suBtn.classList.add('is-loading'); suBtnLabel.textContent='Memproses...'; }, t2+1050);
-      suLater(function(){ su.classList.add('is-success'); }, t2+2600);
-      suLater(function(){ if(suRunning) suCycle(); }, t2+5600);
+      suLater(function(){ su.classList.add('is-success'); suRunning=false; }, t2+2600);
     }
     function suStart(){ if(suRunning) return; suRunning=true; suCycle(); }
-    function suStop(){ suRunning=false; suClear(); suReset(); }
     if(reduced){
       suUser.textContent='alex_tg2'; suEmail.textContent='alex@mail.com';
       suFUser.classList.add('has-text'); suFEmail.classList.add('has-text'); suForm.classList.add('is-in');
     } else if('IntersectionObserver' in window){
-      var suIO=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting) suStart(); else suStop(); }); },{threshold:.35});
+      var suIO=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ suStart(); suIO.unobserve(su); } }); },{threshold:.35});
       suIO.observe(su);
     } else { suStart(); }
   }
@@ -296,7 +301,7 @@
     if(reduced){ dashFinal(); }
     else if('IntersectionObserver' in window){
       dashReset();
-      var dashIO=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting) dashPlay(); else dashReset(); }); },{threshold:.35});
+      var dashIO=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ dashPlay(); dashIO.unobserve(dash); } }); },{threshold:.35});
       dashIO.observe(dash);
     } else { dashPlay(); }
   }
