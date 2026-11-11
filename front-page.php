@@ -1,6 +1,6 @@
 <?php
 /**
- * Halaman depan halo-tg2 (Fase 2) — pindahan landing yang disetujui
+ * Halaman depan halo-tg2 (Fase 2), pindahan landing yang disetujui
  * (halo-tg2-landing.html, final 7 Nov 2026). Header/footer dari tema;
  * gaya section dari assets/css/landing.css; skrip dari assets/js/landing.js.
  *
@@ -28,13 +28,13 @@ get_header();
         <span class="halo-tg2__t-mono-sm" style="color:var(--ht-text-3)">Tanpa kartu kredit · Materi awal gratis</span>
         <div class="halo-tg2__proof">
           <span class="halo-tg2__avatars" aria-hidden="true"><span>IM</span><span>AR</span><span>HS</span></span>
-          <p class="halo-tg2__t-body-sm" style="color:var(--ht-text-2)"><b>312+ peserta</b> sedang belajar — <b>87%</b> dari yang menuntaskan simulasi berhasil lulus.</p>
+          <p class="halo-tg2__t-body-sm" style="color:var(--ht-text-2)"><b>312+ peserta</b> sedang belajar, <b>87%</b> dari yang menuntaskan simulasi berhasil lulus.</p>
         </div>
         <p class="halo-tg2__t-mono-sm" style="color:var(--ht-text-3)">Khusus jalur manufaktur · <span lang="ja">生産管理オペレーション 3級</span></p>
       </div>
       <div class="halo-tg2__hero-visual" id="simulasi"><span class="halo-tg2__float halo-tg2__float--1 halo-tg2__t-label-md"><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Skor 82 · LULUS</span><span class="halo-tg2__float halo-tg2__float--2 halo-tg2__t-label-md"><i class="fa-regular fa-cards-blank" aria-hidden="true"></i> 600+ Flashcard</span>
       <figure class="halo-tg2__card halo-tg2__hero-shot" data-halo-tg2-reveal>
-        <!-- GAMBAR STOK SEMENTARA — ganti src di bawah ini dengan screenshot CBT / dashboard (HP atau desktop) -->
+        <!-- GAMBAR STOK SEMENTARA, ganti src di bawah ini dengan screenshot CBT / dashboard (HP atau desktop) -->
         <img class="halo-tg2__hero-shot-img" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop" alt="Peserta belajar persiapan ujian TG2 lewat laptop" width="1600" height="1000" decoding="async">
       </figure>
     </div>
@@ -55,7 +55,7 @@ get_header();
     <div class="halo-tg2__sec-head" data-halo-tg2-reveal>
       <span class="halo-tg2__eyebrow halo-tg2__t-label-sm">Fitur</span>
       <h2 class="halo-tg2__t-h-md">Semua yang Anda butuhkan untuk lulus</h2>
-      <p class="halo-tg2__t-body-md">Pilih fitur di kiri — panel di kanan menunjukkan cara kerjanya di dashboard Anda.</p>
+      <p class="halo-tg2__t-body-md">Pilih fitur di kiri, panel di kanan menunjukkan cara kerjanya di dashboard Anda.</p>
     </div>
     <div class="halo-tg2__feat-grid">
       <div class="halo-tg2__notes" data-halo-tg2-reveal>
@@ -73,7 +73,7 @@ get_header();
         </button>
         <button class="halo-tg2__note" type="button" data-note="prog" aria-pressed="false">
           <h3><i class="fa-regular fa-chart-line" aria-hidden="true"></i> Dashboard Progress</h3>
-          <p class="halo-tg2__t-body-sm">Skor, bab yang dikuasai, dan fokus berikutnya — semua terlihat dalam satu layar.</p>
+          <p class="halo-tg2__t-body-sm">Skor, bab yang dikuasai, dan fokus berikutnya, semua terlihat dalam satu layar.</p>
         </button>
       </div>
       <div class="halo-tg2__card halo-tg2__panel" data-halo-tg2-reveal aria-hidden="true">
@@ -111,7 +111,7 @@ get_header();
       <div class="halo-tg2__fc-copy" data-halo-tg2-reveal>
         <span class="halo-tg2__eyebrow halo-tg2__t-label-sm">Flashcard</span>
         <h2 class="halo-tg2__t-h-md">Hafalkan kosakata teknis, tanpa terasa menghafal</h2>
-        <p class="halo-tg2__t-body-md">Balik kartunya, cek artinya, tandai yang sudah hafal. Ulangi sedikit demi sedikit — sistemnya yang mengatur ritmenya untuk Anda.</p>
+        <p class="halo-tg2__t-body-md">Balik kartunya, cek artinya, tandai yang sudah hafal. Ulangi sedikit demi sedikit, sistemnya yang mengatur ritmenya untuk Anda.</p>
         <div class="halo-tg2__fc-index" data-fc-dots></div>
         <div class="halo-tg2__fc-prog">
           <div class="halo-tg2__fc-prog-top halo-tg2__t-label-md"><span>Sudah hafal</span><b data-fc-known>0 / 5</b></div>
@@ -237,7 +237,7 @@ get_header();
     <div class="halo-tg2__sec-head halo-tg2__steps-head" data-halo-tg2-reveal>
       <span class="halo-tg2__eyebrow halo-tg2__t-label-sm">Cara Kerja</span>
       <h2 class="halo-tg2__t-h-md">Tiga langkah, langsung belajar</h2>
-      <p class="halo-tg2__t-body-md">Gulir ke bawah — garisnya bergerak mengikuti perjalananmu, sama seperti progres belajarmu nanti.</p>
+      <p class="halo-tg2__t-body-md">Gulir ke bawah, garisnya bergerak mengikuti perjalananmu, sama seperti progres belajarmu nanti.</p>
     </div>
     </div>
     <div class="halo-tg2__timeline" data-timeline>
@@ -246,7 +246,7 @@ get_header();
         <span class="halo-tg2__tl-node" data-tl-node>01</span>
         <div class="halo-tg2__tl-body">
           <h3>Daftar dengan Mudah</h3>
-          <p class="halo-tg2__t-body-md">Buat akun gratis dalam hitungan detik — tanpa biaya pendaftaran, tanpa kartu kredit. Miniaturnya berjalan sendiri, persis semudah aslinya.</p>
+          <p class="halo-tg2__t-body-md">Buat akun gratis dalam hitungan detik, tanpa biaya pendaftaran, tanpa kartu kredit. Miniaturnya berjalan sendiri, persis semudah aslinya.</p>
           <div class="halo-tg2__card halo-tg2__tl-card halo-tg2__demo halo-tg2__demo--signup" data-demo-signup aria-hidden="true">
             <div class="halo-tg2__demo-form" data-demo-form>
               <span class="halo-tg2__t-mono-sm" style="color:var(--ht-text-3)">Daftar · Langkah 1</span>
@@ -265,7 +265,7 @@ get_header();
             <div class="halo-tg2__demo-success">
               <span class="halo-tg2__demo-check"><i class="fa-regular fa-check" aria-hidden="true"></i></span>
               <span class="halo-tg2__demo-success-title">Pendaftaran Berhasil!</span>
-              <span class="halo-tg2__t-body-sm" style="color:var(--ht-text-2)">Akun alex_tg2 sudah aktif — selamat belajar.</span>
+              <span class="halo-tg2__t-body-sm" style="color:var(--ht-text-2)">Akun alex_tg2 sudah aktif. Selamat belajar.</span>
             </div>
           </div>
         </div>
@@ -274,7 +274,7 @@ get_header();
         <span class="halo-tg2__tl-node" data-tl-node>02</span>
         <div class="halo-tg2__tl-body">
           <h3>Pilih Materi Belajar</h3>
-          <p class="halo-tg2__t-body-md">Katalog materinya bergeser sendiri — pilih sesuai target ujianmu, dari 生産管理 sampai simulasi CBT. Semua tersusun bertahap per bab, cukup 15–20 menit per hari.</p>
+          <p class="halo-tg2__t-body-md">Katalog materinya bergeser sendiri. Pilih sesuai target ujianmu, dari 生産管理 sampai simulasi CBT. Semua tersusun bertahap per bab, cukup 15–20 menit per hari.</p>
           <div class="halo-tg2__card halo-tg2__tl-card halo-tg2__demo halo-tg2__demo--catalog" aria-hidden="true">
             <span class="halo-tg2__t-mono-sm" style="color:var(--ht-text-3)">Belajar · Langkah 2</span>
             <div class="halo-tg2__demo-marquee">
@@ -303,7 +303,7 @@ get_header();
         <span class="halo-tg2__tl-node" data-tl-node>03</span>
         <div class="halo-tg2__tl-body">
           <h3>Pantau Hasil Belajar</h3>
-          <p class="halo-tg2__t-body-md">Semua aktivitasmu terangkum otomatis di dashboard — jumlah soal, progres bab, sampai prediksi kelulusan yang naik seiring konsistensimu belajar.</p>
+          <p class="halo-tg2__t-body-md">Semua aktivitasmu terangkum otomatis di dashboard: jumlah soal, progres bab, sampai prediksi kelulusan yang naik seiring konsistensimu belajar.</p>
           <div class="halo-tg2__card halo-tg2__tl-card halo-tg2__demo halo-tg2__demo--dash" data-demo-dash aria-hidden="true">
             <span class="halo-tg2__t-mono-sm" style="color:var(--ht-text-3)">Dashboard · Langkah 3</span>
             <div class="halo-tg2__demo-dash-top">
@@ -369,7 +369,7 @@ get_header();
     <div class="halo-tg2__sec-head" data-halo-tg2-reveal>
       <span class="halo-tg2__eyebrow halo-tg2__t-label-sm">FAQ</span>
       <h2 class="halo-tg2__t-h-md">Pertanyaan yang sering ditanyakan</h2>
-      <p class="halo-tg2__t-body-md">Klik pertanyaannya — jawabannya langsung tampil.</p>
+      <p class="halo-tg2__t-body-md">Klik pertanyaannya, jawabannya langsung tampil.</p>
     </div>
     <div class="halo-tg2__faq2">
       <div class="halo-tg2__faq-list" data-halo-tg2-reveal>
@@ -403,7 +403,7 @@ get_header();
         <div class="halo-tg2__faq-a2" data-faq-pane="5">
           <span class="halo-tg2__t-mono-sm" style="color:var(--ht-primary-70)">Pertanyaan 05</span>
           <h3>Perlu install aplikasi untuk mengaksesnya?</h3>
-          <p class="halo-tg2__t-body-sm">Tidak perlu. Platform ini sepenuhnya berbasis website — cukup buka browser di HP, tablet, atau komputer, lalu login dan mulai belajar. Tampilan sudah dioptimasi untuk layar kecil, sehingga nyaman digunakan bahkan saat jam istirahat kerja.</p>
+          <p class="halo-tg2__t-body-sm">Tidak perlu. Platform ini sepenuhnya berbasis website. Cukup buka browser di HP, tablet, atau komputer, lalu login dan mulai belajar. Tampilan sudah dioptimasi untuk layar kecil, sehingga nyaman digunakan bahkan saat jam istirahat kerja.</p>
         </div>
       </div>
     </div>

@@ -117,7 +117,7 @@ function halo_tg2_panel_unpaid_orders($user_id) {
 /**
  * Data satu course untuk kartu katalog (dipakai view Course panel).
  * Mengikuti perhitungan kartu arsip: harga WooCommerce, lencana
- * diskon, rating, durasi, jumlah siswa, level — semua data nyata.
+ * diskon, rating, durasi, jumlah siswa, level, semua data nyata.
  *
  * @param int   $course_id     ID course Tutor.
  * @param int   $user_id       ID pengguna (status kepemilikan).
@@ -231,6 +231,38 @@ function halo_tg2_wishlist_toggle() {
 	wp_send_json_success(array('state' => 'added'));
 }
 
+add_action('wp_ajax_halo_tg2_photo_upload', 'halo_tg2_photo_upload');
+/**
+ * Terima hasil crop foto dari editor foto panel (AJAX), simpan ke
+ * media library, lalu pasang sebagai foto profil / sampul pengguna
+ * (meta Tutor _tutor_profile_photo / _tutor_cover_photo).
+ */
+function halo_tg2_photo_upload() {
+	check_ajax_referer('halo_tg2_photo_upload', 'nonce');
+	$user_id = get_current_user_id();
+	$target  = isset($_POST['target']) ? sanitize_key(wp_unslash($_POST['target'])) : '';
+	if (!$user_id || !in_array($target, array('profil', 'cover'), true)) {
+		wp_send_json_error(array('message' => 'Permintaan tidak valid.'), 400);
+	}
+	if (empty($_FILES['photo']) || !isset($_FILES['photo']['tmp_name']) || !is_uploaded_file(sanitize_text_field(wp_unslash($_FILES['photo']['tmp_name'])))) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- jalur berkas unggahan diperiksa is_uploaded_file.
+		wp_send_json_error(array('message' => 'Berkas foto tidak diterima.'), 400);
+	}
+	if (isset($_FILES['photo']['size']) && (int) $_FILES['photo']['size'] > 10 * MB_IN_BYTES) {
+		wp_send_json_error(array('message' => 'Ukuran foto melebihi 10MB.'), 400);
+	}
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	$attach_id = media_handle_upload('photo', 0);
+	if (is_wp_error($attach_id)) {
+		wp_send_json_error(array('message' => 'Foto gagal diunggah: ' . $attach_id->get_error_message()), 400);
+	}
+	update_user_meta($user_id, 'profil' === $target ? '_tutor_profile_photo' : '_tutor_cover_photo', $attach_id);
+	wp_send_json_success(array(
+		'url' => (string) wp_get_attachment_image_url($attach_id, 'profil' === $target ? 'medium' : 'large'),
+	));
+}
+
 add_action('wp_enqueue_scripts', 'halo_tg2_panel_assets');
 /**
  * Muat aset panel hanya pada halaman dashboard kustom.
@@ -240,8 +272,9 @@ function halo_tg2_panel_assets() {
 		wp_enqueue_style('halo-tg2-panel', get_template_directory_uri() . '/assets/css/panel.css', array('halo-tg2'), HALO_TG2_VERSION);
 		wp_enqueue_script('halo-tg2-panel', get_template_directory_uri() . '/assets/js/panel.js', array(), HALO_TG2_VERSION, true);
 		wp_localize_script('halo-tg2-panel', 'HT_PANEL', array(
-			'ajaxUrl'   => admin_url('admin-ajax.php'),
-			'wishNonce' => wp_create_nonce('halo_tg2_wish_toggle'),
+			'ajaxUrl'    => admin_url('admin-ajax.php'),
+			'wishNonce'  => wp_create_nonce('halo_tg2_wish_toggle'),
+			'photoNonce' => wp_create_nonce('halo_tg2_photo_upload'),
 		));
 	}
 }

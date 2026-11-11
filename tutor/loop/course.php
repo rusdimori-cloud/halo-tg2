@@ -1,11 +1,11 @@
 <?php
 /**
- * Override halo-tg2 — kartu course pada arsip & daftar course.
+ * Override halo-tg2: kartu course pada arsip & daftar course.
  *
  * Menyamai kartu course di landing page tema (kelas halo-tg2__course):
  * sampul grafis/gambar, lencana, badan berisi judul, meta, harga, dan
  * level. Semua data nyata dari Tutor LMS (kategori, durasi, siswa,
- * nilai, harga WooCommerce, level) — tidak ada angka contoh.
+ * nilai, harga WooCommerce, level), tidak ada angka contoh.
  *
  * @package halo-tg2
  */

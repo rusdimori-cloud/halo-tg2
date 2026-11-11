@@ -2,8 +2,8 @@
 Theme Name: halo-tg2
 Theme URI: https://halo-tg2.com
 Author: halo TG2
-Description: Tema mandiri halo TG2 — dibangun dari Halo TG2 Template Desain. Mesin WooCommerce & Tutor LMS, kulit tema ini. Header pill, footer gradasi navy (satu-satunya gradasi resmi), cart drawer, satu pintu login.
-Version: 1.5.3
+Description: Tema mandiri halo TG2, dibangun dari Halo TG2 Template Desain. Mesin WooCommerce & Tutor LMS, kulit tema ini. Header pill, footer gradasi navy (satu-satunya gradasi resmi), cart drawer, satu pintu login.
+Version: 1.9.11
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -11,7 +11,7 @@ Text Domain: halo-tg2
 */
 
 /* ============================================================
-   HALO TG2 TEMPLATE DESAIN — TOKEN
+   HALO TG2 TEMPLATE DESAIN: TOKEN
    Bawaan publik: tema TERANG (Bagian 5 dokumen arsitektur).
    Tema gelap aktif lewat [data-halo-tg2-theme="dark"] di <html>.
    Warna/font/skala TIDAK dibuka sebagai pengaturan (Bagian 6).
@@ -37,7 +37,7 @@ Text Domain: halo-tg2
 }
 [data-halo-tg2-theme="dark"]{
   --ht-primary-70:#7AA7FF;
-  --ht-bg:#03050B; --ht-surface:#0A0B0D; --ht-fg:#FFFFFF;
+  --ht-bg:#03050B; --ht-surface:#1B1F27; --ht-fg:#FFFFFF;
   color-scheme:dark;
   --ht-line:rgba(255,255,255,.09); --ht-line-strong:rgba(255,255,255,.18);
   --ht-text-2:rgba(255,255,255,.68); --ht-text-3:rgba(255,255,255,.48);
@@ -144,7 +144,7 @@ body.halo-tg2__menu-open{overflow:hidden}
 .halo-tg2__avatarbtn{width:40px;height:40px;border:0;border-radius:9999px;background:transparent;padding:2px;cursor:pointer;display:grid;place-items:center}
 .halo-tg2__avatar{width:36px;height:36px;border-radius:9999px;background:#EEF4FF;color:var(--ht-primary);display:grid;place-items:center;font-weight:700;font-size:15px;overflow:hidden;flex:none}
 .halo-tg2__avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.halo-tg2__userdd{position:absolute;right:0;top:calc(100% + 10px);z-index:80;min-width:248px;background:#fff;color:#0A0B0D;border:1px solid var(--ht-line);border-radius:18px;box-shadow:0 12px 32px rgba(10,11,13,.13);padding:8px;animation:halo-tg2-dd-in .18s var(--ht-ease)}
+.halo-tg2__userdd{position:absolute;right:0;top:calc(100% + 10px);z-index:80;min-width:248px;background:var(--ht-surface);color:var(--ht-fg);border:1px solid var(--ht-line);border-radius:18px;box-shadow:0 12px 32px rgba(10,11,13,.13);padding:8px;animation:halo-tg2-dd-in .18s var(--ht-ease)}
 .halo-tg2__userdd.is-closing{animation:halo-tg2-dd-out .16s var(--ht-ease) forwards}
 @keyframes halo-tg2-dd-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @keyframes halo-tg2-dd-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-4px)}}
@@ -152,7 +152,7 @@ body.halo-tg2__menu-open{overflow:hidden}
 .halo-tg2__userdd-head>span:last-child{display:grid;line-height:1.25;min-width:0}
 .halo-tg2__userdd-head strong{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .halo-tg2__userdd-head small{font-size:12px;color:#5B6472;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.halo-tg2__userdd a,.halo-tg2__userdd-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:12px;font-size:14px;font-weight:400;color:#0A0B0D;background:none;border:0;cursor:pointer;text-align:left;font-family:inherit;text-decoration:none}
+.halo-tg2__userdd a,.halo-tg2__userdd-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:12px;font-size:14px;font-weight:400;color:var(--ht-fg);background:none;border:0;cursor:pointer;text-align:left;font-family:inherit;text-decoration:none}
 .halo-tg2__userdd a:hover,.halo-tg2__userdd-row:hover{background:#F2F5F9}
 .halo-tg2__userdd a svg,.halo-tg2__userdd-row svg{width:18px;height:18px;flex:none}
 .halo-tg2__userdd a.is-danger{color:var(--ht-error)}
@@ -183,7 +183,7 @@ body.halo-tg2__locked{overflow:hidden}
 .halo-tg2__drawer .woocommerce-mini-cart__buttons,.halo-tg2__drawer .woocommerce-mini-cart__empty-message{display:none}
 @media (prefers-reduced-motion:reduce){.halo-tg2__drawer,.halo-tg2__scrim{transition:none!important}}
 
-/* ============ FOOTER (gradasi navy — satu-satunya pengecualian resmi) ============ */
+/* ============ FOOTER (gradasi navy, satu-satunya pengecualian resmi) ============ */
 .halo-tg2__footer{--ht-fg:#FFFFFF;--ht-text-2:rgba(226,233,248,.78);--ht-text-3:rgba(226,233,248,.45);--ht-line:rgba(255,255,255,.09);--ht-line-strong:rgba(255,255,255,.22);--ht-primary-70:#7AA7FF;background:linear-gradient(180deg,#0B1E42 0%,#060D20 52%,#000000 100%);color:#fff;padding:calc(var(--ht-sp-gutter)*1.5) 0 var(--ht-sp-xl);margin-top:calc(var(--ht-sp-gutter)*2)}
 .halo-tg2__footer .halo-tg2__wordmark{color:#fff}
 .halo-tg2__footer-main{display:grid;grid-template-columns:5fr 7fr;gap:calc(var(--ht-sp-gutter)*1.5);margin-bottom:calc(var(--ht-sp-gutter)*1.5)}
@@ -231,3 +231,29 @@ body.halo-tg2__locked{overflow:hidden}
 
 /* Sentuhan akhir: tanpa kilau abu-abu saat elemen diketuk (Android). */
 html{-webkit-tap-highlight-color:transparent}
+
+/* Saklar tema tersegmentasi (matahari | bulan) di dropdown akun header.
+   Blok ini identik dengan yang di assets/css/panel.css; keadaan aktif
+   murni dari atribut tema <html>. */
+.ht-tseg{display:inline-flex;flex:none;align-items:center;background:rgba(10,11,13,.07);border-radius:999px;padding:3px;gap:2px}
+.ht-tseg button{width:34px;height:26px;border:0;border-radius:999px;background:transparent;color:#9AA0AA;display:grid;place-items:center;cursor:pointer;padding:0;transition:background-color .18s ease,color .18s ease,box-shadow .18s ease}
+.ht-tseg button svg{width:15px;height:15px}
+html[data-halo-tg2-theme="light"] .ht-tseg button[data-theme-set="light"],
+html[data-halo-tg2-theme="dark"] .ht-tseg button[data-theme-set="dark"]{background:#fff;color:#17181C;box-shadow:0 2px 8px rgba(10,11,13,.16),0 1px 2px rgba(10,11,13,.10)}
+
+/* Mode gelap: hover baris dropdown akun + rel saklar tema di permukaan gelap. */
+html[data-halo-tg2-theme="dark"] .halo-tg2__userdd a:hover,html[data-halo-tg2-theme="dark"] .halo-tg2__userdd-row:hover{background:var(--ht-fill)}
+html[data-halo-tg2-theme="dark"] .ht-tseg{background:rgba(255,255,255,.14)}
+
+/* ============ ANIMASI KERANJANG MASUK (AJAX add-to-cart) ============ */
+.halo-tg2__cart-btn.is-bump{animation:ht-cart-bump .5s var(--ht-ease)}
+@keyframes ht-cart-bump{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}
+.halo-tg2__drawer-body .widget_shopping_cart_content.is-fresh .woocommerce-mini-cart-item:first-child{animation:ht-cart-fresh 1.2s ease}
+@keyframes ht-cart-fresh{0%{background:var(--ht-primary-soft)}100%{background:transparent}}
+.tutor-add-to-cart-button.is-loading{opacity:.7;pointer-events:none}
+.tutor-add-to-cart-button.is-added{background:var(--ht-success)!important;border-color:var(--ht-success)!important;color:#fff!important}
+/* Tautan "Lihat keranjang" sisipan Woo tidak tampil di kartu beli: konfirmasinya drawer. */
+.pva-buy-card a.added_to_cart{display:none!important}
+@media (prefers-reduced-motion:reduce){
+  .halo-tg2__cart-btn.is-bump,.halo-tg2__drawer-body .widget_shopping_cart_content.is-fresh .woocommerce-mini-cart-item:first-child{animation:none}
+}

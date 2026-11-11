@@ -1,6 +1,6 @@
 <?php
 /**
- * Pengaturan tema halo-tg2 (Customizer) — Bagian 6 dokumen arsitektur.
+ * Pengaturan tema halo-tg2 (Customizer), Bagian 6 dokumen arsitektur.
  * Warna, font, dan skala Template TIDAK dibuka di sini; itu terkunci desain.
  *
  * @package halo-tg2
@@ -123,13 +123,13 @@ function halo_tg2_customize_register($wp_customize) {
 		'priority' => 30,
 	));
 
-	// — Bar pengumuman —
+	// Bar pengumuman
 	$section('announce', 'Bar Pengumuman');
 	$field('announce', 'announce_show', 'Tampilkan bar pengumuman', 'checkbox');
 	$field('announce', 'announce_text', 'Teks pengumuman');
 	$field('announce', 'announce_url', 'Tautan pengumuman (opsional)', 'url');
 
-	// — Identitas & header —
+	// Identitas & header
 	$section('header', 'Identitas & Header');
 	$field('header', 'logo_width', 'Lebar logo (px)', 'number');
 	$field('header', 'logo_maxh', 'Tinggi maksimum logo (px)', 'number');
@@ -156,7 +156,7 @@ function halo_tg2_customize_register($wp_customize) {
 		'fade'  => 'Fade',
 	));
 
-	// — Keranjang —
+	// Keranjang
 	$section('cart', 'Keranjang');
 	$field('cart', 'cart_show', 'Tampilkan ikon keranjang', 'checkbox');
 	$field('cart', 'cart_icon', 'Gaya ikon keranjang', 'select', array(
@@ -169,23 +169,23 @@ function halo_tg2_customize_register($wp_customize) {
 		'page'   => 'Ke halaman cart',
 	));
 
-	// — Kartu kursus & grid —
+	// Kartu kursus & grid
 	$section('cards', 'Kartu Kursus & Grid');
 	$field('cards', 'card_variant', 'Varian desain kartu kursus', 'select', array(
 		'cover'   => 'Cover Besar',
 		'minimal' => 'Minimal',
 		'kompak'  => 'Kompak',
 	));
-	$field('cards', 'cols_desktop', 'Kolom grid — Desktop (1–4)', 'number');
-	$field('cards', 'cols_tablet', 'Kolom grid — Tablet (1–4)', 'number');
-	$field('cards', 'cols_mobile', 'Kolom grid — Mobile (1–4)', 'number');
+	$field('cards', 'cols_desktop', 'Kolom grid Desktop (1–4)', 'number');
+	$field('cards', 'cols_tablet', 'Kolom grid Tablet (1–4)', 'number');
+	$field('cards', 'cols_mobile', 'Kolom grid Mobile (1–4)', 'number');
 	$field('cards', 'card_price', 'Kartu: tampilkan harga', 'checkbox');
 	$field('cards', 'card_discount', 'Kartu: tampilkan harga coret / label diskon', 'checkbox');
 	$field('cards', 'card_badge', 'Kartu: tampilkan badge level', 'checkbox');
 	$field('cards', 'card_wishlist', 'Kartu: tampilkan tombol hati', 'checkbox');
 	$field('cards', 'card_meta', 'Kartu: tampilkan meta (durasi & jumlah modul)', 'checkbox');
 
-	// — Footer & elemen melayang —
+	// Footer & elemen melayang
 	$section('footer', 'Footer & Elemen Melayang');
 	$field('footer', 'footer_tagline', 'Tagline di bawah logo footer');
 	$field('footer', 'contact_email', 'Email kontak footer', 'email');

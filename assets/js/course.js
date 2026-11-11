@@ -1,8 +1,8 @@
-/* halo-tg2 — perilaku halaman single course (Fase 3).
+/* halo-tg2: perilaku halaman single course (Fase 3).
    Pindahan dari child theme lama (v2.7):
    1) Kurikulum selalu terbuka ala ClassAI: header topik tidak melipat isi.
    2) "Apa yang akan kamu Pelajari" + "Penonton" digabung jadi SATU panel
-      dua kolom (.pva-duo) — perubahan gaya pada satu berlaku untuk keduanya. */
+      dua kolom (.pva-duo), perubahan gaya pada satu berlaku untuk keduanya. */
 (function () {
   "use strict";
   document.addEventListener("click", function (e) {

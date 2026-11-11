@@ -1,4 +1,4 @@
-/* halo-tg2 — perilaku dashboard kustom (Fase 8):
+/* halo-tg2: perilaku dashboard kustom (Fase 8):
    drawer, dropdown, modal Hubungi Kami, saringan & urutan kelas,
    tab statistik, strip pembayaran, saklar mode gelap. */
 (function () {
@@ -80,14 +80,6 @@
     if (e.key === "Escape") { closeDropdowns(null); setDrawer(false); closeModal(); }
   });
 
-  /* Dock Profil → buka dropdown avatar topbar (delegasi: isi dock
-     disinkronkan ulang oleh navigasi lembut) */
-  document.addEventListener("click", function (e) {
-    if (!e.target.closest || !e.target.closest("[data-dock-profil]")) return;
-    var btn = $(".ht-panel__top-actions [data-dd-btn].ht-panel__avatarbtn") || $(".ht-panel__avatarbtn");
-    if (btn) btn.click();
-  });
-
   /* Pil penanda aktif dock + bilah biru di tepi atas tab aktif:
      keduanya meluncur dengan pantulan ringan. Pil bergerak
      OPTIMISTIS sejak tautan diklik (tidak menunggu server), lalu
@@ -98,6 +90,10 @@
   var dockPill = null, dockBar = null, pillPos = null;
   function dockEls() {
     if (dockPill && dockEl.contains(dockPill)) return;
+    /* Pengaman: buang pil/bilah asing yang mungkin sudah ada di dalam
+       dock (misalnya terbawa HTML pulihan lama), supaya isinya selalu
+       tepat satu pasang yang terlacak di sini. */
+    Array.prototype.forEach.call(dockEl.querySelectorAll(".ht-panel__dockpill, .ht-panel__dockbar"), function (n) { n.remove(); });
     dockPill = document.createElement("span");
     dockPill.className = "ht-panel__dockpill";
     dockPill.setAttribute("aria-hidden", "true");
@@ -226,7 +222,11 @@
     var tab = e.target.closest ? e.target.closest("[data-stab]") : null;
     if (!tab) return;
     $$("[data-stab]").forEach(function (t) { t.classList.toggle("is-active", t === tab); });
-    $$("[data-spanel]").forEach(function (p) { p.hidden = p.getAttribute("data-spanel") !== tab.getAttribute("data-stab"); });
+    $$("[data-spanel]").forEach(function (p) {
+      var show = p.getAttribute("data-spanel") === tab.getAttribute("data-stab");
+      p.hidden = !show;
+      if (show) { p.classList.remove("ht-stab-enter"); void p.offsetWidth; p.classList.add("ht-stab-enter"); }
+    });
   });
 
   /* Strip pembayaran: tutup per order, diingat di perangkat ini */
@@ -246,15 +246,29 @@
   });
   initStrips(document);
 
-  /* Saklar mode gelap (delegasi; kunci penyimpanan sama dengan tema) */
+  /* Saklar tema tersegmentasi matahari | bulan (delegasi; klik segmen
+     menetapkan tema secara eksplisit; kunci penyimpanan sama dengan tema).
+     Keadaan aktif tombol murni dari atribut tema <html> lewat CSS;
+     aria-pressed disinkronkan di sini. */
+  function syncThemeSegs() {
+    var cur = document.documentElement.getAttribute("data-halo-tg2-theme") === "dark" ? "dark" : "light";
+    $$("[data-theme-set]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-theme-set") === cur ? "true" : "false");
+    });
+  }
   document.addEventListener("click", function (e) {
-    var sw = e.target.closest ? e.target.closest("[data-theme-switch]") : null;
-    if (!sw) return;
+    var btn = e.target.closest ? e.target.closest("[data-theme-set]") : null;
+    if (!btn) return;
     var html = document.documentElement;
-    var next = html.getAttribute("data-halo-tg2-theme") === "dark" ? "light" : "dark";
-    html.setAttribute("data-halo-tg2-theme", next);
-    try { localStorage.setItem("halo-tg2-theme", next); } catch (err) {}
+    var val = btn.getAttribute("data-theme-set") === "dark" ? "dark" : "light";
+    if (html.getAttribute("data-halo-tg2-theme") !== val) {
+      html.setAttribute("data-halo-tg2-theme", val);
+      try { localStorage.setItem("halo-tg2-theme", val); } catch (err) {}
+    }
+    syncThemeSegs();
   });
+  syncThemeSegs();
+  document.addEventListener("ht:softnav:loaded", syncThemeSegs);
 
   /* Tab geser di layar kecil + tips "Geser" otomatis (tour sekali tampil).
      Tab yang muat tidak disentuh; yang meluber dibungkus .ht-panel__tabsbox,
@@ -308,7 +322,7 @@
 
   /* ---------- Katalog course (view Course) ----------
      Pencarian aktif mulai 3 huruf, saringan kategori, dan alih
-     grid/list — semua di sisi klien dari kartu yang dirender
+     grid/list: semua di sisi klien dari kartu yang dirender
      server; skeleton singkat menandai setiap perubahan saringan. */
   var shopQ = "", shopCat = "semua", shopTimer = null, shopSkelTimer = null;
   function shopApply() {
@@ -406,9 +420,478 @@
   }
   shopInit();
 
+  /* ---------- Editor foto profil & sampul (Pengaturan) ----------
+     Modal dengan crop interaktif: pilih foto, geser + zoom,
+     hasil crop diunggah lewat AJAX dan dipasang sebagai foto
+     profil / sampul (meta Tutor). */
+  var phTarget = "profil", phImg = null, phNat = { w: 0, h: 0 },
+      phScale = 1, phMin = 1, phZoom = 1, phTx = 0, phTy = 0, phUrl = null;
+  function phEls() {
+    return {
+      modal: $("[data-photo-modal]"), empty: $("[data-photo-empty]"), work: $("[data-photo-work]"),
+      box: $("[data-crop-box]"), img: $("[data-crop-img]"), zoom: $("[data-crop-zoom]"),
+      save: $("[data-photo-save]"), msg: $("[data-photo-msg]"), file: $("[data-photo-file]")
+    };
+  }
+  function phFrame() {
+    var e = phEls();
+    var w = e.work ? e.work.clientWidth : 300;
+    if (phTarget === "profil") { var s = Math.min(300, w); return { w: s, h: s }; }
+    return { w: w, h: Math.round(w / 3) };
+  }
+  function phClamp() {
+    var f = phFrame();
+    var iw = phNat.w * phScale, ih = phNat.h * phScale;
+    phTx = Math.min(0, Math.max(f.w - iw, phTx));
+    phTy = Math.min(0, Math.max(f.h - ih, phTy));
+  }
+  function phRender() {
+    var e = phEls();
+    if (!e.img || !phImg) return;
+    e.img.style.width = phNat.w + "px";
+    e.img.style.height = phNat.h + "px";
+    e.img.style.transform = "translate(" + phTx + "px," + phTy + "px) scale(" + phScale + ")";
+  }
+  function phLayout(refit) {
+    var e = phEls();
+    if (!e.box) return;
+    var f = phFrame();
+    e.box.style.width = f.w + "px";
+    e.box.style.height = f.h + "px";
+    e.box.classList.toggle("is-profil", phTarget === "profil");
+    e.box.classList.toggle("is-cover", phTarget === "cover");
+    if (!phImg) return;
+    phMin = Math.max(f.w / phNat.w, f.h / phNat.h);
+    if (refit) {
+      phZoom = 1;
+      if (e.zoom) e.zoom.value = "1";
+      phScale = phMin;
+      phTx = (f.w - phNat.w * phScale) / 2;
+      phTy = (f.h - phNat.h * phScale) / 2;
+    } else {
+      phScale = phMin * phZoom;
+      phClamp();
+    }
+    phRender();
+  }
+  function phMsg(text, ok) {
+    var e = phEls();
+    if (!e.msg) return;
+    e.msg.hidden = !text;
+    e.msg.textContent = text || "";
+    e.msg.classList.toggle("is-ok", !!ok);
+    e.msg.classList.toggle("is-error", !!text && !ok);
+  }
+  function phOpen(target) {
+    var e = phEls();
+    if (!e.modal) return;
+    phSetTarget(target || "profil");
+    e.modal.hidden = false;
+    requestAnimationFrame(function () { e.modal.classList.add("is-open"); phLayout(false); });
+  }
+  function phClose() {
+    var e = phEls();
+    if (!e.modal) return;
+    e.modal.classList.remove("is-open");
+    e.modal.hidden = true;
+  }
+  function phSetTarget(t) {
+    phTarget = t === "cover" ? "cover" : "profil";
+    $$("[data-photo-target]").forEach(function (b) { b.classList.toggle("is-active", b.getAttribute("data-photo-target") === phTarget); });
+    phLayout(true);
+  }
+  function phLoadFile(file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { phMsg("Berkas itu bukan gambar."); return; }
+    if (file.size > 10 * 1024 * 1024) { phMsg("Ukuran foto melebihi 10MB."); return; }
+    if (phUrl) URL.revokeObjectURL(phUrl);
+    phUrl = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      phImg = img;
+      phNat = { w: img.naturalWidth, h: img.naturalHeight };
+      var e = phEls();
+      if (e.img) e.img.src = phUrl;
+      if (e.empty) e.empty.hidden = true;
+      if (e.work) e.work.hidden = false;
+      if (e.save) e.save.disabled = false;
+      phMsg("");
+      phLayout(true);
+    };
+    img.onerror = function () { phMsg("Foto tidak bisa dibaca. Coba foto lain."); };
+    img.src = phUrl;
+  }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest) return;
+    var open = e.target.closest("[data-photo-open]");
+    if (open) { phOpen(open.getAttribute("data-target")); return; }
+    if (e.target.closest("[data-photo-close]")) { phClose(); return; }
+    var tab = e.target.closest("[data-photo-target]");
+    if (tab) { phSetTarget(tab.getAttribute("data-photo-target")); return; }
+    if (e.target.closest("[data-photo-change]")) { var f = phEls().file; if (f) f.click(); return; }
+    if (e.target.closest("[data-photo-save]")) { phSave(); }
+  });
+  document.addEventListener("change", function (e) {
+    if (e.target.matches && e.target.matches("[data-photo-file]")) {
+      phLoadFile(e.target.files && e.target.files[0]);
+      e.target.value = "";
+    }
+  });
+  document.addEventListener("input", function (e) {
+    if (!e.target.matches || !e.target.matches("[data-crop-zoom]") || !phImg) return;
+    var f = phFrame();
+    var cx = (f.w / 2 - phTx) / phScale, cy = (f.h / 2 - phTy) / phScale;
+    phZoom = parseFloat(e.target.value) || 1;
+    phScale = phMin * phZoom;
+    phTx = f.w / 2 - cx * phScale;
+    phTy = f.h / 2 - cy * phScale;
+    phClamp();
+    phRender();
+  });
+  document.addEventListener("pointerdown", function (e) {
+    var box = e.target.closest ? e.target.closest("[data-crop-box]") : null;
+    if (!box || !phImg) return;
+    e.preventDefault();
+    var sx = e.clientX, sy = e.clientY, tx0 = phTx, ty0 = phTy;
+    function mv(ev) { phTx = tx0 + (ev.clientX - sx); phTy = ty0 + (ev.clientY - sy); phClamp(); phRender(); }
+    function up() { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); }
+    window.addEventListener("pointermove", mv);
+    window.addEventListener("pointerup", up);
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") phClose(); });
+  function phSaveDone() {
+    var e = phEls();
+    if (!e.save) return;
+    e.save.classList.remove("is-loading");
+    e.save.textContent = "Upload & Simpan";
+    e.save.disabled = !phImg;
+  }
+
+  /* ---------- Konfirmasi reset foto (Pengaturan) ---------- */
+  var resetForm = null;
+  function resetOpen(form) {
+    var modal = $("[data-reset-modal]");
+    if (!modal || !form) return;
+    resetForm = form;
+    var jenisIn = form.querySelector('[name="jenis"]');
+    var isProfil = !jenisIn || jenisIn.value !== "sampul";
+    var t = $("[data-reset-title]"), x = $("[data-reset-text]");
+    if (t) t.textContent = isProfil ? "Reset Foto Profil?" : "Reset Cover?";
+    if (x) x.textContent = isProfil
+      ? "Foto profil akan dihapus dan kembali ke tampilan bawaan berupa huruf inisial namamu. Tindakan ini tidak bisa dibatalkan."
+      : "Foto sampul akan dihapus dan kembali ke tampilan bawaan berupa gradasi biru. Tindakan ini tidak bisa dibatalkan.";
+    modal.hidden = false;
+    requestAnimationFrame(function () { modal.classList.add("is-open"); });
+  }
+  function resetClose() {
+    var modal = $("[data-reset-modal]");
+    if (!modal) return;
+    modal.classList.remove("is-open");
+    modal.hidden = true;
+    resetForm = null;
+  }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest) return;
+    var btn = e.target.closest("[data-reset-btn]");
+    if (btn) { resetOpen(btn.closest("form")); return; }
+    if (e.target.closest("[data-reset-close]")) { resetClose(); return; }
+    if (e.target.closest("[data-reset-confirm]")) {
+      var f = resetForm;
+      resetClose();
+      if (f) {
+        if (f.hasAttribute("data-ajax-form")) ajaxSendForm(f, f.querySelector("[data-reset-btn]"));
+        else f.submit();
+      }
+    }
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") resetClose(); });
+
+  function phSave() {
+    var e = phEls();
+    if (!phImg || !e.save || e.save.disabled) return;
+    if (!window.HT_PANEL || !window.fetch) { phMsg("Unggahan tidak tersedia di halaman ini."); return; }
+    var f = phFrame();
+    var outW = phTarget === "profil" ? 512 : 1200;
+    var outH = phTarget === "profil" ? 512 : 400;
+    var cv = document.createElement("canvas");
+    cv.width = outW; cv.height = outH;
+    var ctx = cv.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, outW, outH);
+    ctx.drawImage(phImg, -phTx / phScale, -phTy / phScale, f.w / phScale, f.h / phScale, 0, 0, outW, outH);
+    e.save.disabled = true;
+    e.save.classList.add("is-loading");
+    e.save.textContent = "Mengunggah…";
+    phMsg("");
+    cv.toBlob(function (blob) {
+      if (!blob) { phMsg("Gagal menyiapkan foto. Coba lagi."); phSaveDone(); return; }
+      var fd = new FormData();
+      fd.append("action", "halo_tg2_photo_upload");
+      fd.append("nonce", window.HT_PANEL.photoNonce);
+      fd.append("target", phTarget);
+      fd.append("photo", blob, phTarget === "profil" ? "foto-profil.jpg" : "cover.jpg");
+      fetch(window.HT_PANEL.ajaxUrl, { method: "POST", body: fd, credentials: "same-origin" })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (!j || !j.success) throw new Error((j && j.data && j.data.message) || "gagal");
+          phSaveDone();
+          phMsg("Foto tersimpan. Memuat ulang halaman…", true);
+          setTimeout(function () { window.location.reload(); }, 800);
+        })
+        .catch(function (err) {
+          phMsg("Foto belum tersimpan (" + (err && err.message ? err.message : "jaringan") + "). Coba lagi.");
+          phSaveDone();
+        });
+    }, "image/jpeg", 0.9);
+  }
+
   /* Setelah navigasi lembut menukar konten: hidupkan lagi widget
      yang bergantung pada node konten (tab geser, strip pembayaran). */
   document.addEventListener("ht:softnav:loaded", function () {
     requestAnimationFrame(function () { initSwipeTabs(); initStrips(document); shopInit(); });
   });
+
+  /* ---------- Tab Pengaturan: panel geser ala Login & Daftar ----------
+     Bilah tab tetap di tempat; hanya panel konten yang bergeser
+     dengan animasi arah. Semua panel dirender server di DOM yang
+     sama, perpindahan murni sisi klien, dan URL diselaraskan dengan
+     replaceState agar tombol kembali tetap urusan navigasi lembut. */
+  var SET_ORDER = ["akun", "keamanan", "sosial", "preferensi"];
+  var setCurrent = null, setTimer = null;
+  var setReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function setNav() { return $("[data-tabnav]"); }
+  function setPanelMap() {
+    var map = {};
+    $$("[data-tabpanel]").forEach(function (p) { map[p.getAttribute("data-tabpanel")] = p; });
+    return map;
+  }
+  function setInk(name) {
+    var nav = setNav(); if (!nav) return;
+    var ink = nav.querySelector("[data-tabink]"); if (!ink) return;
+    var link = null;
+    $$("[data-tablink]", nav).forEach(function (l) { if (l.getAttribute("data-tablink") === name) link = l; });
+    if (!link) { ink.style.width = "0px"; return; }
+    ink.style.left = link.offsetLeft + "px";
+    ink.style.width = link.offsetWidth + "px";
+  }
+  function setActiveLink(name) {
+    $$("[data-tablink]").forEach(function (l) { l.classList.toggle("is-active", l.getAttribute("data-tablink") === name); });
+  }
+  function showSetPanel(name) {
+    var panels = setPanelMap();
+    var target = panels[name];
+    if (!target) return;
+    if (setCurrent === null) {
+      Object.keys(panels).forEach(function (k) { if (!panels[k].hidden) setCurrent = k; });
+      if (setCurrent === null) setCurrent = "akun";
+    }
+    if (name === setCurrent) { setActiveLink(name); setInk(name); return; }
+    var from = panels[setCurrent];
+    var forward = SET_ORDER.indexOf(name) > SET_ORDER.indexOf(setCurrent);
+    setCurrent = name;
+    setActiveLink(name);
+    setInk(name);
+    try {
+      var url = new URL(window.location.href);
+      if (name === "akun") url.searchParams.delete("bagian"); else url.searchParams.set("bagian", name);
+      window.history.replaceState(null, "", url.toString());
+    } catch (err) { /* abaikan */ }
+    var activeLink = null;
+    $$("[data-tablink]").forEach(function (l) { if (l.getAttribute("data-tablink") === name) activeLink = l; });
+    if (activeLink && activeLink.scrollIntoView) { try { activeLink.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (err) {} }
+
+    if (setTimer) { clearTimeout(setTimer); setTimer = null; }
+    Object.keys(panels).forEach(function (k) {
+      var p = panels[k];
+      if (p !== from && p !== target) { p.hidden = true; p.classList.remove("is-leaving", "is-leaving-r", "is-leaving-l", "is-entering-r", "is-entering-l"); }
+    });
+    var viewport = $("[data-tabviewport]");
+    if (setReduced || !viewport || !from) {
+      if (from) from.hidden = true;
+      target.hidden = false;
+      return;
+    }
+    viewport.classList.add("is-animating");
+    viewport.style.height = from.offsetHeight + "px";
+    target.hidden = false;
+    target.classList.add(forward ? "is-entering-r" : "is-entering-l");
+    from.classList.add("is-leaving", forward ? "is-leaving-l" : "is-leaving-r");
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { viewport.style.height = target.offsetHeight + "px"; });
+    });
+    setTimer = setTimeout(function () {
+      from.hidden = true;
+      from.classList.remove("is-leaving", "is-leaving-r", "is-leaving-l");
+      target.classList.remove("is-entering-r", "is-entering-l");
+      viewport.style.height = "";
+      viewport.classList.remove("is-animating");
+      setTimer = null;
+    }, 400);
+  }
+  function initSetTabs() {
+    if (!setNav()) return;
+    var panels = setPanelMap();
+    setCurrent = null;
+    Object.keys(panels).forEach(function (k) { if (!panels[k].hidden) setCurrent = k; });
+    if (!setCurrent) setCurrent = "akun";
+    setActiveLink(setCurrent);
+    requestAnimationFrame(function () { setInk(setCurrent); });
+  }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest) return;
+    var link = e.target.closest("[data-tablink]");
+    if (!link) return;
+    if (!setPanelMap()[link.getAttribute("data-tablink")]) return;
+    e.preventDefault();
+    showSetPanel(link.getAttribute("data-tablink"));
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    if (!e.target.closest || !e.target.closest("[data-tabnav]")) return;
+    e.preventDefault();
+    var idx = SET_ORDER.indexOf(setCurrent || "akun");
+    var next = e.key === "ArrowRight" ? Math.min(SET_ORDER.length - 1, idx + 1) : Math.max(0, idx - 1);
+    showSetPanel(SET_ORDER[next]);
+    var link = null;
+    $$("[data-tablink]").forEach(function (l) { if (l.getAttribute("data-tablink") === SET_ORDER[next]) link = l; });
+    if (link) link.focus();
+  });
+  window.addEventListener("resize", function () { if (setCurrent) setInk(setCurrent); });
+  requestAnimationFrame(initSetTabs);
+  document.addEventListener("ht:softnav:loaded", function () { requestAnimationFrame(initSetTabs); });
+
+  /* ---------- Simpan pengaturan via AJAX ----------
+     Form bertanda data-ajax-form dikirim ke admin-ajax memakai
+     action yang sama dengan jalur admin-post; hasilnya tampil
+     sebagai pesan di dalam kartu tanpa memuat ulang halaman.
+     Bila gerbang sesi/nonce menolak atau jaringan gagal, form
+     dikirim ulang dengan cara lama agar simpanan tidak hilang.
+     Form kata sandi sengaja tidak bertanda: tetap cara lama. */
+  function ajaxMsg(form, ok, text) {
+    var card = form.closest ? form.closest(".ht-panel__setting-card") : null;
+    var slot = card ? card.querySelector("[data-ajaxmsg]") : null;
+    if (!slot) return;
+    slot.className = "ht-panel__ajaxmsg " + (ok ? "is-ok" : "is-error");
+    slot.textContent = text;
+    slot.hidden = false;
+  }
+  function ajaxBtnState(btn, busy) {
+    if (!btn) return;
+    if (busy) {
+      btn.setAttribute("data-ht-label", btn.innerHTML);
+      btn.classList.add("is-loading");
+      btn.disabled = true;
+      btn.textContent = "Memproses…";
+    } else {
+      btn.classList.remove("is-loading");
+      btn.disabled = false;
+      if (btn.getAttribute("data-ht-label")) { btn.innerHTML = btn.getAttribute("data-ht-label"); btn.removeAttribute("data-ht-label"); }
+    }
+  }
+  function ajaxSendForm(form, btn) {
+    if (form.__htBusy) return;
+    if (!window.HT_PANEL || !window.fetch) { form.submit(); return; }
+    form.__htBusy = true;
+    ajaxBtnState(btn, true);
+    var fd = new FormData(form);
+    fetch(HT_PANEL.ajaxUrl, { method: "POST", body: fd, credentials: "same-origin" })
+      .then(function (r) { return r.text(); })
+      .then(function (t) {
+        var json = null;
+        try { json = JSON.parse(t); } catch (e) { json = null; }
+        form.__htBusy = false;
+        ajaxBtnState(btn, false);
+        if (!json || !json.data || json.data.code === "ht_gate") { form.submit(); return; }
+        if (json.success) {
+          ajaxMsg(form, true, json.data.message || "Tersimpan.");
+          ajaxSideEffects(form, json.data);
+        } else {
+          ajaxMsg(form, false, json.data.message || "Belum tersimpan. Coba lagi sebentar lagi.");
+        }
+      })
+      .catch(function () {
+        form.__htBusy = false;
+        ajaxBtnState(btn, false);
+        form.submit();
+      });
+  }
+  function ajaxSideEffects(form, data) {
+    var kind = form.getAttribute("data-ajax-form");
+    if (kind === "profile") {
+      if (data.display_name) $$("[data-ht-displayname]").forEach(function (el) { el.textContent = data.display_name; });
+      if (data.initial) $$(".ht-panel__avatar, .ht-panel__profile-avatar").forEach(function (av) {
+        if (!av.querySelector("img")) av.textContent = data.initial;
+      });
+    } else if (kind === "resetprefs" && data.prefs) {
+      var card = form.closest(".ht-panel__setting-card");
+      if (card) Object.keys(data.prefs).forEach(function (k) {
+        var input = card.querySelector("[name='" + k + "']");
+        if (!input) return;
+        if (input.type === "checkbox") input.checked = (k === "contrast") ? data.prefs[k] === "high" : !!data.prefs[k];
+        else input.value = String(data.prefs[k]);
+      });
+    } else if (kind === "removephoto") {
+      ajaxPhotoReset(form, data);
+    }
+  }
+  function ajaxPhotoReset(form, data) {
+    if (data.jenis === "profil") {
+      $$(".ht-panel__avatar, .ht-panel__profile-avatar").forEach(function (av) { av.textContent = data.initial || ""; });
+    } else if (data.jenis === "sampul") {
+      var prev = $(".ht-panel__cover-preview");
+      if (prev) {
+        var btn = prev.querySelector("[data-photo-open]");
+        prev.innerHTML = "";
+        var span = document.createElement("span");
+        span.textContent = "Belum ada foto sampul";
+        prev.appendChild(span);
+        if (btn) prev.appendChild(btn);
+      }
+    }
+    form.hidden = true;
+    var actions = form.closest(".ht-panel__photo-actions");
+    if (actions) {
+      var anyVisible = false;
+      $$("form", actions).forEach(function (f) { if (!f.hidden) anyVisible = true; });
+      if (!anyVisible) actions.hidden = true;
+    }
+  }
+  document.addEventListener("submit", function (e) {
+    var form = e.target;
+    if (!form || !form.hasAttribute || !form.hasAttribute("data-ajax-form")) return;
+    e.preventDefault();
+    ajaxSendForm(form, form.querySelector("button[type='submit']"));
+  });
+
+  /* ---------- Sorotan target jangkar (mis. #pengingat-ujian) ----------
+     Setelah mendarat dari tautan berjangkar, kartu tujuan diberi
+     denyut sorotan sesaat agar mudah disadari. Bila kartu berada di
+     panel tab yang tersembunyi, tab-nya diaktifkan lebih dulu. */
+  var flashTimer = null;
+  function flashHashTarget() {
+    if (!location.hash || location.hash.length < 2) return;
+    var el = null;
+    try { el = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { el = null; }
+    if (!el) return;
+    var go = function () {
+      el.classList.remove("is-flash");
+      void el.offsetWidth;
+      el.classList.add("is-flash");
+      if (flashTimer) clearTimeout(flashTimer);
+      flashTimer = setTimeout(function () { el.classList.remove("is-flash"); }, 1950);
+    };
+    var panel = el.closest ? el.closest("[data-tabpanel]") : null;
+    if (panel && panel.hidden) {
+      showSetPanel(panel.getAttribute("data-tabpanel"));
+      setTimeout(function () {
+        try { el.scrollIntoView({ block: "start" }); } catch (e) { /* abaikan */ }
+        go();
+      }, 440);
+    } else {
+      go();
+    }
+  }
+  requestAnimationFrame(flashHashTarget);
+  document.addEventListener("ht:softnav:loaded", function () { requestAnimationFrame(flashHashTarget); });
 })();

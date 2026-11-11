@@ -1,6 +1,6 @@
 <?php
 /**
- * Fungsi tema halo-tg2 — Fase 1 (Skeleton).
+ * Fungsi tema halo-tg2: Fase 1 (Skeleton).
  * Setup tema, enqueue, dukungan WooCommerce, lokasi menu, area widget.
  *
  * @package halo-tg2
@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('HALO_TG2_VERSION', '1.5.3');
+define('HALO_TG2_VERSION', '1.9.11');
 
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/woocommerce.php';
@@ -52,7 +52,7 @@ function halo_tg2_setup() {
 
 add_action('widgets_init', 'halo_tg2_widgets');
 /**
- * Area widget footer (3 kolom) — diisi dari Appearance → Widgets (Bagian 6).
+ * Area widget footer (3 kolom), diisi dari Appearance → Widgets (Bagian 6).
  */
 function halo_tg2_widgets() {
 	for ($i = 1; $i <= 3; $i++) {
@@ -242,7 +242,7 @@ function halo_tg2_cart_count() {
 
 /**
  * Cek enrollment yang aman lintas versi Tutor.
- * Override lama memanggil Tutor\Models\EnrollmentModel secara langsung —
+ * Override lama memanggil Tutor\Models\EnrollmentModel secara langsung
  * kelas model itu tidak selalu tersedia di semua versi (situs uji: 4.1.3,
  * override ditulis dari template 4.2.0). Di sini: pakai model bila ada,
  * jika tidak, fallback ke tutor_utils()->is_enrolled().

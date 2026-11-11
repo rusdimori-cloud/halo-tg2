@@ -1,6 +1,6 @@
 <?php
 /**
- * Template for displaying lead info — PVENT CLASSAI OVERRIDE.
+ * Template for displaying lead info: PVENT CLASSAI OVERRIDE.
  *
  * Hero ditata seperti design.md gaya ClassAI: chip kategori/level,
  * judul besar, kutipan (excerpt), baris author dengan avatar bundar,
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $post, $authordata, $course_rating;
 
-$course_id           = get_the_ID(); // Catatan: versi asli memakai Tutor\Core\Input::post() — diganti agar aman di semua versi Tutor (kelas itu tidak selalu tersedia).
+$course_id           = get_the_ID(); // Catatan: versi asli memakai Tutor\Core\Input::post(), diganti agar aman di semua versi Tutor (kelas itu tidak selalu tersedia).
 $profile_url         = tutor_utils()->profile_url( $authordata->ID, true );
 $show_author         = tutor_utils()->get_option( 'enable_course_author' );
 $course_categories   = get_tutor_course_categories();

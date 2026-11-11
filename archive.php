@@ -1,6 +1,6 @@
 <?php
 /**
- * Arsip (blog/kategori/tanggal) — kisi kartu Template (Fase 7).
+ * Arsip (blog/kategori/tanggal), kisi kartu Template (Fase 7).
  *
  * @package halo-tg2
  */

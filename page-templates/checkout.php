@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Halo TG2 — Cart & Checkout (Sempit)
+ * Template Name: Halo TG2 · Cart & Checkout (Sempit)
  * Template Post Type: page
  *
  * Pembungkus halaman cart & checkout WooCommerce (Bagian 5 dokumen

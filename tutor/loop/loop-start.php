@@ -1,6 +1,6 @@
 <?php
 /**
- * Override halo-tg2 — pembuka kisi course: memakai kisi kartu yang
+ * Override halo-tg2: pembuka kisi course: memakai kisi kartu yang
  * sama dengan section kelas di landing page tema.
  *
  * @package halo-tg2

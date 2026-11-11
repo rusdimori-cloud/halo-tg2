@@ -1,6 +1,6 @@
 <?php
 /**
- * Template for displaying single course — PVENT CLASSAI OVERRIDE.
+ * Template for displaying single course: PVENT CLASSAI OVERRIDE.
  *
  * Layout ditata ulang mengikuti design.md gaya ClassAI:
  * hero dua kolom (teks kiri, kartu beli kanan sticky), konten tab

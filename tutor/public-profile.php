@@ -1,11 +1,11 @@
 <?php
 /**
- * Profil publik — override template Tutor "public-profile".
+ * Profil publik: override template Tutor "public-profile".
  *
  * URL: halo-tg2.com/profile/<username>/ (rewrite + query var
  * tutor_profile_username bawaan Tutor). Persiapan data meniru
  * template asli Tutor LMS 4.1.3 (resolusi pengguna, gerbang layout,
- * sosial) — tampilannya diganti penuh ke Halo TG2 Template Desain:
+ * sosial), tampilannya diganti penuh ke Halo TG2 Template Desain:
  * sampul + foto profil, bio, tautan sosial, statistik belajar, dan
  * daftar kelas memakai kartu katalog yang sama dengan arsip.
  *
@@ -50,7 +50,7 @@ $ht_cover_id  = (int) get_user_meta($user_id, '_tutor_cover_photo', true);
 $ht_cover_url = $ht_cover_id ? (string) wp_get_attachment_image_url($ht_cover_id, 'large') : '';
 if ('' === $ht_cover_url && method_exists(tutor_utils(), 'get_cover_photo_url')) {
 	$ht_maybe = (string) tutor_utils()->get_cover_photo_url($user_id);
-	// Tutor mengembalikan gambar bawaan bila kosong — pakai hanya bila
+	// Tutor mengembalikan gambar bawaan bila kosong, pakai hanya bila
 	// memang dari unggahan pengguna (mengandung /uploads/).
 	if (false !== strpos($ht_maybe, '/uploads/')) {
 		$ht_cover_url = $ht_maybe;
@@ -64,6 +64,7 @@ foreach ((array) tutor_utils()->tutor_user_social_icons() as $skey => $sicon) {
 		$ht_socials[] = array(
 			'label' => isset($sicon['label']) ? $sicon['label'] : $skey,
 			'url'   => $surl,
+			'key'   => $skey,
 		);
 	}
 }
@@ -104,6 +105,9 @@ tutor_utils()->tutor_custom_header();
 				<?php if ('' !== $ht_cover_url) : ?>
 					<img src="<?php echo esc_url($ht_cover_url); ?>" alt="">
 				<?php endif; ?>
+				<?php if ($is_owner) : ?>
+					<a class="ht-profile__edit" href="<?php echo esc_url(add_query_arg(array('tampilan' => 'pengaturan', 'bagian' => 'akun'), halo_tg2_panel_page_url())); ?>">Edit Profil</a>
+				<?php endif; ?>
 			</div>
 			<div class="ht-profile__body">
 				<span class="ht-profile__avatar">
@@ -113,23 +117,38 @@ tutor_utils()->tutor_custom_header();
 						<?php echo esc_html(strtoupper(substr($get_user->display_name, 0, 1))); ?>
 					<?php endif; ?>
 				</span>
-				<div class="ht-profile__id">
-					<h1><?php echo esc_html($get_user->display_name); ?></h1>
-					<p class="ht-profile__meta">
-						<?php echo esc_html($is_instructor ? 'Pengajar' : 'Siswa'); ?> · Bergabung <?php echo esc_html($ht_since); ?><?php if ('' !== $ht_job) : ?> · <?php echo esc_html($ht_job); ?><?php endif; ?>
-					</p>
-				</div>
-				<?php if ($is_owner) : ?>
-					<a class="halo-tg2__btn halo-tg2__btn--primary ht-profile__edit" href="<?php echo esc_url(add_query_arg('tampilan', 'pengaturan', halo_tg2_panel_page_url())); ?>">Ubah Profil</a>
+				<h1><?php echo esc_html($get_user->display_name); ?></h1>
+				<?php if ('' !== $ht_job) : ?>
+					<p class="ht-profile__job"><?php echo esc_html($ht_job); ?></p>
+				<?php endif; ?>
+				<p class="ht-profile__meta"><?php echo esc_html($is_instructor ? 'Pengajar' : 'Siswa'); ?> · Bergabung <?php echo esc_html($ht_since); ?></p>
+				<?php if ('' !== trim(wp_strip_all_tags($ht_bio))) : ?>
+					<p class="ht-profile__bio"><?php echo esc_html(wp_strip_all_tags($ht_bio)); ?></p>
 				<?php endif; ?>
 			</div>
-			<?php if ('' !== trim(wp_strip_all_tags($ht_bio))) : ?>
-				<p class="ht-profile__bio"><?php echo esc_html(wp_strip_all_tags($ht_bio)); ?></p>
-			<?php endif; ?>
 			<?php if (!empty($ht_socials)) : ?>
+				<?php
+				$ht_pub_icons = array(
+					'facebook' => '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.2h2.4l.4-2.8h-2.8V9.2c0-.8.3-1.4 1.5-1.4h1.4V5.3c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8.1v2.8h2.4V21Z"/></svg>',
+					'twitter'  => '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4.5 10.2 13 4.3 19.5h2.3l4.7-5.4 4.9 5.4H20l-6.5-9.3L19.4 4.5h-2.3l-4.2 4.9-4-4.9Z"/></svg>',
+					'linkedin' => '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.9 8.9H4.1V20h2.8ZM5.5 7.6a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4ZM10 20v-5.4c0-1.2.5-2 1.8-2 1.2 0 1.7.9 1.7 2V20h2.9v-6c0-2.9-1.4-4.2-3.6-4.2-1.5 0-2.4.8-2.9 1.5V8.9H7.1c0 .9 0 11.1 0 11.1Z"/></svg>',
+					'github'   => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m8.5 8.5-4 3.5 4 3.5M15.5 8.5l4 3.5-4 3.5"/></svg>',
+					'website'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.3 3.9 5.2 3.9 8.5s-1.3 6.2-3.9 8.5c-2.6-2.3-3.9-5.2-3.9-8.5s1.3-6.2 3.9-8.5Z"/></svg>',
+				);
+				?>
 				<div class="ht-profile__socials">
 					<?php foreach ($ht_socials as $social) : ?>
-						<a href="<?php echo esc_url($social['url']); ?>" target="_blank" rel="noopener noreferrer nofollow"><?php echo esc_html($social['label']); ?></a>
+						<?php
+						$ht_net  = 'website';
+						$ht_hay  = strtolower($social['key'] . ' ' . $social['label']);
+						foreach (array('facebook', 'twitter', 'linkedin', 'github') as $ht_cand) {
+							if (false !== strpos($ht_hay, $ht_cand)) {
+								$ht_net = $ht_cand;
+								break;
+							}
+						}
+						?>
+						<a href="<?php echo esc_url($social['url']); ?>" target="_blank" rel="noopener noreferrer nofollow" aria-label="<?php echo esc_attr($social['label']); ?>" title="<?php echo esc_attr($social['label']); ?>"><?php echo $ht_pub_icons[$ht_net]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ikon SVG statis. ?></a>
 					<?php endforeach; ?>
 				</div>
 			<?php endif; ?>

@@ -1,4 +1,4 @@
-/* halo-tg2 — skrip utama tema
+/* halo-tg2: skrip utama tema
    Toggle tema (tombol header + switch Mode Gelap di dropdown akun),
    menu mobile fullscreen, dropdown akun header, dan cart drawer.
    Tanpa dependensi. */
@@ -20,14 +20,26 @@
     themeBtn.setAttribute("aria-label", dark ? "Aktifkan tema terang" : "Aktifkan tema gelap");
   }
   function toggleTheme() {
-    var next = rootEl.getAttribute("data-halo-tg2-theme") === "dark" ? "light" : "dark";
-    rootEl.setAttribute("data-halo-tg2-theme", next);
-    try { localStorage.setItem("halo-tg2-theme", next); } catch (e) {}
+    setTheme(rootEl.getAttribute("data-halo-tg2-theme") === "dark" ? "light" : "dark");
+  }
+  function setTheme(val) {
+    rootEl.setAttribute("data-halo-tg2-theme", val);
+    try { localStorage.setItem("halo-tg2-theme", val); } catch (e) {}
     syncThemeBtn();
+    syncThemeSegs();
+  }
+  function syncThemeSegs() {
+    var cur = rootEl.getAttribute("data-halo-tg2-theme") === "dark" ? "dark" : "light";
+    $$("[data-theme-set]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-theme-set") === cur ? "true" : "false");
+    });
   }
   if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
-  $$("[data-theme-switch]").forEach(function (b) { b.addEventListener("click", toggleTheme); });
+  $$("[data-theme-set]").forEach(function (b) {
+    b.addEventListener("click", function () { setTheme(b.getAttribute("data-theme-set") === "dark" ? "dark" : "light"); });
+  });
   syncThemeBtn();
+  syncThemeSegs();
 
   /* ===== Menu mobile (fullscreen) ===== */
   var burger = $("[data-burger]");

@@ -1,9 +1,9 @@
 <?php
 /**
- * Template Name: Halo TG2 — Blank (Fokus / Canvas)
+ * Template Name: Halo TG2 · Blank (Fokus / Canvas)
  * Template Post Type: page
  *
- * Halaman kosong tanpa header/footer tema — untuk halaman kampanye dan
+ * Halaman kosong tanpa header/footer tema: untuk halaman kampanye dan
  * halaman bebas Elementor Canvas (Bagian 4 & 6 dokumen arsitektur).
  * Token Template tetap tersedia lewat style.css tema.
  *

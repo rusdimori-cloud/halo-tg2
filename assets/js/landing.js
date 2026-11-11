@@ -1,4 +1,4 @@
-/* halo-tg2 — skrip halaman depan (Fase 2): reveal, counters, flashcard,
+/* halo-tg2: skrip halaman depan (Fase 2): reveal, counters, flashcard,
    filter kursus, fitur interaktif, timeline scroll, hero rotating text.
    Toggle tema & menu mobile dimiliki assets/js/main.js tema. */
 (function(){

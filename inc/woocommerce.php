@@ -1,6 +1,6 @@
 <?php
 /**
- * Integrasi WooCommerce halo-tg2 (Fase 4 — Toko).
+ * Integrasi WooCommerce halo-tg2 (Fase 4, Toko).
  * Mesin transaksi tetap WooCommerce 100%; file ini hanya kulit & arahan:
  * banner terima kasih menuju dashboard + pemuatan aset toko.
  *
@@ -27,13 +27,16 @@ function halo_tg2_shop_assets() {
 	}
 	if (is_cart() || is_checkout() || is_singular('courses')) {
 		wp_enqueue_script('halo-tg2-shop', get_template_directory_uri() . '/assets/js/shop.js', array('jquery'), HALO_TG2_VERSION, true);
+		wp_localize_script('halo-tg2-shop', 'HT_SHOP', array(
+			'ajaxUrl' => home_url('/?wc-ajax=add_to_cart'),
+		));
 	}
 }
 
 add_action('woocommerce_thankyou', 'halo_tg2_thankyou_banner', 5);
 /**
  * Banner arahan setelah order diterima (Bagian 4 dokumen arsitektur):
- * momen setelah bayar harus jelas — "kursusmu sudah ada di dashboard".
+ * momen setelah bayar harus jelas: "kursusmu sudah ada di dashboard".
  *
  * @param int $order_id ID order Woo.
  */
@@ -45,7 +48,7 @@ function halo_tg2_thankyou_banner($order_id) {
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
 		</div>
 		<div class="halo-tg2__thanks-text">
-			<h2>Pembayaran diterima — selamat belajar!</h2>
+			<h2>Pembayaran diterima, selamat belajar!</h2>
 			<p>Kursus yang kamu beli sudah terbuka dan menunggu di dashboard. Langsung lanjut kapan pun kamu siap.</p>
 		</div>
 		<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($dashboard); ?>">Buka Dashboard</a>

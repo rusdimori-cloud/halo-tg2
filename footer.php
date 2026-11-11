@@ -23,7 +23,7 @@ if ('' === $ht_copy) {
 				<p class="halo-tg2__footer-tag"><?php echo esc_html((string) halo_tg2_get('footer_tagline')); ?></p>
 				<div class="halo-tg2__footer-contacts">
 					<?php if ('' !== $ht_line) : ?>
-						<a class="halo-tg2__footer-contact" href="<?php echo esc_url($ht_line); ?>">LINE — Tanya via chat</a>
+						<a class="halo-tg2__footer-contact" href="<?php echo esc_url($ht_line); ?>">LINE: Tanya via chat</a>
 					<?php endif; ?>
 					<?php if ('' !== $ht_email) : ?>
 						<a class="halo-tg2__footer-contact" href="mailto:<?php echo esc_attr($ht_email); ?>"><?php echo esc_html($ht_email); ?></a>

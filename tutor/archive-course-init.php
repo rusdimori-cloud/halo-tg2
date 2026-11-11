@@ -1,6 +1,6 @@
 <?php
 /**
- * Override halo-tg2 — tata letak arsip course (berbasis template
+ * Override halo-tg2: tata letak arsip course (berbasis template
  * Tutor LMS 4.1.3 archive-course-init.php; logika loop, filter, dan
  * pagination Tutor dipertahankan persis, hanya rangkanya diganti
  * bahasa Halo TG2 Template Desain).
@@ -117,7 +117,7 @@ if ( isset( $the_query ) ) {
 		<header class="ht-arch__head">
 			<span class="halo-tg2__eyebrow halo-tg2__t-label-sm">Katalog</span>
 			<h1 class="halo-tg2__t-h-lg">Semua Kelas</h1>
-			<p class="halo-tg2__t-body-md">Semua kelas halo TG2 dalam satu tempat — pilih yang sesuai dengan jalur belajarmu.</p>
+			<p class="halo-tg2__t-body-md">Semua kelas halo TG2 dalam satu tempat, pilih yang sesuai dengan jalur belajarmu.</p>
 		</header>
 
 		<div class="tutor-wrap tutor-wrap-parent tutor-courses-wrap tutor-container course-archive-page" data-tutor_courses_meta="<?php echo esc_attr( json_encode( $GLOBALS['tutor_course_archive_arg'] ) ); ?>">

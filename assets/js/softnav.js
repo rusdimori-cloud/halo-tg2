@@ -1,6 +1,6 @@
-/* halo-tg2 — navigasi lembut (soft navigation / PJAX ringan).
+/* halo-tg2: navigasi lembut (soft navigation / PJAX ringan).
    Kerang halaman (header, topbar, sidebar, dock) tetap hidup; hanya
-   region konten yang bertukar, dengan skeleton selama memuat —
+   region konten yang bertukar, dengan skeleton selama memuat
    seperti aplikasi. Dua kerang didukung:
    - panel  : region <main id="ht-panel-main"> di halaman dashboard
    - lesson : region #tutor-single-entry-content di halaman lesson
@@ -61,6 +61,8 @@
       inner = '<div class="ht-skel ht-skel--video"></div>' + skelLine(60) + skelLine(92) + skelLine(96) + skelLine(78) + skelLine(40);
     } else if (view === "kelas" || view === "wishlist" || view === "course") {
       inner = skelLine(34) + skelCards(4);
+    } else if (view === "profil") {
+      body = '<div class="ht-skel ht-skel--block" style="height:190px;border-radius:20px"></div>' + rows(4);
     } else if (view === "statistik") {
       inner = skelLine(34) + skelBlock(180) + skelRows(3);
     } else if (view === "pengaturan") {
@@ -97,7 +99,20 @@
     var out = {};
     SYNC[SHELL].forEach(function (rule) {
       var el = doc.querySelector(rule.sel);
-      if (el) out[rule.sel] = rule.mode === "text" ? el.textContent : el.innerHTML;
+      if (!el) return;
+      if (rule.mode === "text") { out[rule.sel] = el.textContent; return; }
+      /* Pil + bilah dock dibuat oleh JS (panel.js) dan tinggal di dalam
+         elemen yang disinkronkan ini. Keduanya tidak boleh ikut
+         disimpan: salinan cache yang memuatnya akan menghidupkannya
+         lagi sebagai kloningan beku saat tombol kembali memulihkan
+         navbar, lalu panel.js menambah sepasang lagi di atasnya. */
+      if (el.querySelector(".ht-panel__dockpill, .ht-panel__dockbar")) {
+        var clone = el.cloneNode(true);
+        Array.prototype.forEach.call(clone.querySelectorAll(".ht-panel__dockpill, .ht-panel__dockbar"), function (n) { n.remove(); });
+        out[rule.sel] = clone.innerHTML;
+      } else {
+        out[rule.sel] = el.innerHTML;
+      }
     });
     return out;
   }
@@ -135,12 +150,33 @@
     var region = $(REGION[SHELL]);
     if (!region) return full(url);
     newRegion.classList.add("ht-soft-enter");
+    /* Kelas masuk HARUS dilepas begitu animasinya selesai: nilai akhir
+       animasi yang tertahan (fill both) terbaca sebagai matriks identitas,
+       dan transform apa pun pada wilayah konten membuat elemen
+       position:fixed di dalamnya (modal foto, modal reset) terperangkap
+       mengikuti tinggi konten, bukan layar. */
+    var clearEnter = function () { newRegion.classList.remove("ht-soft-enter"); };
+    newRegion.addEventListener("animationend", clearEnter, { once: true });
+    setTimeout(clearEnter, 340);
     region.parentNode.replaceChild(newRegion, region);
     runScripts(newRegion);
     if (doc) { applySync(captureSync(doc)); document.title = doc.title; }
     else if (opts.cached) { applySync(opts.cached.sync); document.title = opts.cached.title; }
     if (opts.push) history.pushState({ htSoft: 1 }, "", url);
-    window.scrollTo(0, opts.scroll || 0);
+    var hashEl = null;
+    if (opts.push && url) {
+      var hi = String(url).indexOf("#");
+      if (hi > -1 && hi < String(url).length - 1) {
+        try { hashEl = document.getElementById(decodeURIComponent(String(url).slice(hi + 1))); } catch (e) { hashEl = null; }
+      }
+    }
+    if (hashEl) {
+      var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      try { hashEl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" }); }
+      catch (e) { window.scrollTo(0, Math.max(0, hashEl.getBoundingClientRect().top + window.scrollY - 84)); }
+    } else {
+      window.scrollTo(0, opts.scroll || 0);
+    }
     closeOverlays();
     progress(false);
     document.dispatchEvent(new CustomEvent("ht:softnav:loaded", { detail: { url: url, shell: SHELL } }));

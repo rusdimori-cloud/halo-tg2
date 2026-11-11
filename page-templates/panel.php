@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Halo TG2 — Dashboard Kustom
+ * Template Name: Halo TG2 · Dashboard Kustom
  * Template Post Type: page
  *
  * Dashboard siswa kustom sesuai mockup yang disetujui (Fase 8):
@@ -23,7 +23,7 @@ if (!is_user_logged_in()) {
 $ht_user    = wp_get_current_user();
 $ht_uid     = get_current_user_id();
 $ht_view    = isset($_GET['tampilan']) ? sanitize_key(wp_unslash($_GET['tampilan'])) : 'beranda'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-if (!in_array($ht_view, array('beranda', 'kelas', 'course', 'wishlist', 'pesanan', 'akun', 'statistik', 'notifikasi', 'pengaturan'), true)) {
+if (!in_array($ht_view, array('beranda', 'kelas', 'course', 'wishlist', 'pesanan', 'akun', 'statistik', 'notifikasi', 'profil', 'pengaturan'), true)) {
 	$ht_view = 'beranda';
 }
 $ht_base    = get_permalink();
@@ -32,7 +32,7 @@ $ht_url     = function ($view) use ($ht_base) {
 };
 $ht_courses = halo_tg2_panel_courses($ht_uid);
 $ht_unpaid  = halo_tg2_panel_unpaid_orders($ht_uid);
-// Statistik mini beranda — semua dari data Tutor yang nyata.
+// Statistik mini beranda: semua dari data Tutor yang nyata.
 $ht_stat_total = count($ht_courses);
 $ht_done_ids   = function_exists('tutor_utils') ? tutor_utils()->get_completed_courses_ids_by_user($ht_uid) : array();
 $ht_stat_done  = is_array($ht_done_ids) ? count($ht_done_ids) : 0;
@@ -41,7 +41,7 @@ foreach ($ht_courses as $ht_sc) {
 	$ht_stat_sum += (int) (is_array($ht_sc) && isset($ht_sc['percent']) ? $ht_sc['percent'] : 0);
 }
 $ht_stat_avg = $ht_stat_total > 0 ? (int) round($ht_stat_sum / $ht_stat_total) : 0;
-// Kelengkapan profil — perhitungan resmi Tutor LMS
+// Kelengkapan profil: perhitungan resmi Tutor LMS
 // (tutor_utils()->user_profile_completion: foto profil, tautan
 // sosial, bio; + metode penarikan untuk instruktur approved).
 // Kartu panel tampil sampai 100% (saklar Tutor hanya mengatur
@@ -90,6 +90,7 @@ $ht_titles  = array(
 	'notifikasi' => 'Notifikasi',
 	'wishlist' => 'Wishlist',
 	'course'    => 'Katalog Course',
+	'profil'    => 'Profil',
 	'pengaturan' => 'Pengaturan',
 );
 $ht_initial = strtoupper(substr($ht_user->display_name, 0, 1));
@@ -125,6 +126,24 @@ if ('course' === $ht_view) {
 		$ht_sdata               = halo_tg2_course_card_data($ht_spost->ID, $ht_uid, $ht_enrolled_ids);
 		$ht_sdata['wishlisted'] = in_array((int) $ht_spost->ID, $ht_wish_ids, true);
 		$ht_shop[]              = $ht_sdata;
+	}
+}
+$ht_prof = array();
+if ('profil' === $ht_view) {
+	$ht_cover_id = (int) get_user_meta($ht_uid, '_tutor_cover_photo', true);
+	$ht_prof     = array(
+		'cover'      => $ht_cover_id ? (string) wp_get_attachment_image_url($ht_cover_id, 'large') : '',
+		'photo'      => $ht_photo_id ? (string) wp_get_attachment_image_url($ht_photo_id, 'medium') : '',
+		'job'        => (string) get_user_meta($ht_uid, '_tutor_profile_job_title', true),
+		'bio'        => (string) get_user_meta($ht_uid, '_tutor_profile_bio', true),
+		'public_url' => home_url('/profile/' . $ht_user->user_nicename . '/'),
+		'socials'    => array(),
+	);
+	foreach (array('facebook' => '_tutor_profile_facebook', 'twitter' => '_tutor_profile_twitter', 'linkedin' => '_tutor_profile_linkedin', 'github' => '_tutor_profile_github', 'website' => '_tutor_profile_website') as $ht_skey => $ht_smeta) {
+		$ht_surl = (string) get_user_meta($ht_uid, $ht_smeta, true);
+		if ('' !== $ht_surl) {
+			$ht_prof['socials'][$ht_skey] = $ht_surl;
+		}
 	}
 }
 $ht_profil_status  = isset($_GET['profil']) ? sanitize_key(wp_unslash($_GET['profil'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -175,9 +194,9 @@ function halo_tg2_panel_user_menu($logout_url) {
 	<a href="<?php echo esc_url(halo_tg2_panel_page_url()); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg>Dashboard</a>
 	<a href="<?php echo esc_url(add_query_arg('tampilan', 'kelas', halo_tg2_panel_page_url())); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg>Kelas Saya</a>
 	<a href="<?php echo esc_url(add_query_arg('tampilan', 'pengaturan', halo_tg2_panel_page_url())); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg>Pengaturan Profil</a>
-	<button type="button" class="ht-panel__menu-row" data-theme-switch>
-		<span class="ht-panel__menu-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z"/></svg>Mode Gelap</span><span class="ht-panel__switch" aria-hidden="true"></span>
-	</button>
+	<div class="ht-panel__menu-row">
+		<span class="ht-panel__menu-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor" stroke="none"/></svg>Tema</span><span class="ht-tseg" role="group" aria-label="Tema tampilan"><button type="button" data-theme-set="light" aria-label="Tema terang" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg></button><button type="button" data-theme-set="dark" aria-label="Tema gelap" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z"/></svg></button></span>
+	</div>
 	<a class="is-danger" href="<?php echo esc_url($logout_url); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Keluar</a>
 	<?php
 }
@@ -199,6 +218,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 		<a class="halo-tg2__wordmark" href="<?php echo esc_url(home_url('/')); ?>" rel="home">halo <em>TG2</em></a>
 		<nav class="ht-panel__nav" aria-label="Menu dashboard">
 			<p class="ht-panel__group">Menu</p>
+			<a class="<?php echo 'profil' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('profil')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg><span>Profil</span></a>
 			<a class="<?php echo 'beranda' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('beranda')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg><span>Dashboard</span></a>
 			<a class="<?php echo 'kelas' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('kelas')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg><span>Kelas Saya</span></a>
 			<a class="<?php echo 'course' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('course')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.1 4.9-4.9 2.1 2.1-4.9Z"/></svg><span>Katalog Course</span></a>
@@ -215,7 +235,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 		<div class="ht-panel__userbox">
 			<button type="button" class="ht-panel__userchip" data-dd-btn aria-haspopup="true">
 				<span class="ht-panel__avatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
-				<span class="ht-panel__userinfo"><strong><?php echo esc_html($ht_user->display_name); ?></strong><small><?php echo esc_html($ht_user->user_email); ?></small></span>
+				<span class="ht-panel__userinfo"><strong data-ht-displayname><?php echo esc_html($ht_user->display_name); ?></strong><small><?php echo esc_html($ht_user->user_email); ?></small></span>
 			</button>
 			<div class="ht-panel__dropdown is-up" data-dd-panel hidden>
 				<?php halo_tg2_panel_user_menu($ht_logout); ?>
@@ -267,7 +287,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 					<div class="ht-panel__dropdown" data-dd-panel hidden>
 						<div class="ht-panel__dd-head">
 							<span class="ht-panel__avatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
-							<span><strong><?php echo esc_html($ht_user->display_name); ?></strong><small><?php echo esc_html($ht_user->user_email); ?></small></span>
+							<span><strong data-ht-displayname><?php echo esc_html($ht_user->display_name); ?></strong><small><?php echo esc_html($ht_user->user_email); ?></small></span>
 						</div>
 						<?php halo_tg2_panel_user_menu($ht_logout); ?>
 					</div>
@@ -283,12 +303,12 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<?php endif; ?>
 
 			<?php if ('beranda' === $ht_view) : ?>
-				<p class="ht-panel__greeting">Halo, <strong><?php echo esc_html($ht_user->first_name ? $ht_user->first_name : $ht_user->display_name); ?></strong> — siap lanjut belajar?</p>
+				<p class="ht-panel__greeting">Halo, <strong><?php echo esc_html($ht_user->first_name ? $ht_user->first_name : $ht_user->display_name); ?></strong>, siap lanjut belajar?</p>
 				<?php if (null !== $ht_exam_days && $ht_exam_days >= 0) : ?>
 					<div class="ht-panel__exam">
 						<div class="ht-panel__exam-text">
 							<strong>Ujian Anda pada <?php echo esc_html(date_i18n('l, j F Y', strtotime($ht_exam_date))); ?></strong>
-							<span><?php echo esc_html('' !== $ht_exam_name ? $ht_exam_name . ' · ' : ''); ?>Hitung mundur menuju hari ujianmu — tetap konsisten belajarnya.</span>
+							<span><?php echo esc_html('' !== $ht_exam_name ? $ht_exam_name . ' · ' : ''); ?>Hitung mundur menuju hari ujianmu, tetap konsisten belajarnya.</span>
 						</div>
 						<div class="ht-panel__exam-ring" aria-hidden="true">
 							<?php $ht_ring_c = 2 * M_PI * 26; $ht_ring_f = min(max($ht_exam_days, 0), 30) / 30; ?>
@@ -315,7 +335,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 					<div class="ht-panel__exam is-empty">
 						<div class="ht-panel__exam-text">
 							<strong>Belum ada pengingat ujian</strong>
-							<span>Atur tanggal ujianmu — hitung mundurnya akan tampil di sini setiap kamu membuka Dashboard.</span>
+							<span>Atur tanggal ujianmu. Hitung mundurnya akan tampil di sini setiap kamu membuka Dashboard.</span>
 						</div>
 						<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_url('pengaturan')); ?>#pengingat-ujian">Atur Tanggal Ujian</a>
 					</div>
@@ -627,7 +647,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 				<div data-spanel="statistik">
 					<div class="halo-tg2__empty">
 						<h3>Belum ada data simulasi</h3>
-						<p>Hasil simulasi CBT pertamamu akan diringkas di sini — skor, tren, dan bagian terlemahmu.</p>
+						<p>Hasil simulasi CBT pertamamu akan diringkas di sini: skor, tren, dan bagian terlemahmu.</p>
 					</div>
 				</div>
 				<div data-spanel="flashcard" hidden>
@@ -650,6 +670,104 @@ $ht_logout = wp_logout_url(home_url('/'));
 					echo '<p>Aktifkan plugin halo-tg2-core untuk melihat notifikasi di sini.</p>';
 				}
 				?>
+			<?php elseif ('profil' === $ht_view) : ?>
+				<?php
+				$ht_chev = '<svg class="ht-profil__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+				$ht_rows_akun = array(
+					array('url' => add_query_arg('bagian', 'akun', $ht_url('pengaturan')), 'title' => 'Profil & Foto', 'sub' => 'Nama, bio, foto profil & sampul', 'icon' => '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>'),
+					array('url' => add_query_arg('bagian', 'keamanan', $ht_url('pengaturan')), 'title' => 'Keamanan', 'sub' => 'Email & kata sandi akun', 'icon' => '<path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6Z"/><path d="m9.3 11.6 2 2 3.6-4"/>'),
+					array('url' => add_query_arg('bagian', 'sosial', $ht_url('pengaturan')), 'title' => 'Akun Sosial', 'sub' => 'Tautan media sosial', 'icon' => '<circle cx="6" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M8.2 10.8l6.6-3.6M8.2 13.2l6.6 3.6"/>'),
+					array('url' => add_query_arg('bagian', 'preferensi', $ht_url('pengaturan')), 'title' => 'Preferensi', 'sub' => 'Pengalaman belajar & tampilan', 'icon' => '<path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2"/><circle cx="9" cy="16" r="2"/>'),
+				);
+				$ht_rows_belajar = array(
+					array('url' => $ht_url('kelas'), 'title' => 'Kelas Saya', 'sub' => 'Lanjutkan belajarmu', 'icon' => '<path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/>'),
+					array('url' => $ht_url('course'), 'title' => 'Katalog Course', 'sub' => 'Semua course yang tersedia', 'icon' => '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.1 4.9-4.9 2.1 2.1-4.9Z"/>'),
+					array('url' => $ht_url('wishlist'), 'title' => 'Wishlist', 'sub' => 'Course yang kamu simpan', 'icon' => '<path d="M12 20.5C7 16.5 3.5 13.3 3.5 9.6A4.6 4.6 0 0 1 8 5c1.7 0 3.2.9 4 2.2C12.8 5.9 14.3 5 16 5a4.6 4.6 0 0 1 4.5 4.6c0 3.7-3.5 6.9-8.5 10.9Z"/>'),
+					array('url' => $ht_url('statistik'), 'title' => 'Statistik', 'sub' => 'Hasil simulasi & progres belajar', 'icon' => '<path d="M4 20V10M10 20V4M16 20v-8M21 20H3"/>'),
+				);
+				$ht_rows_lain = array(
+					array('url' => $ht_url('pesanan'), 'title' => 'Pesanan Saya', 'sub' => 'Riwayat pembelian & invoice', 'icon' => '<path d="M6 3h12v18l-2-1.4L14 21l-2-1.4L10 21l-2-1.4L6 21Z"/><path d="M9 8h6M9 12h6"/>'),
+					array('url' => $ht_url('notifikasi'), 'title' => 'Notifikasi', 'sub' => 'Pembayaran & pengumuman', 'icon' => '<path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/>', 'badge' => $ht_notif_unread),
+					array('url' => $ht_prof['public_url'], 'title' => 'Profil Publik', 'sub' => 'Halaman profil yang dilihat orang lain', 'icon' => '<path d="M14 4h6v6M20 4l-9.5 9.5M19 13.5V19a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 4 19V7a1.5 1.5 0 0 1 1.5-1.5H11"/>'),
+				);
+				$ht_social_icons = array(
+					'facebook' => '<path fill="currentColor" stroke="none" d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.3-1.5 1.6-1.5h1.3V4.9c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8V11H8v3h2.5v7Z"/>',
+					'twitter'  => '<path fill="currentColor" stroke="none" d="M4 4l6.1 8.2L4.4 20h2.3l4.4-5.9 4.4 5.9H20l-6.4-8.6L19.3 4h-2.3l-4 5.4L9 4Z"/>',
+					'linkedin' => '<path fill="currentColor" stroke="none" d="M6.9 8.6H4V20h2.9ZM5.4 7.2a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4ZM10 20h2.9v-5.7c0-1.4.7-2.3 1.9-2.3 1.1 0 1.6.8 1.6 2.3V20h2.9v-6.1c0-3-1.6-4.4-3.8-4.4-1.8 0-2.6 1-3 1.7V8.6H10Z"/>',
+					'github'   => '<path d="m8.5 8.5-4 3.5 4 3.5M15.5 8.5l4 3.5-4 3.5"/>',
+					'website'  => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.7 2.6 4 5.7 4 9s-1.3 6.4-4 9c-2.7-2.6-4-5.7-4-9s1.3-6.4 4-9Z"/>',
+				);
+				?>
+				<div class="ht-profil">
+					<section class="ht-profil__card">
+						<div class="ht-profil__cover">
+							<?php if ('' !== $ht_prof['cover']) : ?>
+								<img src="<?php echo esc_url($ht_prof['cover']); ?>" alt="">
+							<?php endif; ?>
+							<a class="ht-profil__edit" href="<?php echo esc_url(add_query_arg('bagian', 'akun', $ht_url('pengaturan'))); ?>">Edit Profil</a>
+						</div>
+						<div class="ht-profil__head">
+							<div class="ht-profil__avatar">
+								<?php if ('' !== $ht_prof['photo']) : ?>
+									<img src="<?php echo esc_url($ht_prof['photo']); ?>" alt="">
+								<?php else : ?>
+									<span><?php echo esc_html($ht_initial); ?></span>
+								<?php endif; ?>
+							</div>
+							<h2 class="ht-profil__name"><?php echo esc_html($ht_user->display_name); ?></h2>
+							<?php if ('' !== $ht_prof['job']) : ?>
+								<p class="ht-profil__job"><?php echo esc_html($ht_prof['job']); ?></p>
+							<?php endif; ?>
+							<p class="ht-profil__bio"><?php echo '' !== $ht_prof['bio'] ? esc_html($ht_prof['bio']) : 'Pejuang TG2'; ?></p>
+						</div>
+						<div class="ht-profil__stats">
+							<div><b><?php echo esc_html($ht_stat_total); ?></b><span>Kelas Diikuti</span></div>
+							<div><b><?php echo esc_html($ht_stat_done); ?></b><span>Kelas Selesai</span></div>
+							<div><b><?php echo esc_html($ht_stat_avg); ?>%</b><span>Rata-rata Progres</span></div>
+						</div>
+						<?php if (!empty($ht_prof['socials'])) : ?>
+							<div class="ht-profil__socials">
+								<?php foreach ($ht_prof['socials'] as $ht_skey => $ht_surl) : ?>
+									<a href="<?php echo esc_url($ht_surl); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr(ucfirst($ht_skey)); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><?php echo $ht_social_icons[$ht_skey]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ikon SVG statis. ?></svg></a>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+					</section>
+					<?php
+					$ht_groups = array('Akun' => $ht_rows_akun, 'Belajar & Belanja' => $ht_rows_belajar, 'Lainnya' => $ht_rows_lain);
+					foreach ($ht_groups as $ht_glabel => $ht_grows) :
+						?>
+						<nav class="ht-profil__group" aria-label="<?php echo esc_attr($ht_glabel); ?>">
+							<h3 class="ht-profil__glabel"><?php echo esc_html($ht_glabel); ?></h3>
+							<div class="ht-profil__menu">
+								<?php foreach ($ht_grows as $ht_row) : ?>
+									<a class="ht-profil__row" href="<?php echo esc_url($ht_row['url']); ?>">
+										<span class="ht-profil__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><?php echo $ht_row['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ikon SVG statis. ?></svg></span>
+										<span class="ht-profil__rt"><b><?php echo esc_html($ht_row['title']); ?></b><i><?php echo esc_html($ht_row['sub']); ?></i></span>
+										<?php if (!empty($ht_row['badge'])) : ?>
+											<span class="ht-panel__badge"><?php echo esc_html($ht_row['badge'] > 99 ? '99+' : $ht_row['badge']); ?></span>
+										<?php endif; ?>
+										<?php echo $ht_chev; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ikon SVG statis. ?>
+									</a>
+								<?php endforeach; ?>
+								<?php if ('Lainnya' === $ht_glabel) : ?>
+									<div class="ht-profil__row">
+										<span class="ht-profil__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor" stroke="none"/></svg></span>
+										<span class="ht-profil__rt"><b>Tema</b><i>Pilih tampilan terang atau gelap</i></span>
+										<span class="ht-tseg" role="group" aria-label="Tema tampilan"><button type="button" data-theme-set="light" aria-label="Tema terang" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg></button><button type="button" data-theme-set="dark" aria-label="Tema gelap" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z"/></svg></button></span>
+									</div>
+									<button type="button" class="ht-profil__row" data-contact-open>
+										<span class="ht-profil__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4.5 7.5 7.5 6 7.5-6"/></svg></span>
+										<span class="ht-profil__rt"><b>Hubungi Kami</b><i>Kirim pesan lewat email</i></span>
+										<?php echo $ht_chev; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ikon SVG statis. ?>
+									</button>
+								<?php endif; ?>
+							</div>
+						</nav>
+					<?php endforeach; ?>
+					<a class="ht-profil__logout" href="<?php echo esc_url($ht_logout); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Keluar</a>
+				</div>
+
 			<?php elseif ('pengaturan' === $ht_view) : ?>
 				<?php
 				$ht_bagian = isset($_GET['bagian']) ? sanitize_key(wp_unslash($_GET['bagian'])) : 'akun'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -712,7 +830,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 				<?php elseif ('dihapus' === $ht_foto_status) : ?>
 					<p class="ht-panel__notice is-ok">Foto dihapus.</p>
 				<?php elseif ('gagal' === $ht_foto_status) : ?>
-					<p class="ht-panel__notice is-error">Foto belum tersimpan — pastikan berkasnya JPG/PNG dan ukurannya tidak melebihi batas server.</p>
+					<p class="ht-panel__notice is-error">Foto belum tersimpan. Pastikan berkasnya JPG/PNG dan ukurannya tidak melebihi batas server.</p>
 				<?php endif; ?>
 				<?php if ('tersimpan' === $ht_profil_status) : ?>
 					<p class="ht-panel__notice is-ok">Profil tersimpan.</p>
@@ -720,11 +838,11 @@ $ht_logout = wp_logout_url(home_url('/'));
 					<p class="ht-panel__notice is-error">Profil belum tersimpan. Coba lagi sebentar lagi.</p>
 				<?php endif; ?>
 				<?php if ('tersimpan' === $ht_ujian_status) : ?>
-					<p class="ht-panel__notice is-ok">Pengingat ujian tersimpan — hitung mundurnya tampil di Dashboard.</p>
+					<p class="ht-panel__notice is-ok">Pengingat ujian tersimpan. Hitung mundurnya tampil di Dashboard.</p>
 				<?php elseif ('dihapus' === $ht_ujian_status) : ?>
 					<p class="ht-panel__notice is-ok">Pengingat ujian dihapus.</p>
 				<?php elseif ('gagal' === $ht_ujian_status) : ?>
-					<p class="ht-panel__notice is-error">Pengingat ujian belum tersimpan — periksa tanggalnya lalu coba lagi.</p>
+					<p class="ht-panel__notice is-error">Pengingat ujian belum tersimpan. Periksa tanggalnya lalu coba lagi.</p>
 				<?php endif; ?>
 				<?php if ('berubah' === $ht_sandi_status) : ?>
 					<p class="ht-panel__notice is-ok">Kata sandi berhasil diubah.</p>
@@ -744,17 +862,19 @@ $ht_logout = wp_logout_url(home_url('/'));
 					<p class="ht-panel__notice is-error">Preferensi belum tersimpan. Coba lagi sebentar lagi.</p>
 				<?php endif; ?>
 
-				<nav class="ht-panel__tabs ht-panel__tabs--links" aria-label="Bagian pengaturan">
-					<a class="<?php echo 'akun' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('akun')); ?>">Akun</a>
-					<a class="<?php echo 'keamanan' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('keamanan')); ?>">Keamanan</a>
-					<a class="<?php echo 'sosial' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('sosial')); ?>">Akun Sosial</a>
-					<a class="<?php echo 'preferensi' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('preferensi')); ?>">Preferensi</a>
+				<nav class="ht-panel__tabs ht-panel__tabs--links" data-tabnav aria-label="Bagian pengaturan">
+					<span class="ht-panel__tabink" data-tabink aria-hidden="true"></span>
+					<a data-tablink="akun" data-no-soft class="<?php echo 'akun' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('akun')); ?>">Akun</a>
+					<a data-tablink="keamanan" data-no-soft class="<?php echo 'keamanan' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('keamanan')); ?>">Keamanan</a>
+					<a data-tablink="sosial" data-no-soft class="<?php echo 'sosial' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('sosial')); ?>">Akun Sosial</a>
+					<a data-tablink="preferensi" data-no-soft class="<?php echo 'preferensi' === $ht_bagian ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_ret('preferensi')); ?>">Preferensi</a>
 				</nav>
 
-				<?php if ('akun' === $ht_bagian) : ?>
+				<div class="ht-panel__tabviewport" data-tabviewport>
+				<div class="ht-panel__tabpanel" data-tabpanel="akun"<?php echo 'akun' === $ht_bagian ? '' : ' hidden'; ?>>
 				<section class="ht-panel__setting-card">
 					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5" width="18" height="14" rx="2.4"/><circle cx="9" cy="10" r="1.6"/><path d="m4.5 17.5 5-5 3.5 3.5 4-4.5 2.5 3"/></svg>Foto Profil &amp; Sampul</h2>
-					<p class="ht-panel__modal-sub">Foto profil tampil di panel, header situs, dan profil publikmu; sampul tampil di widget Dashboard dan bagian atas profil publik.</p>
+					<p class="ht-panel__modal-sub">Foto profil tampil di panel, header situs, dan profil publikmu; sampul tampil di bagian atas profil. Tekan tombol kamera untuk mengubah foto, lalu atur potongannya agar posisinya pas.</p>
 					<div class="ht-panel__profile-head">
 						<div class="ht-panel__cover-preview">
 							<?php if ('' !== $ht_cover_url) : ?>
@@ -762,53 +882,90 @@ $ht_logout = wp_logout_url(home_url('/'));
 							<?php else : ?>
 								<span>Belum ada foto sampul</span>
 							<?php endif; ?>
+							<button type="button" class="ht-panel__cover-btn" data-photo-open data-target="cover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h1.6l1.7-2.3A1 1 0 0 1 9.6 4.2h4.8a1 1 0 0 1 .8.5L16.9 7h1.6A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z"/><circle cx="12" cy="12" r="3.4"/></svg>Ubah Cover</button>
 						</div>
 						<span class="ht-panel__profile-avatar"><?php if ('' !== $ht_photo_url) : ?><img src="<?php echo esc_url($ht_photo_url); ?>" alt=""><?php else : ?><?php echo esc_html($ht_initial); ?><?php endif; ?></span>
+						<button type="button" class="ht-panel__avatar-cam" data-photo-open data-target="profil" aria-label="Ubah foto profil" title="Ubah foto profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h1.6l1.7-2.3A1 1 0 0 1 9.6 4.2h4.8a1 1 0 0 1 .8.5L16.9 7h1.6A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z"/><circle cx="12" cy="12" r="3.4"/></svg></button>
 					</div>
-					<form method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-						<input type="hidden" name="action" value="halo_tg2_save_photo">
-						<?php wp_nonce_field('halo_tg2_save_photo', '_htfnonce'); ?>
-						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
-						<div class="ht-panel__form-grid">
-							<label class="ht-panel__field">Foto Profil (JPG/PNG)
-								<input type="file" name="profile_photo" accept=".jpg,.jpeg,.png">
-							</label>
-							<label class="ht-panel__field">Foto Sampul (JPG/PNG)
-								<input type="file" name="cover_photo" accept=".jpg,.jpeg,.png">
-							</label>
-						</div>
-						<div class="ht-panel__modal-actions">
-							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Foto</button>
-						</div>
-					</form>
 					<?php if ($ht_photo_id || $ht_cover_id) : ?>
 						<div class="ht-panel__photo-actions">
 							<?php if ($ht_photo_id) : ?>
-								<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+								<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-ajax-form="removephoto">
 									<input type="hidden" name="action" value="halo_tg2_remove_photo">
 									<?php wp_nonce_field('halo_tg2_remove_photo', '_htrnonce'); ?>
 									<input type="hidden" name="jenis" value="profil">
 									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
-									<button type="submit" class="halo-tg2__btn ht-panel__danger-btn">Hapus Foto Profil</button>
+									<button type="button" class="halo-tg2__btn ht-panel__danger-btn" data-reset-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.6 3.8v4.6h4.6"/></svg>Reset Foto Profil</button>
 								</form>
 							<?php endif; ?>
 							<?php if ($ht_cover_id) : ?>
-								<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+								<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-ajax-form="removephoto">
 									<input type="hidden" name="action" value="halo_tg2_remove_photo">
 									<?php wp_nonce_field('halo_tg2_remove_photo', '_htrnonce'); ?>
 									<input type="hidden" name="jenis" value="sampul">
 									<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
-									<button type="submit" class="halo-tg2__btn ht-panel__danger-btn">Hapus Sampul</button>
+									<button type="button" class="halo-tg2__btn ht-panel__danger-btn" data-reset-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.6 3.8v4.6h4.6"/></svg>Reset Cover</button>
 								</form>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>
+									<p class="ht-panel__ajaxmsg" data-ajaxmsg hidden></p>
 				</section>
+
+				<div class="ht-photo-modal" data-photo-modal hidden>
+					<div class="ht-photo-modal__backdrop" data-photo-close></div>
+					<div class="ht-photo-modal__box" role="dialog" aria-modal="true" aria-label="Editor foto">
+						<div class="ht-photo-modal__head">
+							<h3>Ubah Foto</h3>
+							<button type="button" class="ht-photo-modal__x" data-photo-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+						</div>
+						<div class="ht-photo-modal__tabs" role="group" aria-label="Jenis foto">
+							<button type="button" data-photo-target="profil" class="is-active">Foto Profil</button>
+							<button type="button" data-photo-target="cover">Cover</button>
+						</div>
+						<div class="ht-photo-modal__empty" data-photo-empty>
+							<span class="ht-photo-modal__empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2.4"/><circle cx="9" cy="10" r="1.6"/><path d="m4.5 17.5 5-5 3.5 3.5 4-4.5 2.5 3"/></svg></span>
+							<p>Pilih foto dari perangkatmu, lalu atur potongannya.</p>
+							<label class="ht-photo-modal__pick">Pilih Foto<input type="file" data-photo-file accept="image/*" hidden></label>
+							<p class="ht-photo-modal__hint">JPG, PNG, atau WebP · maks 10MB</p>
+						</div>
+						<div class="ht-photo-modal__work" data-photo-work hidden>
+							<div class="ht-crop" data-crop-box>
+								<img data-crop-img alt="" draggable="false">
+								<div class="ht-crop__shade" data-crop-shade></div>
+							</div>
+							<div class="ht-photo-modal__tools">
+								<span class="ht-photo-modal__zoom-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.6 16.6M8.5 11h5M11 8.5v5"/></svg></span>
+								<input type="range" data-crop-zoom min="1" max="3" step="0.01" value="1" aria-label="Perbesar foto">
+								<button type="button" class="ht-photo-modal__change" data-photo-change>Ganti Foto</button>
+							</div>
+							<p class="ht-photo-modal__hint">Geser foto untuk mengatur posisi · gunakan slider untuk zoom</p>
+						</div>
+						<p class="ht-photo-modal__msg" data-photo-msg hidden></p>
+						<div class="ht-photo-modal__actions">
+							<button type="button" class="ht-photo-modal__cancel" data-photo-close>Batal</button>
+							<button type="button" class="ht-photo-modal__save" data-photo-save disabled>Upload &amp; Simpan</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="ht-photo-modal ht-reset-modal" data-reset-modal hidden>
+					<div class="ht-photo-modal__backdrop" data-reset-close></div>
+					<div class="ht-photo-modal__box ht-reset-modal__box" role="alertdialog" aria-modal="true" aria-label="Konfirmasi reset foto">
+						<span class="ht-reset-modal__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.6 3.8v4.6h4.6"/></svg></span>
+						<h3 data-reset-title>Reset Foto Profil?</h3>
+						<p data-reset-text>Foto akan dihapus dan kembali ke tampilan bawaan.</p>
+						<div class="ht-reset-modal__actions">
+							<button type="button" class="ht-photo-modal__cancel" data-reset-close>Batal</button>
+							<button type="button" class="ht-reset-modal__confirm" data-reset-confirm>Ya, Reset</button>
+						</div>
+					</div>
+				</div>
 
 				<section class="ht-panel__setting-card">
 					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>Profil</h2>
 					<p class="ht-panel__modal-sub">Nama dan keterangan yang tampil di kelasmu.</p>
-					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-ajax-form="profile">
 						<input type="hidden" name="action" value="halo_tg2_save_profile">
 						<?php wp_nonce_field('halo_tg2_save_profile', '_htpnonce'); ?>
 						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
@@ -856,12 +1013,13 @@ $ht_logout = wp_logout_url(home_url('/'));
 							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Profil</button>
 						</div>
 					</form>
+									<p class="ht-panel__ajaxmsg" data-ajaxmsg hidden></p>
 				</section>
 
 				<section class="ht-panel__setting-card" id="pengingat-ujian">
 					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 9a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17S18 15 18 9ZM10 20a2.2 2.2 0 0 0 4 0"/></svg>Pengingat Ujian</h2>
-					<p class="ht-panel__modal-sub">Atur tanggal ujianmu — banner hitung mundurnya tampil di Dashboard.</p>
-					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+					<p class="ht-panel__modal-sub">Atur tanggal ujianmu. Banner hitung mundurnya tampil di Dashboard.</p>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-ajax-form="exam">
 						<input type="hidden" name="action" value="halo_tg2_save_exam">
 						<?php wp_nonce_field('halo_tg2_save_exam', '_htexnonce'); ?>
 						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('akun')); ?>">
@@ -878,15 +1036,17 @@ $ht_logout = wp_logout_url(home_url('/'));
 						</div>
 						<p class="ht-panel__modal-sub">Untuk menghapus pengingat, kosongkan tanggalnya lalu simpan.</p>
 					</form>
+									<p class="ht-panel__ajaxmsg" data-ajaxmsg hidden></p>
 				</section>
 
 				<section class="ht-panel__setting-card is-danger">
 					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16M9.5 7V5.2A1.2 1.2 0 0 1 10.7 4h2.6A1.2 1.2 0 0 1 14.5 5.2V7M6.5 7l.9 12.2A1.8 1.8 0 0 0 9.2 21h5.6a1.8 1.8 0 0 0 1.8-1.8L17.5 7M10 11v6M14 11v6"/></svg>Hapus Akun</h2>
-					<p class="ht-panel__modal-sub">Menghapus akun bersifat permanen — akses kelas dan riwayat belajarmu ikut hilang. Demi keamanan, penghapusan diproses manual lewat email agar tidak ada yang terhapus karena tidak sengaja.</p>
+					<p class="ht-panel__modal-sub">Menghapus akun bersifat permanen. Akses kelas dan riwayat belajarmu ikut hilang. Demi keamanan, penghapusan diproses manual lewat email agar tidak ada yang terhapus karena tidak sengaja.</p>
 					<button type="button" class="halo-tg2__btn ht-panel__danger-btn" data-contact-open>Minta Hapus Akun</button>
 				</section>
 
-				<?php elseif ('keamanan' === $ht_bagian) : ?>
+				</div>
+				<div class="ht-panel__tabpanel" data-tabpanel="keamanan"<?php echo 'keamanan' === $ht_bagian ? '' : ' hidden'; ?>>
 				<section class="ht-panel__setting-card">
 					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5.5" width="18" height="13" rx="2.4"/><path d="m4 7 8 6 8-6"/></svg>Info Masuk</h2>
 					<p class="ht-panel__modal-sub">Email ini dipakai untuk masuk dan menerima pemberitahuan akun.</p>
@@ -920,11 +1080,12 @@ $ht_logout = wp_logout_url(home_url('/'));
 					</form>
 				</section>
 
-				<?php elseif ('sosial' === $ht_bagian) : ?>
+				</div>
+				<div class="ht-panel__tabpanel" data-tabpanel="sosial"<?php echo 'sosial' === $ht_bagian ? '' : ' hidden'; ?>>
 				<section class="ht-panel__setting-card">
 					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="5.5" r="2.6"/><circle cx="17.5" cy="18.5" r="2.6"/><path d="m8.3 10.8 6.9-4M8.3 13.2l6.9 4"/></svg>Akun Sosial</h2>
 					<p class="ht-panel__modal-sub">Tautan media sosial yang tertaut ke profil publikmu. Kosongkan untuk melepas tautan.</p>
-					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-ajax-form="social">
 						<input type="hidden" name="action" value="halo_tg2_save_social">
 						<?php wp_nonce_field('halo_tg2_save_social', '_htsononce'); ?>
 						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('sosial')); ?>">
@@ -937,13 +1098,15 @@ $ht_logout = wp_logout_url(home_url('/'));
 							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Akun Sosial</button>
 						</div>
 					</form>
+					<p class="ht-panel__ajaxmsg" data-ajaxmsg hidden></p>
 				</section>
 
-				<?php elseif ('preferensi' === $ht_bagian) : ?>
+				</div>
+				<div class="ht-panel__tabpanel" data-tabpanel="preferensi"<?php echo 'preferensi' === $ht_bagian ? '' : ' hidden'; ?>>
 				<section class="ht-panel__setting-card">
 					<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 8h9M19 8h1M4 16h3M13 16h7"/><circle cx="16" cy="8" r="2.4"/><circle cx="10" cy="16" r="2.4"/></svg>Preferensi Belajar</h2>
-					<p class="ht-panel__modal-sub">Atur pengalaman belajarmu di halaman lesson — sama seperti preferensi di dasbor Tutor.</p>
-					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+					<p class="ht-panel__modal-sub">Atur pengalaman belajarmu di halaman lesson, sama seperti preferensi di dasbor Tutor.</p>
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-ajax-form="prefs">
 						<input type="hidden" name="action" value="halo_tg2_save_preferences">
 						<?php wp_nonce_field('halo_tg2_save_preferences', '_htpnonce2'); ?>
 						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('preferensi')); ?>">
@@ -987,14 +1150,16 @@ $ht_logout = wp_logout_url(home_url('/'));
 							<button type="submit" class="halo-tg2__btn halo-tg2__btn--primary">Simpan Preferensi</button>
 						</div>
 					</form>
-					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="ht-panel__reset-form">
+					<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-ajax-form="resetprefs" class="ht-panel__reset-form">
 						<input type="hidden" name="action" value="halo_tg2_reset_preferences">
 						<?php wp_nonce_field('halo_tg2_reset_preferences', '_htrnonce2'); ?>
 						<input type="hidden" name="return_url" value="<?php echo esc_url($ht_ret('preferensi')); ?>">
 						<button type="submit" class="halo-tg2__btn halo-tg2__btn--ghost">Atur Ulang ke Bawaan</button>
 					</form>
+					<p class="ht-panel__ajaxmsg" data-ajaxmsg hidden></p>
 				</section>
-				<?php endif; ?>
+				</div>
+				</div>
 			<?php endif; ?>
 		</main>
 
@@ -1002,7 +1167,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 			<a class="<?php echo 'beranda' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('beranda')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg><span>Dashboard</span></a>
 			<a class="<?php echo 'kelas' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('kelas')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 6c-1.7-1.5-4-2-8-2v14c4 0 6.3.5 8 2 1.7-1.5 4-2 8-2V4c-4 0-6.3.5-8 2Zm0 0v14"/></svg><span>Kelas</span></a>
 			<a class="<?php echo 'course' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('course')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5Z"/></svg><span>Course</span></a>
-			<button type="button" data-dock-profil><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg><span>Profil</span></button>
+			<a class="<?php echo 'profil' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('profil')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg><span>Profil</span></a>
 		</nav>
 	</div>
 </div>
@@ -1010,7 +1175,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 <div class="ht-panel__modal" data-contact-modal hidden role="dialog" aria-modal="true" aria-labelledby="ht-contact-title">
 	<div class="ht-panel__modal-card">
 		<h2 id="ht-contact-title">Hubungi Kami</h2>
-		<p class="ht-panel__modal-sub">Ceritakan kebutuhanmu — balasan datang lewat email.</p>
+		<p class="ht-panel__modal-sub">Ceritakan kebutuhanmu, balasan datang lewat email.</p>
 		<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 			<input type="hidden" name="action" value="halo_tg2_contact">
 			<?php wp_nonce_field('halo_tg2_contact', '_htcnonce'); ?>
