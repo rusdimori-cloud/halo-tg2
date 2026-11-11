@@ -21,7 +21,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .halo-tg2__input{width:100%;background:var(--ht-surface);color:var(--ht-fg);border:1px solid var(--ht-line);border-radius:var(--ht-r-md);padding:12px 14px;font-size:14px;line-height:21px;font-family:var(--ht-font)}
 .halo-tg2__input::placeholder{color:var(--ht-text-3)}
 .halo-tg2__input:focus{outline:2px solid var(--ht-primary);outline-offset:1px}
-.halo-tg2__avatar{flex:none;width:40px;height:40px;border-radius:var(--ht-r-full);background:var(--ht-primary-soft);border:1px solid var(--ht-line);display:grid;place-items:center;color:var(--ht-primary-70);font-size:13.6px;font-weight:600;letter-spacing:.02em}
+.halo-tg2__testi-who .halo-tg2__avatar{flex:none;width:40px;height:40px;border-radius:var(--ht-r-full);background:var(--ht-primary-soft);border:1px solid var(--ht-line);display:grid;place-items:center;color:var(--ht-primary-70);font-size:13.6px;font-weight:600;letter-spacing:.02em}
 .halo-tg2__icon-badge{width:48px;height:48px;flex:none;border-radius:var(--ht-r-md);background:var(--ht-primary-soft);border:1px solid var(--ht-line);display:grid;place-items:center;color:var(--ht-primary-70);font-size:20px}
 .halo-tg2__progress{height:6px;border-radius:var(--ht-r-full);background:var(--ht-fill);overflow:hidden}
 .halo-tg2__progress-bar{display:block;height:100%;border-radius:var(--ht-r-full);background:var(--ht-primary);transition:width .5s var(--ht-ease)}

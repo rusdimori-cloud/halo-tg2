@@ -258,25 +258,32 @@
       suLater(function(){ suMoveTo(suBtn); }, t2+300);
       suLater(function(){ suFEmail.classList.remove('is-active'); suBtn.classList.add('is-press'); }, t2+850);
       suLater(function(){ suBtn.classList.remove('is-press'); suBtn.classList.add('is-loading'); suBtnLabel.textContent='Memproses...'; }, t2+1050);
-      suLater(function(){ su.classList.add('is-success'); suRunning=false; }, t2+2600);
+      suLater(function(){ su.classList.add('is-success'); }, t2+2600);
+      /* Looping: tahan di kartu sukses, lalu ulangi dari awal selama masih terlihat. */
+      suLater(function(){ if(suWant){ suCycle(); } else { suRunning=false; } }, t2+5400);
     }
+    var suWant=false;
     function suStart(){ if(suRunning) return; suRunning=true; suCycle(); }
     if(reduced){
       suUser.textContent='alex_tg2'; suEmail.textContent='alex@mail.com';
       suFUser.classList.add('has-text'); suFEmail.classList.add('has-text'); suForm.classList.add('is-in');
     } else if('IntersectionObserver' in window){
-      var suIO=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ suStart(); suIO.unobserve(su); } }); },{threshold:.35});
+      var suIO=new IntersectionObserver(function(es){ es.forEach(function(en){
+        if(en.isIntersecting){ suWant=true; suStart(); }
+        else { suWant=false; suTimers.forEach(clearTimeout); suTimers=[]; suRunning=false; }
+      }); },{threshold:.35});
       suIO.observe(su);
-    } else { suStart(); }
+    } else { suWant=true; suStart(); }
   }
 
   /* ===== Demo Step 3: dashboard count-up + grafik ===== */
   var dash=$('[data-demo-dash]');
   if(dash){
-    var dashNums=$$('[data-demo-count]',dash), dashLine=$('[data-demo-chart-line]',dash), dashRafs=[];
+    var dashNums=$$('[data-demo-count]',dash), dashLine=$('[data-demo-chart-line]',dash), dashRafs=[], dashPlaying=false;
     function dashFmt(v){ return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
     function dashSetupLine(){ if(!dashLine) return 0; var len=0; try{ len=dashLine.getTotalLength(); }catch(e){} if(len){ dashLine.style.transition='none'; dashLine.style.strokeDasharray=len; dashLine.style.strokeDashoffset=len; } return len; }
     function dashPlay(){
+      dashPlaying=true;
       var len=dashSetupLine();
       if(dashLine && len){ void dashLine.getBoundingClientRect(); dashLine.style.transition='stroke-dashoffset 1.8s cubic-bezier(.16,1,.3,1) .15s'; dashLine.style.strokeDashoffset='0'; }
       dash.classList.add('is-playing');
@@ -287,6 +294,7 @@
       });
     }
     function dashReset(){
+      dashPlaying=false;
       dashRafs.forEach(cancelAnimationFrame); dashRafs=[];
       dash.classList.remove('is-playing');
       dashNums.forEach(function(el){ el.textContent='0'; });
@@ -301,7 +309,11 @@
     if(reduced){ dashFinal(); }
     else if('IntersectionObserver' in window){
       dashReset();
-      var dashIO=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ dashPlay(); dashIO.unobserve(dash); } }); },{threshold:.35});
+      /* Main saat masuk layar; reset saat keluar layar (mis. scroll ke atas) supaya memutar lagi saat kembali. */
+      var dashIO=new IntersectionObserver(function(es){ es.forEach(function(en){
+        if(en.isIntersecting){ if(!dashPlaying){ dashReset(); dashPlay(); } }
+        else if(dashPlaying){ dashReset(); }
+      }); },{threshold:.35});
       dashIO.observe(dash);
     } else { dashPlay(); }
   }

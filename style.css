@@ -3,7 +3,7 @@ Theme Name: halo-tg2
 Theme URI: https://halo-tg2.com
 Author: halo TG2
 Description: Tema mandiri halo TG2, dibangun dari Halo TG2 Template Desain. Mesin WooCommerce & Tutor LMS, kulit tema ini. Header pill, footer gradasi navy (satu-satunya gradasi resmi), cart drawer, satu pintu login.
-Version: 1.9.11
+Version: 1.9.19
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -70,7 +70,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .halo-tg2__t-mono-sm{font-family:var(--ht-mono);font-size:10px;font-weight:400;line-height:14px;letter-spacing:.16em;text-transform:uppercase}
 
 /* ============ LAYOUT & KOMPONEN DASAR ============ */
-.halo-tg2__wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 var(--ht-sp-md)}
+.halo-tg2__wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 22px}
 .halo-tg2__section{padding:calc(var(--ht-sp-gutter)*2) 0}
 .halo-tg2__card{background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:28px}
 .halo-tg2__btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--ht-sp-xs);height:40px;padding:11px 16px;border-radius:var(--ht-r-full);font-size:13.6px;font-weight:500;line-height:20px;letter-spacing:.02em;border:1px solid transparent;transition:background-color .2s,color .2s,border-color .2s,transform .15s var(--ht-ease);white-space:nowrap}
@@ -90,10 +90,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .halo-tg2__announce a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 
 /* ============ HEADER (pill melayang, seperti landing) ============ */
-.halo-tg2__header{position:fixed;inset:0 0 auto 0;z-index:50;background:transparent;padding:14px 20px 0}
-.halo-tg2__header-in{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:var(--ht-sp-md);height:58px;padding:0 8px 0 20px;background:var(--ht-header-bg);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--ht-line);border-radius:var(--ht-r-full);box-shadow:var(--ht-shadow)}
-.halo-tg2__wordmark{font-size:18px;font-weight:700;letter-spacing:-.02em;display:inline-flex;align-items:baseline;gap:var(--ht-sp-xs);color:var(--ht-fg)}
+.halo-tg2__header{position:fixed;inset:0 0 auto 0;z-index:50;background:transparent;padding:14px 22px 0}
+.halo-tg2__wrap.halo-tg2__header-in{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:var(--ht-sp-md);height:52px;padding:0 8px 0 22px;background:var(--ht-header-bg);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--ht-line);border-radius:var(--ht-r-full);box-shadow:var(--ht-shadow)}
+.halo-tg2__wordmark{font-size:18px;font-weight:700;letter-spacing:-.02em;display:inline-flex;align-items:baseline;gap:0;color:var(--ht-fg)}
 .halo-tg2__wordmark em{font-style:normal;color:var(--ht-primary)}
+.halo-tg2__logo-svg{display:block;height:28px;width:auto}
+@media (max-width:640px){.halo-tg2__logo-svg{height:25px}}
 .halo-tg2__logo img{width:var(--ht-logo-w);max-height:var(--ht-logo-maxh);height:auto;object-fit:contain}
 .halo-tg2__logo .halo-tg2__logo-dark{display:none}
 [data-halo-tg2-theme="dark"] .halo-tg2__logo .halo-tg2__logo-light{display:none}
@@ -114,7 +116,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .halo-tg2__burger[aria-expanded="true"] .ic-x{display:block}
 
 /* ============ MENU MOBILE (fullscreen seperti mockup landing) ============ */
-.halo-tg2__mobile-menu{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:var(--ht-sp-xs);background:var(--ht-bg);padding:104px 28px 24px;overflow-y:auto;transform:translateY(-102%);visibility:hidden;transition:transform .55s var(--ht-ease),visibility 0s .55s}
+.halo-tg2__mobile-menu{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;gap:var(--ht-sp-xs);background:var(--ht-bg);padding:98px 28px 24px;overflow-y:auto;transform:translateY(-102%);visibility:hidden;transition:transform .55s var(--ht-ease),visibility 0s .55s}
 .halo-tg2__mobile-menu.is-open{transform:translateY(0);visibility:visible;transition:transform .55s var(--ht-ease)}
 .halo-tg2__mobile-menu ul{list-style:none;display:grid;gap:2px}
 .halo-tg2__mobile-menu li a{display:block;font-size:20px;font-weight:500;line-height:28px;letter-spacing:-.01em;color:var(--ht-text-2);padding:12px 0;opacity:0;transform:translateY(18px);transition:opacity .4s ease,transform .5s var(--ht-ease),color .2s}
@@ -220,9 +222,12 @@ body.halo-tg2__locked{overflow:hidden}
   .halo-tg2__nav{display:none}
   .halo-tg2__burger{display:grid}
   .halo-tg2__footer-main{grid-template-columns:1fr}
+  .halo-tg2__wrap{padding:0 16px}
+  .halo-tg2__header{padding:14px 16px 0}
 }
 @media (max-width:640px){
-  .halo-tg2__header{padding:10px 12px 0}
+  .halo-tg2__wrap{padding:0 10px}
+  .halo-tg2__header{padding:10px 10px 0}
   .halo-tg2__header-cta .halo-tg2__btn-link{display:none}
   .halo-tg2__header-cta>.halo-tg2__btn{display:none}
   .halo-tg2__footer-links{grid-template-columns:1fr 1fr}

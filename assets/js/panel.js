@@ -761,6 +761,165 @@
   requestAnimationFrame(initSetTabs);
   document.addEventListener("ht:softnav:loaded", function () { requestAnimationFrame(initSetTabs); });
 
+  /* ===== Dropdown kustom: <select data-custom-select> menjadi tombol + menu gaya Halo TG2.
+     Select asli tetap di DOM sebagai pembawa nilai form (tersembunyi oleh CSS),
+     jadi kirim form klasik maupun AJAX tidak berubah sama sekali. ===== */
+  var HT_CHEV = '<svg width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1 1.5 6 6.5 11 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  var HT_CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function closeAllSelects(except) {
+    $$(".ht-select.is-open").forEach(function (w) {
+      if (except && w === except) return;
+      w.classList.remove("is-open");
+      var m = $("[data-select-menu]", w); if (m) m.hidden = true;
+      var b = $("[data-select-btn]", w); if (b) b.setAttribute("aria-expanded", "false");
+    });
+  }
+  function syncSelect(wrap) {
+    var sel = $("select", wrap); if (!sel) return;
+    var label = $("[data-select-label]", wrap);
+    var opt = sel.options[sel.selectedIndex];
+    if (label) label.textContent = opt ? opt.textContent : "";
+    $$("[data-select-opt]", wrap).forEach(function (b) {
+      var on = b.getAttribute("data-value") === sel.value;
+      b.classList.toggle("is-selected", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+  }
+  function openSelect(wrap) {
+    closeAllSelects(wrap);
+    var menu = $("[data-select-menu]", wrap); var btn = $("[data-select-btn]", wrap);
+    if (!menu || !btn) return;
+    menu.hidden = false;
+    menu.classList.remove("is-up");
+    var r = btn.getBoundingClientRect();
+    var h = Math.min(menu.scrollHeight || 264, 264);
+    if (r.bottom + h + 10 > window.innerHeight && r.top - h - 10 > 0) menu.classList.add("is-up");
+    wrap.classList.add("is-open");
+    btn.setAttribute("aria-expanded", "true");
+    var sel = $(".ht-select__opt.is-selected", menu) || $(".ht-select__opt", menu);
+    if (sel) {
+      $$(".ht-select__opt", menu).forEach(function (b) { b.classList.remove("is-focus"); });
+      sel.classList.add("is-focus");
+      sel.scrollIntoView({ block: "nearest" });
+    }
+  }
+  function closeSelect(wrap) {
+    wrap.classList.remove("is-open");
+    var m = $("[data-select-menu]", wrap); if (m) m.hidden = true;
+    var b = $("[data-select-btn]", wrap); if (b) b.setAttribute("aria-expanded", "false");
+  }
+  function chooseSelect(wrap, value) {
+    var sel = $("select", wrap); if (!sel) return;
+    sel.value = value;
+    syncSelect(wrap);
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    closeSelect(wrap);
+    var b = $("[data-select-btn]", wrap); if (b) b.focus();
+  }
+  function buildSelect(sel) {
+    if (!sel || sel.getAttribute("data-built")) return;
+    sel.setAttribute("data-built", "1");
+    var wrap = document.createElement("span");
+    wrap.className = "ht-select";
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.setAttribute("tabindex", "-1");
+    sel.setAttribute("aria-hidden", "true");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "ht-select__btn";
+    btn.setAttribute("data-select-btn", "");
+    btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-expanded", "false");
+    btn.innerHTML = "<span data-select-label></span>" + HT_CHEV;
+    wrap.appendChild(btn);
+    var menu = document.createElement("span");
+    menu.className = "ht-select__menu";
+    menu.setAttribute("data-select-menu", "");
+    menu.setAttribute("role", "listbox");
+    menu.hidden = true;
+    Array.prototype.forEach.call(sel.options, function (o) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "ht-select__opt";
+      b.setAttribute("data-select-opt", "");
+      b.setAttribute("data-value", o.value);
+      b.setAttribute("role", "option");
+      b.innerHTML = "<span></span>" + HT_CHECK;
+      b.firstChild.textContent = o.textContent;
+      menu.appendChild(b);
+    });
+    wrap.appendChild(menu);
+    syncSelect(wrap);
+  }
+  function initCustomSelects() {
+    $$("select[data-custom-select]").forEach(buildSelect);
+  }
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("[data-select-btn]") : null;
+    if (btn) {
+      var w = btn.closest(".ht-select");
+      if (w) { w.classList.contains("is-open") ? closeSelect(w) : openSelect(w); }
+      return;
+    }
+    var opt = e.target.closest ? e.target.closest("[data-select-opt]") : null;
+    if (opt) {
+      var w2 = opt.closest(".ht-select");
+      if (w2) chooseSelect(w2, opt.getAttribute("data-value"));
+      return;
+    }
+    if (!(e.target.closest && e.target.closest(".ht-select"))) closeAllSelects(null);
+  });
+  document.addEventListener("keydown", function (e) {
+    var btn = e.target.closest ? e.target.closest("[data-select-btn]") : null;
+    var opt = e.target.closest ? e.target.closest("[data-select-opt]") : null;
+    if (e.key === "Escape") { closeAllSelects(null); return; }
+    if (btn && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+      e.preventDefault();
+      var w = btn.closest(".ht-select");
+      if (w) openSelect(w);
+      return;
+    }
+    if (opt && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      var w2 = opt.closest(".ht-select");
+      if (e.key === "Enter" || e.key === " ") { chooseSelect(w2, opt.getAttribute("data-value")); return; }
+      var items = $$("[data-select-opt]", w2);
+      var i = items.indexOf(opt);
+      var n = e.key === "ArrowDown" ? Math.min(i + 1, items.length - 1) : Math.max(i - 1, 0);
+      items.forEach(function (b) { b.classList.remove("is-focus"); });
+      items[n].classList.add("is-focus");
+      items[n].focus();
+    }
+  });
+  document.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t && t.matches && t.matches("select[data-custom-select]")) {
+      var w = t.closest(".ht-select");
+      if (w) syncSelect(w);
+    }
+  });
+  initCustomSelects();
+  document.addEventListener("ht:softnav:loaded", function () { requestAnimationFrame(initCustomSelects); });
+
+  /* Terapkan preferensi tampilan ke atribut shell panel (efeknya di CSS panel). */
+  function applyPrefAttrs(p) {
+    var shell = $(".ht-panel");
+    if (!shell || !p) return;
+    if (typeof p.vision !== "undefined") shell.setAttribute("data-vision", p.vision || "normal");
+    if (typeof p.contrast !== "undefined") shell.setAttribute("data-contrast", p.contrast === "high" ? "high" : "");
+    if (typeof p.motion_effects !== "undefined") shell.setAttribute("data-motion", p.motion_effects || "auto");
+  }
+  function prefAttrsFromForm(form) {
+    var g = function (n) { var el = form.querySelector("[name='" + n + "']"); return el ? el.value : undefined; };
+    var c = form.querySelector("[name='contrast']");
+    return {
+      vision: g("vision"),
+      motion_effects: g("motion_effects"),
+      contrast: c ? (c.checked ? "high" : "") : undefined
+    };
+  }
+
   /* ---------- Simpan pengaturan via AJAX ----------
      Form bertanda data-ajax-form dikirim ke admin-ajax memakai
      action yang sama dengan jalur admin-post; hasilnya tampil
@@ -823,6 +982,8 @@
       if (data.initial) $$(".ht-panel__avatar, .ht-panel__profile-avatar").forEach(function (av) {
         if (!av.querySelector("img")) av.textContent = data.initial;
       });
+    } else if (kind === "prefs") {
+      applyPrefAttrs(prefAttrsFromForm(form));
     } else if (kind === "resetprefs" && data.prefs) {
       var card = form.closest(".ht-panel__setting-card");
       if (card) Object.keys(data.prefs).forEach(function (k) {
@@ -830,7 +991,9 @@
         if (!input) return;
         if (input.type === "checkbox") input.checked = (k === "contrast") ? data.prefs[k] === "high" : !!data.prefs[k];
         else input.value = String(data.prefs[k]);
+        if (input.tagName === "SELECT") input.dispatchEvent(new Event("change", { bubbles: true }));
       });
+      applyPrefAttrs({ vision: data.prefs.vision, contrast: data.prefs.contrast, motion_effects: data.prefs.motion_effects });
     } else if (kind === "removephoto") {
       ajaxPhotoReset(form, data);
     }

@@ -4,7 +4,14 @@
    statistik, dan ikon sosial ubin ala app icon dengan hover terbalik.
    Daftar kelas memakai kartu katalog dari archive-course.css. */
 
-.ht-profile{padding:28px 0 56px}
+/* Padding atas 96px: ruang aman header melayang tema (sama seperti halaman course),
+   supaya cover dan tombol Edit Profil tidak tertutup pil header saat halaman dibuka. */
+.ht-profile{padding:96px 0 56px}
+/* Gutter kiri-kanan halaman mengikuti standar global: desktop 22px, <=900px 16px, HP 10px. */
+.ht-profile .halo-tg2__wrap{padding-left:22px;padding-right:22px}
+@media (max-width:900px){
+  .ht-profile .halo-tg2__wrap{padding-left:16px;padding-right:16px}
+}
 .ht-profile__head{
   background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:20px;
   box-shadow:var(--ht-shadow);overflow:hidden;margin:0 auto 30px;max-width:860px;
@@ -49,7 +56,8 @@
 .ht-profile__courses h2{font-size:21px;font-weight:700;margin:0 0 16px}
 
 @media (max-width:640px){
-  .ht-profile{padding:18px 0 44px}
+  .ht-profile{padding:84px 0 44px}
+  .ht-profile .halo-tg2__wrap{padding-left:10px;padding-right:10px}
   .ht-profile__cover{height:148px}
   .ht-profile__avatar{width:70px;height:70px;font-size:26px}
   .ht-profile__body{margin-top:-34px}

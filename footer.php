@@ -19,7 +19,7 @@ if ('' === $ht_copy) {
 	<div class="halo-tg2__wrap">
 		<div class="halo-tg2__footer-main">
 			<div class="halo-tg2__footer-brand">
-				<a class="halo-tg2__wordmark halo-tg2__footer-logo" href="<?php echo esc_url(home_url('/')); ?>" rel="home">halo <em>TG2</em></a>
+				<a class="halo-tg2__wordmark halo-tg2__footer-logo" href="<?php echo esc_url(home_url('/')); ?>" rel="home">halo<em>tg2.</em></a>
 				<p class="halo-tg2__footer-tag"><?php echo esc_html((string) halo_tg2_get('footer_tagline')); ?></p>
 				<div class="halo-tg2__footer-contacts">
 					<?php if ('' !== $ht_line) : ?>

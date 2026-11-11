@@ -108,7 +108,7 @@ $ht_eye_off = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 <body <?php body_class('halo-tg2-auth-page'); ?>>
 <?php wp_body_open(); ?>
 <div class="halo-tg2__auth-shell">
-	<a class="halo-tg2__wordmark halo-tg2__auth-logo" href="<?php echo esc_url(home_url('/')); ?>" rel="home">halo <em>TG2</em></a>
+	<a class="halo-tg2__wordmark halo-tg2__auth-logo" href="<?php echo esc_url(home_url('/')); ?>" rel="home">halo<em>tg2.</em></a>
 
 	<div class="halo-tg2__card halo-tg2__auth-card" data-auth-root>
 		<div class="ht-auth__tabs" role="tablist" aria-label="Masuk atau daftar" data-auth-tabs <?php echo 'lostpassword' === $ht_mode ? 'hidden' : ''; ?>>

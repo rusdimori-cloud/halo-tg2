@@ -156,6 +156,22 @@ $ht_exam_days      = null;
 if ('' !== $ht_exam_date) {
 	$ht_exam_days = (int) floor((strtotime($ht_exam_date) - strtotime(current_time('Y-m-d'))) / DAY_IN_SECONDS);
 }
+// Preferensi tampilan pengguna untuk atribut shell panel (vision/kontras/gerak
+// benar-benar diterapkan oleh CSS panel, bukan sekadar tersimpan).
+$ht_shell_prefs = array();
+if (class_exists('\TUTOR\UserPreference')) {
+	$ht_shell_prefs = \TUTOR\UserPreference::get_preferences($ht_uid);
+}
+if (!is_array($ht_shell_prefs) || empty($ht_shell_prefs)) {
+	$ht_shell_saved = get_user_meta($ht_uid, 'tutor_user_preferences', true);
+	$ht_shell_prefs = array_merge(
+		array('vision' => 'normal', 'contrast' => '', 'motion_effects' => 'auto'),
+		is_array($ht_shell_saved) ? $ht_shell_saved : array()
+	);
+}
+$ht_shell_vision  = isset($ht_shell_prefs['vision']) ? (string) $ht_shell_prefs['vision'] : 'normal';
+$ht_shell_contrast = (isset($ht_shell_prefs['contrast']) && 'high' === $ht_shell_prefs['contrast']) ? 'high' : '';
+$ht_shell_motion  = isset($ht_shell_prefs['motion_effects']) ? (string) $ht_shell_prefs['motion_effects'] : 'auto';
 $ht_notif_unread = function_exists('halo_tg2_core_notif_unread') ? halo_tg2_core_notif_unread($ht_uid) : 0;
 $ht_notif_latest = function_exists('halo_tg2_core_notif_list') ? halo_tg2_core_notif_list($ht_uid, 5) : array();
 
@@ -211,11 +227,11 @@ $ht_logout = wp_logout_url(home_url('/'));
 </head>
 <body <?php body_class('halo-tg2-panel-page'); ?>>
 <?php wp_body_open(); ?>
-<div class="ht-panel">
+<div class="ht-panel" data-vision="<?php echo esc_attr($ht_shell_vision); ?>" data-contrast="<?php echo esc_attr($ht_shell_contrast); ?>" data-motion="<?php echo esc_attr($ht_shell_motion); ?>">
 	<div class="ht-panel__scrim" data-scrim hidden></div>
 
 	<aside class="ht-panel__side" data-drawer>
-		<a class="halo-tg2__wordmark" href="<?php echo esc_url(home_url('/')); ?>" rel="home">halo <em>TG2</em></a>
+		<a class="halo-tg2__wordmark" href="<?php echo esc_url(home_url('/')); ?>" rel="home">halo<em>tg2.</em></a>
 		<nav class="ht-panel__nav" aria-label="Menu dashboard">
 			<p class="ht-panel__group">Menu</p>
 			<a class="<?php echo 'profil' === $ht_view ? 'is-active' : ''; ?>" href="<?php echo esc_url($ht_url('profil')); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg><span>Profil</span></a>
@@ -997,7 +1013,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 							</label>
 						</div>
 						<label class="ht-panel__field">Zona Waktu
-							<select name="timezone">
+							<select name="timezone" data-custom-select>
 								<?php if (!isset($ht_tz_list[$ht_tz])) : ?>
 									<option value="<?php echo esc_attr($ht_tz); ?>" selected><?php echo esc_html($ht_tz); ?></option>
 								<?php endif; ?>
@@ -1115,20 +1131,20 @@ $ht_logout = wp_logout_url(home_url('/'));
 							<span class="ht-panel__switchwrap"><input type="checkbox" name="auto_play_next" value="1" <?php checked(!empty($ht_prefs['auto_play_next'])); ?>><span class="ht-panel__switch" aria-hidden="true"></span></span>
 						</div>
 						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Efek Gerak</strong><small>Batasi animasi bila mata cepat lelah.</small></span>
-							<span class="ht-panel__pref-control"><select name="motion_effects">
+							<span class="ht-panel__pref-control"><select name="motion_effects" data-custom-select>
 								<option value="auto" <?php selected($ht_prefs['motion_effects'], 'auto'); ?>>Otomatis (bawaan sistem)</option>
 								<option value="reduce" <?php selected($ht_prefs['motion_effects'], 'reduce'); ?>>Kurangi animasi</option>
 								<option value="standard" <?php selected($ht_prefs['motion_effects'], 'standard'); ?>>Standar</option>
 							</select></span>
 						</label>
 						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Mode Belajar</strong><small>Gaya tampilan materi belajar.</small></span>
-							<span class="ht-panel__pref-control"><select name="learning_mood">
+							<span class="ht-panel__pref-control"><select name="learning_mood" data-custom-select>
 								<option value="modern" <?php selected($ht_prefs['learning_mood'], 'modern'); ?>>Modern</option>
 								<option value="kids" <?php selected($ht_prefs['learning_mood'], 'kids'); ?>>Anak</option>
 							</select></span>
 						</label>
 						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Skala Font</strong><small>Ukuran huruf di halaman belajar.</small></span>
-							<span class="ht-panel__pref-control"><select name="font_scale">
+							<span class="ht-panel__pref-control"><select name="font_scale" data-custom-select>
 								<?php foreach (array(60, 80, 100, 120, 140, 160, 180, 200) as $fs) : ?>
 									<option value="<?php echo esc_attr($fs); ?>" <?php selected((int) $ht_prefs['font_scale'], $fs); ?>><?php echo esc_html($fs); ?>%</option>
 								<?php endforeach; ?>
@@ -1139,7 +1155,7 @@ $ht_logout = wp_logout_url(home_url('/'));
 							<span class="ht-panel__switchwrap"><input type="checkbox" name="contrast" value="1" <?php checked('high' === $ht_prefs['contrast']); ?>><span class="ht-panel__switch" aria-hidden="true"></span></span>
 						</div>
 						<label class="ht-panel__pref-row"><span class="ht-panel__pref-text"><strong>Penglihatan</strong><small>Saringan warna sesuai kebutuhan penglihatanmu.</small></span>
-							<span class="ht-panel__pref-control"><select name="vision">
+							<span class="ht-panel__pref-control"><select name="vision" data-custom-select>
 								<option value="normal" <?php selected($ht_prefs['vision'], 'normal'); ?>>Normal</option>
 								<option value="protanopia" <?php selected($ht_prefs['vision'], 'protanopia'); ?>>Protanopia</option>
 								<option value="deuteranopia" <?php selected($ht_prefs['vision'], 'deuteranopia'); ?>>Deuteranopia</option>

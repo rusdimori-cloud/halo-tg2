@@ -796,3 +796,53 @@ html[data-halo-tg2-theme="dark"] .ht-tseg button[data-theme-set="dark"]{backgrou
 html[data-halo-tg2-theme="dark"] .ht-tseg{background:rgba(255,255,255,.14)}
 html[data-halo-tg2-theme="dark"] .ht-panel__nav a.is-active{background:var(--ht-primary-soft)}
 html[data-halo-tg2-theme="dark"] .ht-panel__avatar{background:var(--ht-primary-soft)}
+
+/* ============ Dropdown kustom (.ht-select): pengganti <select> bawaan browser ============ */
+/* Select asli tetap di DOM (tersembunyi) sebagai pembawa nilai form; yang tampil tombol + menu gaya Halo TG2. */
+.ht-select{position:relative;display:inline-flex;max-width:100%}
+.ht-select>select{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;margin:0}
+.ht-select__btn{
+  display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ht-line-strong);border-radius:12px;
+  background:var(--ht-surface);color:var(--ht-fg);padding:9px 12px;font:inherit;font-size:13.6px;line-height:1.25;
+  cursor:pointer;max-width:230px;text-align:left;
+}
+.ht-select__btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ht-select__btn svg{flex:none;color:var(--ht-text-3);transition:transform .18s ease}
+.ht-select.is-open .ht-select__btn{border-color:var(--ht-primary)}
+.ht-select.is-open .ht-select__btn svg{transform:rotate(180deg)}
+.ht-panel__field .ht-select{display:flex;width:100%}
+.ht-panel__field .ht-select__btn{flex:1;max-width:none;border-radius:14px;padding:11px 14px;width:100%;justify-content:space-between}
+.ht-select__menu{
+  position:absolute;top:calc(100% + 6px);right:0;z-index:90;min-width:100%;width:max-content;max-width:min(320px,86vw);
+  max-height:264px;overflow-y:auto;background:var(--ht-surface);border:1px solid var(--ht-line);border-radius:14px;
+  box-shadow:var(--ht-shadow);padding:6px;display:grid;gap:2px;animation:ht-dd-in .18s ease both;
+}
+.ht-panel__field .ht-select__menu{left:0;right:0;width:auto;max-width:none}
+.ht-select__menu.is-up{top:auto;bottom:calc(100% + 6px)}
+.ht-select__menu[hidden]{display:none}
+.ht-select__opt{
+  display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;color:var(--ht-fg);
+  font:inherit;font-size:13.6px;text-align:left;padding:9px 10px;border-radius:9px;cursor:pointer;line-height:1.3;
+}
+.ht-select__opt:hover,.ht-select__opt.is-focus{background:var(--ht-fill)}
+.ht-select__opt.is-selected{background:var(--ht-primary-soft);font-weight:600}
+.ht-select__opt svg{flex:none;margin-left:auto;color:var(--ht-primary);visibility:hidden}
+.ht-select__opt.is-selected svg{visibility:visible}
+
+/* ============ Efek preferensi tampilan (data-* di shell .ht-panel) ============ */
+/* Penglihatan: petakan ulang warna semantik ke palet aman buta warna (Okabe-Ito), beda tiap jenis. */
+.ht-panel[data-vision="protanopia"]{--ht-success:#009E73;--ht-error:#D55E00;--ht-amber:#E69F00}
+.ht-panel[data-vision="deuteranopia"]{--ht-success:#0072B2;--ht-error:#D55E00;--ht-amber:#E69F00}
+.ht-panel[data-vision="deuteranomaly"]{--ht-success:#0E8A66;--ht-error:#D9480F;--ht-amber:#F0A202}
+/* Kontras tinggi: teks sekunder dan garis dibuat lebih tegas. */
+.ht-panel[data-contrast="high"]{--ht-text-2:rgba(3,5,11,.86);--ht-text-3:rgba(3,5,11,.68);--ht-line:rgba(3,5,11,.24);--ht-line-strong:rgba(3,5,11,.42)}
+html[data-halo-tg2-theme="dark"] .ht-panel[data-contrast="high"]{--ht-text-2:rgba(255,255,255,.9);--ht-text-3:rgba(255,255,255,.72);--ht-line:rgba(255,255,255,.24);--ht-line-strong:rgba(255,255,255,.4)}
+/* Efek gerak dikurangi: animasi dan transisi panel dimatikan. */
+.ht-panel[data-motion="reduce"] *,.ht-panel[data-motion="reduce"] *::before,.ht-panel[data-motion="reduce"] *::after{
+  animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;
+}
+@media (prefers-reduced-motion:reduce){
+  .ht-panel[data-motion="auto"] *,.ht-panel[data-motion="auto"] *::before,.ht-panel[data-motion="auto"] *::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;
+  }
+}
