@@ -419,7 +419,6 @@ get_header();
       <h2 class="halo-tg2__t-h-lg">Mulai Sekarang Juga!</h2>
       <p class="halo-tg2__t-body-md">Daftar gratis dan buka materi pertama Anda dalam waktu kurang dari satu menit.</p>
       <a class="halo-tg2__btn halo-tg2__btn--primary halo-tg2__btn--glow" href="#daftar">Daftar Sekarang <i class="fa-regular fa-arrow-right" aria-hidden="true"></i></a>
-      <span class="halo-tg2__cta-note halo-tg2__t-mono-sm">Tanpa kartu kredit · Tanpa perpanjangan otomatis</span>
       <p class="halo-tg2__t-body-sm" style="color:var(--ht-text-2)">Masih ragu atau mau tanya dulu?</p>
       <a class="halo-tg2__btn halo-tg2__btn--wa-outline" href="#" data-wa-link><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Tanya via WhatsApp</a>
     </div>

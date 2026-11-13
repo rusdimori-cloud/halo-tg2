@@ -37,7 +37,7 @@
 }
 .woocommerce-error{border-top-color:var(--ht-error)}
 
-/* ---------- Cart ---------- */
+/* ---------- Cart klasik (shortcode, jaga-jaga) ---------- */
 .woocommerce-cart .woocommerce-cart-form{
   background:var(--ht-surface);border:1px solid var(--ht-line);
   border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);padding:8px var(--ht-sp-md);
@@ -56,6 +56,193 @@
 .woocommerce a.remove:hover{background:var(--ht-error);color:#fff!important}
 .woocommerce .cart-empty,.woocommerce .return-to-shop{text-align:center}
 .woocommerce-cart .wc-proceed-to-checkout a.checkout-button{width:100%;height:52px;font-size:15.6px}
+
+/* ---------- Cart block WooCommerce (desain ulang 1.9.20) ---------- */
+.woocommerce-cart .halo-tg2__prose-wrap{max-width:1140px}
+.woocommerce-cart .wp-block-woocommerce-cart{max-width:1080px;margin-inline:auto;color:var(--ht-fg)}
+.woocommerce-cart .wc-block-components-notice-banner{
+  border:1px solid var(--ht-line);border-radius:var(--ht-r-md);
+  background:var(--ht-surface);box-shadow:var(--ht-shadow);color:var(--ht-fg);
+  font-size:14px;padding:14px 16px;
+}
+.woocommerce-cart .wc-block-components-notice-banner>svg{color:var(--ht-primary)}
+
+/* Keadaan terisi: dua kartu (daftar item + ringkasan) */
+.woocommerce-cart .wp-block-woocommerce-filled-cart-block{align-items:flex-start;row-gap:20px}
+.woocommerce-cart .wp-block-woocommerce-cart-items-block{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);
+  padding:6px var(--ht-sp-md) var(--ht-sp-sm);
+}
+.woocommerce-cart .wp-block-woocommerce-cart-totals-block{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:var(--ht-r-lg);box-shadow:var(--ht-shadow);
+  padding:var(--ht-sp-md);align-self:start;
+}
+.woocommerce-cart .wc-block-cart-items{width:100%}
+.woocommerce-cart .wc-block-cart-items th{
+  font-family:var(--ht-mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ht-text-3);font-weight:500;
+  padding:14px 8px 10px;border-bottom:1px solid var(--ht-line);text-align:left;
+}
+.woocommerce-cart .wc-block-cart-items td{padding:18px 8px;border-bottom:1px solid var(--ht-line);vertical-align:top}
+.woocommerce-cart .wc-block-cart-items tr:last-child td{border-bottom:0}
+.woocommerce-cart .wc-block-cart-item__image img{
+  width:72px;height:72px;object-fit:cover;border-radius:var(--ht-r-md);
+  border:1px solid var(--ht-line);display:block;
+}
+.woocommerce-cart .wc-block-components-product-name{
+  font-size:15px;font-weight:600;color:var(--ht-fg);text-decoration:none;line-height:1.35;
+}
+.woocommerce-cart .wc-block-components-product-name:hover{color:var(--ht-primary)}
+.woocommerce-cart .wc-block-cart-item__prices,.woocommerce-cart .wc-block-components-product-price{
+  font-size:13.5px;color:var(--ht-text-2);margin-top:3px;
+}
+.woocommerce-cart .wc-block-components-product-metadata{font-size:12.5px;color:var(--ht-text-3)}
+.woocommerce-cart .wc-block-components-quantity-selector{
+  border:1px solid var(--ht-line-strong);border-radius:var(--ht-r-full);
+  background:var(--ht-surface);padding:2px;
+}
+.woocommerce-cart .wc-block-components-quantity-selector>.qty{
+  border:0;background:transparent;color:var(--ht-fg);
+  font-family:var(--ht-font);font-size:14px;font-weight:600;
+}
+.woocommerce-cart .wc-block-components-quantity-selector__button{
+  color:var(--ht-text-2);border-radius:var(--ht-r-full);
+}
+.woocommerce-cart .wc-block-components-quantity-selector__button:hover{color:var(--ht-primary);background:var(--ht-primary-soft)}
+.woocommerce-cart .wc-block-cart-item__remove-link{
+  font-size:12.5px;color:var(--ht-text-3);text-decoration:none;margin-top:8px;
+}
+.woocommerce-cart .wc-block-cart-item__remove-link:hover{color:var(--ht-error);text-decoration:underline}
+.woocommerce-cart .wc-block-cart-item__total{font-size:15px;font-weight:600;color:var(--ht-fg);text-align:right;white-space:nowrap}
+.woocommerce-cart .wc-block-components-totals-item{padding:7px 0;font-size:14px}
+.woocommerce-cart .wc-block-components-totals-item__label{color:var(--ht-text-2)}
+.woocommerce-cart .wc-block-components-totals-item__value{font-weight:600;color:var(--ht-fg)}
+.woocommerce-cart .wc-block-components-totals-footer-item{
+  border-top:1px solid var(--ht-line);margin-top:10px;padding-top:14px;
+  font-size:15.5px;
+}
+.woocommerce-cart .wc-block-components-totals-footer-item .wc-block-components-totals-item__label{color:var(--ht-fg);font-weight:600}
+.woocommerce-cart .wc-block-components-totals-footer-item .wc-block-components-totals-item__value{font-size:17px;font-weight:700}
+.woocommerce-cart .wc-block-components-totals-coupon__button,
+.woocommerce-cart .wc-block-components-totals-coupon a{color:var(--ht-primary);font-weight:600;font-size:13.5px}
+.woocommerce-cart .wc-block-components-totals-coupon__form .wc-block-components-text-input input{
+  border:1px solid var(--ht-line-strong);border-radius:var(--ht-r-md);
+  background:var(--ht-surface);color:var(--ht-fg);font-family:var(--ht-font);
+}
+.woocommerce-cart .wc-block-components-totals-coupon__form button{
+  border-radius:var(--ht-r-full);background:#0F0F0F;color:#fff;border:1px solid #0F0F0F;
+  font-family:var(--ht-font);font-weight:500;padding:0 18px;
+}
+.woocommerce-cart .wp-block-woocommerce-cart-order-summary-heading-block,
+.woocommerce-cart .wc-block-cart__totals-title{
+  font-size:16.5px;font-weight:600;color:var(--ht-fg);text-align:left;margin-bottom:6px;
+}
+.woocommerce-cart .wc-block-cart__submit-button,
+.woocommerce-cart .wp-block-woocommerce-proceed-to-checkout-block .wc-block-components-button{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;min-height:52px;border-radius:var(--ht-r-full);
+  background:var(--ht-primary);border:1px solid var(--ht-primary);color:#fff;
+  font-family:var(--ht-font);font-size:15.5px;font-weight:600;text-decoration:none;
+  box-shadow:0 12px 26px rgba(20,99,255,.30),0 3px 10px rgba(20,99,255,.22);
+  transition:background-color .2s,transform .15s var(--ht-ease);
+}
+.woocommerce-cart .wc-block-cart__submit-button::before,
+.woocommerce-cart .wp-block-woocommerce-proceed-to-checkout-block .wc-block-components-button::before{
+  font-family:"Font Awesome 5 Pro";font-weight:400;content:"\f023";font-size:14px;
+}
+.woocommerce-cart .wc-block-cart__submit-button:hover,
+.woocommerce-cart .wp-block-woocommerce-proceed-to-checkout-block .wc-block-components-button:hover{background:var(--ht-primary-70);color:#fff}
+.woocommerce-cart .wc-block-cart__submit-button:active,
+.woocommerce-cart .wp-block-woocommerce-proceed-to-checkout-block .wc-block-components-button:active{transform:scale(.985)}
+.woocommerce-cart .wp-block-woocommerce-cart-accepted-payment-methods-block{opacity:.75;margin-top:14px}
+
+/* Keadaan kosong: hero ikon + tombol, lalu rak produk baru */
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding-top:var(--ht-sp-md);
+}
+.woocommerce-cart .wc-block-cart__empty-cart__title{
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  font-size:21px;font-weight:700;letter-spacing:-.01em;color:var(--ht-fg);
+  margin:0 0 10px;
+}
+.woocommerce-cart .wc-block-cart__empty-cart__title::before{
+  content:"\f07a";font-family:"Font Awesome 5 Pro";font-weight:400;
+  width:88px;height:88px;margin:0;border-radius:var(--ht-r-full);
+  background:var(--ht-primary-soft);color:var(--ht-primary);
+  display:grid;place-items:center;font-size:36px;
+  box-shadow:0 0 0 10px color-mix(in srgb,var(--ht-primary) 6%,transparent);
+  -webkit-mask:none;mask:none;
+  animation:htCartEmptyIn .6s var(--ht-ease) both;
+}
+@keyframes htCartEmptyIn{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block>p{margin:0;color:var(--ht-text-2);font-size:14.5px}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block>p a{
+  display:inline-flex;align-items:center;gap:9px;margin-top:16px;
+  height:46px;padding:0 26px;border-radius:var(--ht-r-full);
+  background:#0F0F0F;color:#fff;font-weight:500;font-size:14.5px;text-decoration:none;
+  transition:background-color .2s,transform .15s var(--ht-ease);
+}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block>p a::after{
+  font-family:"Font Awesome 5 Pro";font-weight:400;content:"\f061";font-size:13px;
+}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block>p a:hover{background:#000;color:#fff}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block>p a:active{transform:scale(.98)}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wp-block-separator{
+  border:0;border-top:2px dotted var(--ht-line-strong);width:120px;
+  margin:40px auto 6px;background:none;opacity:1;
+}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wp-block-separator::before{content:none}
+/* Rekomendasi produk di keadaan kosong disembunyikan atas permintaan
+   pemilik situs: cart kosong hanya menampilkan ikon, judul, dan tombol. */
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wp-block-separator,
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block>h2:not(.wc-block-cart__empty-cart__title),
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid{display:none}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block>h2:not(.wc-block-cart__empty-cart__title){
+  align-self:stretch;text-align:left;font-size:17px;font-weight:600;
+  color:var(--ht-fg);margin:18px 0 14px;
+}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid{align-self:stretch;width:100%}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid__products{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+  list-style:none;margin:0;padding:0;
+}
+.woocommerce-cart .wc-block-grid__product{
+  background:var(--ht-surface);border:1px solid var(--ht-line);
+  border-radius:18px;box-shadow:var(--ht-shadow);padding:14px;
+  display:flex;flex-direction:column;text-align:left;width:auto;max-width:none;margin:0;
+}
+/* Netralkan ukuran flex bawaan blok (flex-basis dan max-width persen
+   dari aturan has-N-columns Woo) agar kartu mengisi kolom grid.
+   Padding ditegaskan di sini karena aturan media <=480px Woo
+   menolakkannya, dan bungkus gambar dipaksa selebar kartu karena
+   bawaan blok menyusut mengikuti lebar alami gambar. */
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid .wc-block-grid__product{
+  flex:none;max-width:none;padding:14px;margin:0;
+}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid__product-image{
+  display:block;width:100%;
+}
+.woocommerce-cart .wc-block-grid__product-image{margin:0 0 10px}
+.woocommerce-cart .wc-block-grid__product-image img{
+  width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;display:block;
+}
+.woocommerce-cart .wc-block-grid__product-link{text-decoration:none;color:inherit}
+.woocommerce-cart .wc-block-grid__product-title{font-size:14.5px;font-weight:600;color:var(--ht-fg);line-height:1.35}
+.woocommerce-cart .wc-block-grid__product-price{font-size:14px;font-weight:600;color:var(--ht-fg);margin:5px 0 12px}
+.woocommerce-cart .wc-block-grid__product .wp-block-button{margin-top:auto}
+.woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid__product-add-to-cart{
+  width:100%;margin-left:0;margin-right:0;align-self:stretch;
+}
+.woocommerce-cart .wc-block-grid__product-add-to-cart .wp-block-button__link{
+  display:flex;align-items:center;justify-content:center;width:100%;height:33px;
+  border-radius:var(--ht-r-full);background:var(--ht-primary);color:#fff;
+  font-size:13px;font-weight:600;text-decoration:none;padding:0 14px;
+  white-space:nowrap;line-height:1;
+}
+.woocommerce-cart .wc-block-grid__product-add-to-cart .wp-block-button__link:hover{background:var(--ht-primary-70);color:#fff}
 
 /* ---------- Checkout ---------- */
 .woocommerce-checkout .col2-set .col-1,.woocommerce-checkout .col2-set .col-2,
@@ -109,4 +296,15 @@
   .woocommerce table.shop_table td,.woocommerce table.shop_table th{padding:12px 6px}
   .halo-tg2__thanks{flex-direction:column;align-items:flex-start}
   .woocommerce .woocommerce-order-overview{flex-direction:column;gap:var(--ht-sp-sm)}
+  .woocommerce-cart .wp-block-woocommerce-cart-items-block{padding:2px 14px 8px}
+  .woocommerce-cart .wp-block-woocommerce-cart-totals-block{padding:18px}
+  .woocommerce-cart .wc-block-cart-items td{padding:14px 4px}
+  .woocommerce-cart .wc-block-cart-item__image img{width:56px;height:56px}
+  .woocommerce-cart .wc-block-cart__empty-cart__title{font-size:19px}
+  .woocommerce-cart .wc-block-cart__empty-cart__title::before{width:76px;height:76px;font-size:31px}
+  .woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid__products{grid-template-columns:repeat(2,1fr);gap:12px}
+  .woocommerce-cart .wc-block-grid__product-add-to-cart .wp-block-button__link{font-size:12.5px;padding:0 10px}
+}
+@media (max-width:640px){
+  .woocommerce-cart .wp-block-woocommerce-empty-cart-block .wc-block-grid__products{grid-template-columns:1fr}
 }

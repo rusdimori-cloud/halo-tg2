@@ -3,7 +3,7 @@ Theme Name: halo-tg2
 Theme URI: https://halo-tg2.com
 Author: halo TG2
 Description: Tema mandiri halo TG2, dibangun dari Halo TG2 Template Desain. Mesin WooCommerce & Tutor LMS, kulit tema ini. Header pill, footer gradasi navy (satu-satunya gradasi resmi), cart drawer, satu pintu login.
-Version: 1.9.19
+Version: 1.9.28
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -107,6 +107,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .halo-tg2__header-cta{display:flex;align-items:center;gap:var(--ht-sp-sm)}
 .halo-tg2__cart-btn{position:relative}
 .halo-tg2__cart-count{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:var(--ht-r-full);background:var(--ht-primary);color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.halo-tg2__cart-count.is-zero{display:none}
 .halo-tg2__theme-toggle .ic-sun{display:none}
 [data-halo-tg2-theme="dark"] .halo-tg2__theme-toggle .ic-sun{display:block}
 [data-halo-tg2-theme="dark"] .halo-tg2__theme-toggle .ic-moon{display:none}
@@ -262,3 +263,18 @@ html[data-halo-tg2-theme="dark"] .ht-tseg{background:rgba(255,255,255,.14)}
 @media (prefers-reduced-motion:reduce){
   .halo-tg2__cart-btn.is-bump,.halo-tg2__drawer-body .widget_shopping_cart_content.is-fresh .woocommerce-mini-cart-item:first-child{animation:none}
 }
+
+/* Bar bawah bawaan Tutor LMS di halaman lesson disembunyikan di semua
+   ukuran layar: footer melayang "Tandai sebagai Selesai" menutupi
+   navigasi ujian CBT dan mengganggu. Tombol selesai di topbar lesson
+   tetap ada bila dibutuhkan. Ruang kosong 96px penyeimbang footer
+   tetap dari Tutor ikut diluruskan. */
+.tutor-learning-area-footer,
+.tutor-spotlight-mobile-progress-complete{display:none!important}
+.tutor-learning-area .tutor-learning-area-container{padding-bottom:24px!important}
+
+/* Kontainer konten lesson diperlebar: batas lebar 760px bawaan Tutor
+   dihapus dan jarak sisi tinggal 10px, supaya kartu lesson dan konsol
+   ujian CBT tidak terasa sempit, terutama di desktop. */
+.tutor-learning-area .tutor-learning-area-content{padding-inline:0!important}
+.tutor-learning-area .tutor-learning-area-container{max-width:960px !important;padding-inline:10px!important}

@@ -40,6 +40,23 @@ if ($ht_logged) {
 		: esc_html($ht_initial);
 }
 
+/** Markup tombol keranjang header: untuk member tampil sebelum menu
+ * akun (urutan ikon keranjang lalu avatar), untuk tamu sesudah tautan
+ * Masuk/Daftar. Badge disembunyikan selama isi keranjang masih 0. */
+$ht_cart_html = '';
+if ($ht_cart_on) {
+	$ht_cart_count = (int) halo_tg2_cart_count();
+	$ht_cart_icon  = 'bag' === halo_tg2_get('cart_icon')
+		? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 6h14l-1.2 12.2a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3L5 6Z"/><path d="M8.5 8V4.5a3.5 3.5 0 0 1 7 0V8"/></svg>'
+		: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9.5" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 3.5h2l2.4 11a1.5 1.5 0 0 0 1.5 1.2h7.9a1.5 1.5 0 0 0 1.5-1.2L19.5 7H6"/></svg>';
+	$ht_cart_badge = halo_tg2_get('cart_badge')
+		? '<span class="halo-tg2__cart-count' . (0 === $ht_cart_count ? ' is-zero' : '') . '" data-cart-count>' . esc_html((string) $ht_cart_count) . '</span>'
+		: '';
+	$ht_cart_html  = 'drawer' === halo_tg2_get('cart_behavior')
+		? '<button class="halo-tg2__icon-btn halo-tg2__cart-btn" type="button" data-cart-open aria-label="Buka keranjang">' . $ht_cart_icon . $ht_cart_badge . '</button>'
+		: '<a class="halo-tg2__icon-btn halo-tg2__cart-btn" href="' . esc_url($ht_cart_page) . '" aria-label="Ke halaman keranjang">' . $ht_cart_icon . $ht_cart_badge . '</a>';
+}
+
 /** Menu desktop: lokasi "header"; cadangan = menu bawaan. */
 $ht_nav_args = array(
 	'theme_location' => 'header',
@@ -131,6 +148,7 @@ if ('' === $ht_mnav_html) {
 
 		<div class="halo-tg2__header-cta">
 			<?php if ($ht_logged) : ?>
+				<?php echo $ht_cart_html; // phpcs:ignore WordPress.Security.EscapeOutput -- dibangun di kepala header dari nilai yang sudah di-escape. ?>
 				<div class="halo-tg2__usermenu" data-user-dd>
 					<button class="halo-tg2__avatarbtn" type="button" data-user-dd-btn aria-haspopup="true" aria-expanded="false" aria-label="Menu akun">
 						<span class="halo-tg2__avatar"><?php echo $ht_avatar_html; // phpcs:ignore WordPress.Security.EscapeOutput -- img/inisial sudah di-escape saat dibangun. ?></span>
@@ -154,26 +172,11 @@ if ('' === $ht_mnav_html) {
 				<a class="halo-tg2__btn halo-tg2__btn--primary" href="<?php echo esc_url($ht_reg_url); ?>">Daftar</a>
 			<?php endif; ?>
 
-			<?php if ($ht_cart_on) : ?>
-				<?php if ('drawer' === halo_tg2_get('cart_behavior')) : ?>
-					<button class="halo-tg2__icon-btn halo-tg2__cart-btn" type="button" data-cart-open aria-label="Buka keranjang">
-				<?php else : ?>
-					<a class="halo-tg2__icon-btn halo-tg2__cart-btn" href="<?php echo esc_url($ht_cart_page); ?>" aria-label="Ke halaman keranjang">
-				<?php endif; ?>
-					<?php if ('bag' === halo_tg2_get('cart_icon')) : ?>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 6h14l-1.2 12.2a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3L5 6Z"/><path d="M8.5 8V4.5a3.5 3.5 0 0 1 7 0V8"/></svg>
-					<?php else : ?>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9.5" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/><path d="M3 3.5h2l2.4 11a1.5 1.5 0 0 0 1.5 1.2h7.9a1.5 1.5 0 0 0 1.5-1.2L19.5 7H6"/></svg>
-					<?php endif; ?>
-					<?php if (halo_tg2_get('cart_badge')) : ?>
-						<span class="halo-tg2__cart-count" data-cart-count><?php echo esc_html((string) halo_tg2_cart_count()); ?></span>
-					<?php endif; ?>
-				<?php if ('drawer' === halo_tg2_get('cart_behavior')) : ?>
-					</button>
-				<?php else : ?>
-					</a>
-				<?php endif; ?>
-			<?php endif; ?>
+			<?php
+			if (!$ht_logged) {
+				echo $ht_cart_html; // phpcs:ignore WordPress.Security.EscapeOutput -- dibangun di kepala header dari nilai yang sudah di-escape.
+			}
+			?>
 
 			<button class="halo-tg2__icon-btn halo-tg2__burger" type="button" data-burger aria-label="Buka menu" aria-expanded="false" aria-controls="halo-tg2-menu">
 				<svg class="ic-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>

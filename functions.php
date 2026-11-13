@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('HALO_TG2_VERSION', '1.9.19');
+define('HALO_TG2_VERSION', '1.9.28');
 
 require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/woocommerce.php';
@@ -288,9 +288,10 @@ add_filter('woocommerce_add_to_cart_fragments', 'halo_tg2_cart_fragments');
  * @return array<string,string>
  */
 function halo_tg2_cart_fragments($fragments) {
+	$ht_count = (int) halo_tg2_cart_count();
 	ob_start();
 	?>
-	<span class="halo-tg2__cart-count" data-cart-count><?php echo esc_html((string) halo_tg2_cart_count()); ?></span>
+	<span class="halo-tg2__cart-count<?php echo 0 === $ht_count ? ' is-zero' : ''; ?>" data-cart-count><?php echo esc_html((string) $ht_count); ?></span>
 	<?php
 	$fragments['.halo-tg2__cart-count'] = ob_get_clean();
 	return $fragments;

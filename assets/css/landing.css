@@ -139,7 +139,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .halo-tg2__cta-in p{color:var(--ht-text-2);max-width:560px}
 .halo-tg2__cta-form{display:flex;gap:var(--ht-sp-xs);width:100%;max-width:480px}
 .halo-tg2__cta-form .halo-tg2__input{flex:1}
-.halo-tg2__cta-note{color:var(--ht-text-3)}
 .halo-tg2__band--light{--ht-fg:#0A0B0D;--ht-text-2:rgba(3,5,11,.66);--ht-text-3:rgba(3,5,11,.46);--ht-line:rgba(3,5,11,.1);--ht-line-strong:rgba(3,5,11,.22);--ht-surface:#FFFFFF;--ht-fill:rgba(3,5,11,.04);--ht-primary-soft:rgba(20,99,255,.08);--ht-primary-70:#0F53D8;background:#FFFFFF;color:var(--ht-fg)}
 .halo-tg2__band--dark{--ht-fg:#FFFFFF;--ht-text-2:rgba(255,255,255,.68);--ht-text-3:rgba(255,255,255,.48);--ht-line:rgba(255,255,255,.09);--ht-line-strong:rgba(255,255,255,.18);--ht-surface:#0A0B0D;--ht-fill:rgba(255,255,255,.04);--ht-primary-soft:rgba(20,99,255,.14);--ht-primary-70:#7AA7FF;background:#000000;color:var(--ht-fg)}
 .halo-tg2__band--primary{--ht-text-2:rgba(255,255,255,.85);--ht-text-3:rgba(255,255,255,.65);background:var(--ht-primary);color:#fff}

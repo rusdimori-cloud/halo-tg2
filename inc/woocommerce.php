@@ -25,6 +25,10 @@ function halo_tg2_shop_assets() {
 	if ($is_shop_page) {
 		wp_enqueue_style('halo-tg2-shop', get_template_directory_uri() . '/assets/css/shop.css', array('halo-tg2'), HALO_TG2_VERSION);
 	}
+	if (is_cart() || is_checkout()) {
+		// Ikon Font Awesome regular untuk kulit cart dan checkout.
+		wp_enqueue_style('halo-tg2-fa', 'https://cdn.jsdelivr.net/gh/aquawolf04/font-awesome-pro@5cd1511/css/all.css', array(), null);
+	}
 	if (is_cart() || is_checkout() || is_singular('courses')) {
 		wp_enqueue_script('halo-tg2-shop', get_template_directory_uri() . '/assets/js/shop.js', array('jquery'), HALO_TG2_VERSION, true);
 		wp_localize_script('halo-tg2-shop', 'HT_SHOP', array(
